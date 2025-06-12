@@ -1,0 +1,27 @@
+.customized-timeline .p-timeline-event-opposite {
+    display: none;
+}
+
+.customized-timeline .p-timeline-event-content {
+    padding-bottom: 0;
+}
+
+.customized-timeline .p-timeline-event-connector {
+    background-color: #e5e7eb;
+    width: 2px;
+}
+
+.customized-timeline .p-card {
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.customized-timeline .p-card:hover {
+    transform: translateX(4px);
+    border-left-width: 4px;
+}
+
+.customized-timeline .p-timeline-event {
+    min-height: 70px;
+} 
