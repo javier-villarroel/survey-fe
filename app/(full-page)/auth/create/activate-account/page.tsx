@@ -1,7 +1,7 @@
 'use client';
 
 import { LayoutContext } from '../../../../../layout/context/layoutcontext';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { classNames } from 'primereact/utils';
 import { Password } from 'primereact/password';
@@ -9,7 +9,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { noAuthApi } from '@/app/api/axios';
 
-const ActivateAccount = () => {
+const ActivateAccountContent = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -416,4 +416,16 @@ const ActivateAccount = () => {
     );
 };
 
-export default ActivateAccount; 
+const ActivateAccountPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="surface-ground min-h-screen min-w-screen overflow-hidden flex align-items-center justify-content-center">
+                <div className="animate-pulse bg-gray-200 h-12 w-full max-w-md rounded"></div>
+            </div>
+        }>
+            <ActivateAccountContent />
+        </Suspense>
+    );
+};
+
+export default ActivateAccountPage; 

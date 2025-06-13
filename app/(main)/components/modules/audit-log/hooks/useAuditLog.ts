@@ -176,6 +176,10 @@ const useAuditLog = () => {
         fetchData();
     }, [selectedUser]);
 
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     const handleFilterChange = (newFilters: Partial<AuditLogFilters>) => {
         setFilters(prev => ({ ...prev, ...newFilters }));
         setPage(1); // Reset to first page when filters change

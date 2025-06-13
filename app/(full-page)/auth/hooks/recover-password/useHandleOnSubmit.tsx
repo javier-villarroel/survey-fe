@@ -41,7 +41,7 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
       }
 
       setIsVerifying(true);
-      const response = await verifyOTPService({ code, passToken });
+      const response = await verifyOTPService({ code, passToken }) as any;
 
       if ('error' in response) {
         return false;
@@ -53,14 +53,14 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
     } finally {
       setIsVerifying(false);
     }
-  }, [passToken, isVerifying]);
+  }, [isVerifying]);
 
   const handleOTPComplete = useCallback(async (code: string): Promise<boolean> => {
     if (code.length === 4) {
       return await verifyOTP(code);
     }
     return false;
-  }, [verifyOTP, passToken]);
+  }, [verifyOTP]);
 
   return { onSubmit, verifyOTP, handleOTPComplete, userId, passToken };
 };
