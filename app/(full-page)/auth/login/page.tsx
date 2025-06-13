@@ -86,7 +86,7 @@ const LoginPage = () => {
                     closeButton: { style: { color: '#fff' } }
                 }}
             />
-            <div className="flex flex-column align-items-center justify-content-center" style={{ marginLeft: '5vw' }}>
+            <div className="flex flex-column align-items-center justify-content-center ml-5" style={{ marginLeft: '7vw' }}>
                 <div
                     style={{
                         position: 'relative',
@@ -95,7 +95,9 @@ const LoginPage = () => {
                         background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)',
                         border: 'none',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        width: '100%',
+                        maxWidth: '600px'
                     }}
                 >
                     {/* Borde superior degradado */}
