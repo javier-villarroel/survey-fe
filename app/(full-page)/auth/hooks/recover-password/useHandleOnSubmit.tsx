@@ -21,10 +21,13 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
         return false;
       }
 
-      // Guardamos el passToken y userId para usarlos en la verificación
-      setPassToken(response.result.otp.passToken);
-      setUserId(response.result.userId);
-      return true;
+      if (response.result?.otp?.passToken && response.result?.userId) {
+        setPassToken(response.result.otp.passToken);
+        setUserId(response.result.userId);
+        return true;
+      }
+      
+      return false;
     } catch (error) {
       return false;
     }
@@ -32,7 +35,7 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
 
   const verifyOTP = useCallback(async (code: string): Promise<boolean> => {
     try {
-      if (!passToken) {
+      if (!passToken || passToken.trim() === '') {
         return false;
       }
 
@@ -49,18 +52,19 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
 
       return response.result || false;
     } catch (error) {
+      console.error('Error verifying OTP:', error);
       return false;
     } finally {
       setIsVerifying(false);
     }
-  }, [isVerifying]);
+  }, [isVerifying, passToken]);
 
   const handleOTPComplete = useCallback(async (code: string): Promise<boolean> => {
-    if (code.length === 4) {
+    if (code.length === 4 && passToken && passToken.trim() !== '') {
       return await verifyOTP(code);
     }
     return false;
-  }, [verifyOTP]);
+  }, [verifyOTP, passToken]);
 
   return { onSubmit, verifyOTP, handleOTPComplete, userId, passToken };
 };
