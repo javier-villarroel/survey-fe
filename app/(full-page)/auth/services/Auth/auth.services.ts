@@ -72,11 +72,14 @@ export const recoverPasswordService = async (email: IFormRecoverPassword): Promi
 };
 
 export const verifyOTPService = async (verifyData: IVerifyOTPRequest): Promise<ServiceResponse<{ valid: boolean }>> => {
+	
 	try {
+		console.log('verificando');
 		const { data } = await noAuthApi.post<BaseResponse<{ valid: boolean }>>(
 			"/otp/confirmation",
 			{ "event": "OTP_RESET_PASSWORD",...verifyData}
 		);
+		
 		return data;
 	} catch (error) {
 		if (error instanceof AxiosError) {
