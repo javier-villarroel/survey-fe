@@ -1,6 +1,5 @@
 import { recoverPasswordService, verifyOTPService } from "../../services/Auth/auth.services";
 import { useState, useCallback } from "react";
-import { toast } from "sonner";
 
 interface UseOnSubmitReturn {
   onSubmit: (email: string) => Promise<boolean>;
@@ -19,7 +18,6 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
     try {
       const response = await recoverPasswordService({ email }) as any;
       if ('error' in response) {
-        toast.error(response.info?.message_to_show);
         return false;
       }
 
@@ -35,7 +33,6 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
   const verifyOTP = useCallback(async (code: string): Promise<boolean> => {
     try {
       if (!passToken) {
-        toast.error('No hay un token válido');
         return false;
       }
 
@@ -47,19 +44,11 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
       const response = await verifyOTPService({ code, passToken });
 
       if ('error' in response) {
-        toast.error(response.error);
         return false;
       }
 
-      if (response.result) {
-        toast.success('Código verificado correctamente');
-        return true;
-      } else {
-        toast.error('Código inválido');
-        return false;
-      }
+      return response.result || false;
     } catch (error) {
-      toast.error('Error al verificar el código');
       return false;
     } finally {
       setIsVerifying(false);

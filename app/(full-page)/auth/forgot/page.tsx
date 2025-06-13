@@ -22,11 +22,26 @@ const Forgot = () => {
     const containerClassName = classNames('surface-ground min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
     const handleEmailSubmit = async () => {
+        if (!email) {
+            toast.current?.show({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: 'Por favor, ingrese su correo electrónico', 
+                life: 3000 
+            });
+            return;
+        }
+
         const success = await onSubmit(email);
         if (success) {
             setShowModal(true);
-        }else {
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo enviar el correo. Por favor, Verifique el correo ingresado.', life: 3000 });
+        } else {
+            toast.current?.show({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: 'No se pudo enviar el correo. Por favor, verifique el correo ingresado.', 
+                life: 3000 
+            });
         }
     };
 
@@ -43,6 +58,13 @@ const Forgot = () => {
                         });
                         router.push(`/auth/reset-password?${params.toString()}`);
                     }, 1500);
+                } else {
+                    toast.current?.show({ 
+                        severity: 'error', 
+                        summary: 'Error', 
+                        detail: 'Código de verificación inválido', 
+                        life: 3000 
+                    });
                 }
             });
         }
@@ -171,7 +193,7 @@ const Forgot = () => {
                     />
                 </div>
             </Dialog>
-            <div className="flex flex-column align-items-center justify-content-center" style={{ marginLeft: '5vw' }}>
+            <div className="flex flex-column align-items-center justify-content-center" style={{ marginLeft: '2vw' }}>
                 <div
                     style={{
                         position: 'relative',
