@@ -4,14 +4,33 @@ import { Tag } from 'primereact/tag';
 import { Divider } from 'primereact/divider';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { getActionIcon, getModuleIcon } from '../utils/icons';
 
 interface AuditLogCardProps {
     item: any;
     onClick: (item: any) => void;
+    getModuleIcon: (module: string) => string;
 }
 
-export const AuditLogCard: React.FC<AuditLogCardProps> = ({ item, onClick }) => {
+export const AuditLogCard: React.FC<AuditLogCardProps> = ({
+    item,
+    onClick,
+    getModuleIcon
+}) => {
+    const getActionSeverity = (action: string) => {
+        switch (action.toLowerCase()) {
+            case 'crear':
+                return 'success';
+            case 'modificar':
+                return 'warning';
+            case 'eliminar':
+                return 'danger';
+            case 'ver':
+                return 'info';
+            default:
+                return 'info';
+        }
+    };
+
     return (
         <Card 
             className="mb-4 border-left-3 surface-border cursor-pointer hover:shadow-lg" 
@@ -33,12 +52,7 @@ export const AuditLogCard: React.FC<AuditLogCardProps> = ({ item, onClick }) => 
                     <Divider layout="vertical" />
                     <Tag 
                         value={item.action} 
-                        severity={
-                            item.action.toLowerCase() === 'crear' ? 'success' :
-                            item.action.toLowerCase() === 'modificar' ? 'warning' :
-                            item.action.toLowerCase() === 'eliminar' ? 'danger' :
-                            'info'
-                        }
+                        severity={getActionSeverity(item.action)}
                         className="action-tag"
                     />
                 </div>

@@ -1,275 +1,189 @@
-export const mockUsers = [
-    { id: 1, name: 'Juan Pérez', email: 'juan.perez@example.com' },
-    { id: 2, name: 'María García', email: 'maria.garcia@example.com' },
-    { id: 3, name: 'Carlos López', email: 'carlos.lopez@example.com' },
-    { id: 4, name: 'Ana Martínez', email: 'ana.martinez@example.com' },
-    { id: 5, name: 'Roberto Sánchez', email: 'roberto.sanchez@example.com' }
+import { User, AuditLogItem } from '../types';
+
+export const mockUsers: User[] = [
+    { id: '1', name: 'Juan Pérez', email: 'juan.perez@example.com' },
+    { id: '2', name: 'María García', email: 'maria.garcia@example.com' },
+    { id: '3', name: 'Carlos López', email: 'carlos.lopez@example.com' },
+    { id: '4', name: 'Ana Martínez', email: 'ana.martinez@example.com' },
+    { id: '5', name: 'Pedro Sánchez', email: 'pedro.sanchez@example.com' }
 ];
 
-export const mockAuditLogs = [
+export const mockAuditLogs: AuditLogItem[] = [
     {
-        id: 1,
+        id: '1',
         user: mockUsers[0],
-        created_at: '2024-03-15T10:30:00',
-        module: 'Usuarios',
+        created_at: '2024-03-15T10:30:00Z',
+        module: 'Encuestas',
         action: 'Crear',
-        description: 'Se creó un nuevo usuario en el sistema',
+        description: 'Se creó una nueva encuesta de satisfacción',
         metadata: {
             Antes: {},
             Despues: {
-                nombre: 'Juan Pérez',
-                email: 'juan.perez@example.com',
-                rol: 'editor'
+                titulo: 'Encuesta de Satisfacción 2024',
+                descripcion: 'Encuesta para medir la satisfacción de los usuarios',
+                estado: 'Activa'
             }
         }
     },
     {
-        id: 2,
+        id: '2',
         user: mockUsers[1],
-        created_at: '2024-03-15T11:45:00',
-        module: 'Usuarios',
+        created_at: '2024-03-15T11:15:00Z',
+        module: 'Preguntas',
         action: 'Modificar',
-        description: 'Se actualizó la información del usuario',
+        description: 'Se modificó la pregunta sobre la experiencia del usuario',
         metadata: {
             Antes: {
-                nombre: 'María',
-                rol: 'editor'
+                texto: '¿Cómo calificaría su experiencia?',
+                tipo: 'Escala'
             },
             Despues: {
-                nombre: 'María García',
-                rol: 'administrador'
+                texto: '¿Cómo calificaría su experiencia general?',
+                tipo: 'Escala',
+                opciones: ['1', '2', '3', '4', '5']
             }
         }
     },
     {
-        id: 3,
+        id: '3',
         user: mockUsers[2],
-        created_at: '2024-03-15T14:20:00',
-        module: 'Configuración',
-        action: 'Modificar',
-        description: 'Se actualizó la configuración del sistema',
-        metadata: {
-            Antes: {
-                tema: 'claro',
-                idioma: 'es'
-            },
-            Despues: {
-                tema: 'oscuro',
-                idioma: 'en'
-            }
-        }
-    },
-    {
-        id: 4,
-        user: mockUsers[3],
-        created_at: '2024-03-15T16:15:00',
-        module: 'Documentos',
+        created_at: '2024-03-15T12:00:00Z',
+        module: 'Respuestas',
         action: 'Eliminar',
-        description: 'Se eliminó un documento del sistema',
+        description: 'Se eliminó una respuesta duplicada',
         metadata: {
             Antes: {
-                nombre: 'documento.pdf',
-                tamaño: '2.5MB',
-                tipo: 'PDF'
+                respuesta: 'Muy satisfecho',
+                fecha: '2024-03-14T15:30:00Z'
             },
             Despues: {}
         }
     },
     {
-        id: 5,
-        user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
-        module: 'Permisos',
-        action: 'Modificar',
-        description: 'Se actualizaron los permisos de acceso',
+        id: '4',
+        user: mockUsers[3],
+        created_at: '2024-03-15T13:45:00Z',
+        module: 'Usuarios',
+        action: 'Ver',
+        description: 'Se consultó el perfil de un usuario',
         metadata: {
-            Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
-            },
+            Antes: {},
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                nombre: 'Roberto Díaz',
+                email: 'roberto.diaz@example.com',
+                rol: 'Administrador'
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },
     {
-        id: 5,
+        id: '5',
         user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
+        created_at: '2024-03-15T14:30:00Z',
         module: 'Permisos',
         action: 'Modificar',
         description: 'Se actualizaron los permisos de acceso',
         metadata: {
             Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
+                permisos: ['lectura', 'escritura']
             },
             Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
-            }
-        }
-    },
-    {
-        id: 5,
-        user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
-        module: 'Permisos',
-        action: 'Modificar',
-        description: 'Se actualizaron los permisos de acceso',
-        metadata: {
-            Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
-            },
-            Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
-            }
-        }
-    },
-    {
-        id: 5,
-        user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
-        module: 'Permisos',
-        action: 'Modificar',
-        description: 'Se actualizaron los permisos de acceso',
-        metadata: {
-            Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
-            },
-            Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
-            }
-        }
-    },
-    {
-        id: 5,
-        user: mockUsers[4],
-        created_at: '2024-03-15T17:30:00',
-        module: 'Permisos',
-        action: 'Modificar',
-        description: 'Se actualizaron los permisos de acceso',
-        metadata: {
-            Antes: {
-                nivel: 'básico',
-                accesos: ['lectura']
-            },
-            Despues: {
-                nivel: 'avanzado',
-                accesos: ['lectura', 'escritura', 'administración']
+                permisos: ['lectura', 'escritura', 'administración']
             }
         }
     },

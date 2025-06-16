@@ -4,20 +4,36 @@ import { Tag } from 'primereact/tag';
 import { Divider } from 'primereact/divider';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { getModuleIcon } from '../utils/icons';
 
 interface AuditLogDialogProps {
     visible: boolean;
     onHide: () => void;
     selectedItem: any;
+    getModuleIcon: (module: string) => string;
 }
 
 export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
     visible,
     onHide,
-    selectedItem
+    selectedItem,
+    getModuleIcon
 }) => {
     if (!selectedItem) return null;
+
+    const getActionSeverity = (action: string) => {
+        switch (action.toLowerCase()) {
+            case 'crear':
+                return 'success';
+            case 'modificar':
+                return 'warning';
+            case 'eliminar':
+                return 'danger';
+            case 'ver':
+                return 'info';
+            default:
+                return 'info';
+        }
+    };
 
     return (
         <Dialog 
@@ -42,12 +58,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                         <Divider layout="vertical" />
                         <Tag 
                             value={selectedItem.action} 
-                            severity={
-                                selectedItem.action.toLowerCase() === 'crear' ? 'success' :
-                                selectedItem.action.toLowerCase() === 'modificar' ? 'warning' :
-                                selectedItem.action.toLowerCase() === 'eliminar' ? 'danger' :
-                                'info'
-                            }
+                            severity={getActionSeverity(selectedItem.action)}
                             className="action-tag"
                         />
                     </div>
@@ -73,7 +84,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                         <h3 className="text-lg font-semibold mb-2">Después</h3>
                         <div className="flex flex-col gap-2">
                             {Object.entries(selectedItem.metadata.Despues).length > 0 ? (
-                                Object.entries(selectedItem.metadata.Despues).map(([key, value]: [string, any]) => (
+                                Object.entries(selectedItem.metadata.Despues).map(([key, value]) => (
                                     <div key={key} className="flex items-center gap-2">
                                         <span className="font-semibold min-w-[120px] capitalize">{key}:</span>
                                         <span className="text-gray-700">{String(value)}</span>

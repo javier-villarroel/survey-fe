@@ -1,3 +1,32 @@
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+}
+
+export interface AuditLogMetadata {
+    Antes: Record<string, any>;
+    Despues: Record<string, any>;
+}
+
+export interface AuditLogItem {
+    id: string;
+    user: User;
+    created_at: string;
+    module: string;
+    action: string;
+    description: string;
+    metadata: AuditLogMetadata;
+}
+
+export interface AuditLogState {
+    selectedUser: User | null;
+    visible: boolean;
+    selectedItem: AuditLogItem | null;
+    first: number;
+    rows: number;
+}
+
 export interface AuditLogEntry {
     id: string;
     action: string;

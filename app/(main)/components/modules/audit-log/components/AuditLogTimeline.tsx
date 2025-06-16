@@ -1,27 +1,39 @@
+'use client';
+
 import React from 'react';
 import { Timeline } from 'primereact/timeline';
 import { AuditLogCard } from './AuditLogCard';
-import { getActionIcon } from '../utils/icons';
+import { AuditLogItem } from '../types';
 
 interface AuditLogTimelineProps {
-    items: any[];
-    onItemClick: (item: any) => void;
+    items: AuditLogItem[];
+    onItemClick: (item: AuditLogItem) => void;
+    getActionIcon: (action: string) => string;
+    getModuleIcon: (module: string) => string;
 }
 
 export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
     items,
-    onItemClick
+    onItemClick,
+    getActionIcon,
+    getModuleIcon
 }) => {
-    const customizedMarker = (item: any) => {
+    const customizedMarker = (item: AuditLogItem) => {
         return (
-            <span className="flex w-8 h-8 items-center justify-center rounded-full border-2 border-gray-200 bg-white">
-                <i className={getActionIcon(item.action)} />
-            </span>
+            <div className="flex items-center justify-center" style={{ marginLeft: '16px' }}>
+                <i className={`${getActionIcon(item.action)} text-2xl`} />
+            </div>
         );
     };
 
-    const customizedContent = (item: any) => {
-        return <AuditLogCard item={item} onClick={onItemClick} />;
+    const customizedContent = (item: AuditLogItem) => {
+        return (
+            <AuditLogCard
+                item={item}
+                onClick={() => onItemClick(item)}
+                getModuleIcon={getModuleIcon}
+            />
+        );
     };
 
     return (
@@ -32,6 +44,17 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                 className="customized-timeline"
                 marker={customizedMarker}
                 content={customizedContent}
+                pt={{
+                    content: {
+                        className: 'p-0'
+                    },
+                    marker: {
+                        className: 'border-none bg-transparent'
+                    },
+                    connector: {
+                        className: 'bg-gray-200'
+                    }
+                }}
             />
         </div>
     );
