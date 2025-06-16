@@ -13,7 +13,28 @@ interface AuditLogHeaderProps {
     startDate: Date | null;
     endDate: Date | null;
     onDateChange: (start: Date | null, end: Date | null) => void;
+    selectedAction: string | null;
+    onActionChange: (action: string | null) => void;
+    selectedModule: string | null;
+    onModuleChange: (module: string | null) => void;
 }
+
+const actions = [
+    { label: 'Todas las acciones', value: null },
+    { label: 'Crear', value: 'crear' },
+    { label: 'Modificar', value: 'modificar' },
+    { label: 'Eliminar', value: 'eliminar' },
+    { label: 'Ver', value: 'ver' }
+];
+
+const modules = [
+    { label: 'Todos los módulos', value: null },
+    { label: 'Encuestas', value: 'encuestas' },
+    { label: 'Usuarios', value: 'usuarios' },
+    { label: 'Preguntas', value: 'preguntas' },
+    { label: 'Respuestas', value: 'respuestas' },
+    { label: 'Reportes', value: 'reportes' }
+];
 
 export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
     users,
@@ -21,7 +42,11 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
     onUserChange,
     startDate,
     endDate,
-    onDateChange
+    onDateChange,
+    selectedAction,
+    onActionChange,
+    selectedModule,
+    onModuleChange
 }) => {
     const handleStartDateChange = (date: Date | null) => {
         onDateChange(date, endDate);
@@ -34,9 +59,11 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
     const handleClearFilters = () => {
         onUserChange({ id: 'all', name: 'Todos los usuarios', email: '' });
         onDateChange(null, null);
+        onActionChange(null);
+        onModuleChange(null);
     };
 
-    const hasActiveFilters = selectedUser?.id !== 'all' || startDate || endDate;
+    const hasActiveFilters = selectedUser?.id !== 'all' || startDate || endDate || selectedAction || selectedModule;
 
     return (
         <div className="flex flex-column gap-4">
@@ -57,8 +84,8 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                 )}
             </div>
             <div className="flex justify-content-center">
-                <div className="flex flex-column sm:flex-row gap-4 align-items-stretch sm:align-items-end w-full sm:w-auto" style={{ maxWidth: '800px' }}>
-                    <div className="flex flex-column gap-2 w-full sm:w-6">
+                <div className="flex flex-column sm:flex-row gap-4 align-items-stretch sm:align-items-end w-full sm:w-auto" style={{ maxWidth: '1000px' }}>
+                    <div className="flex flex-column gap-2 w-full sm:w-4">
                         <label htmlFor="userFilter" className="font-medium">
                             Usuario
                         </label>
@@ -69,6 +96,32 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                             onChange={(e) => onUserChange(e.value)}
                             optionLabel="name"
                             placeholder="Seleccionar usuario"
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="flex flex-column gap-2 w-full sm:w-4">
+                        <label htmlFor="actionFilter" className="font-medium">
+                            Acción
+                        </label>
+                        <Dropdown
+                            id="actionFilter"
+                            value={selectedAction}
+                            options={actions}
+                            onChange={(e) => onActionChange(e.value)}
+                            placeholder="Seleccionar acción"
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="flex flex-column gap-2 w-full sm:w-4">
+                        <label htmlFor="moduleFilter" className="font-medium">
+                            Módulo
+                        </label>
+                        <Dropdown
+                            id="moduleFilter"
+                            value={selectedModule}
+                            options={modules}
+                            onChange={(e) => onModuleChange(e.value)}
+                            placeholder="Seleccionar módulo"
                             className="w-full"
                         />
                     </div>

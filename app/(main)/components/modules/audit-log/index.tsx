@@ -15,6 +15,8 @@ export const AuditLog: React.FC = () => {
         items,
         users,
         selectedUser,
+        selectedAction,
+        selectedModule,
         loading,
         error,
         total,
@@ -23,6 +25,8 @@ export const AuditLog: React.FC = () => {
         startDate,
         endDate,
         setSelectedUser,
+        setSelectedAction,
+        setSelectedModule,
         setPage,
         setPageSize,
         setDateRange
@@ -93,6 +97,10 @@ export const AuditLog: React.FC = () => {
                     startDate={startDate}
                     endDate={endDate}
                     onDateChange={setDateRange}
+                    selectedAction={selectedAction}
+                    onActionChange={setSelectedAction}
+                    selectedModule={selectedModule}
+                    onModuleChange={setSelectedModule}
                 />
                 <div className="flex flex-col gap-4">
                     {loading ? (

@@ -101,6 +101,8 @@ interface UseAuditLogReturn {
     items: AuditLogItem[];
     users: User[];
     selectedUser: User | null;
+    selectedAction: string | null;
+    selectedModule: string | null;
     loading: boolean;
     error: Error | null;
     total: number;
@@ -109,6 +111,8 @@ interface UseAuditLogReturn {
     startDate: Date | null;
     endDate: Date | null;
     setSelectedUser: (user: User | null) => void;
+    setSelectedAction: (action: string | null) => void;
+    setSelectedModule: (module: string | null) => void;
     setPage: (page: number) => void;
     setPageSize: (pageSize: number) => void;
     setDateRange: (start: Date | null, end: Date | null) => void;
@@ -118,6 +122,8 @@ export const useAuditLog = (): UseAuditLogReturn => {
     const [items, setItems] = useState<AuditLogItem[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>({ id: 'all', name: 'Todos los usuarios', email: '' });
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
+    const [selectedModule, setSelectedModule] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const [total, setTotal] = useState(0);
@@ -132,6 +138,8 @@ export const useAuditLog = (): UseAuditLogReturn => {
             const [logsResponse, usersResponse] = await Promise.all([
                 auditLogService.getAuditLogs({
                     userId: selectedUser?.id === 'all' ? undefined : selectedUser?.id,
+                    action: selectedAction || undefined,
+                    module: selectedModule || undefined,
                     page,
                     pageSize,
                     startDate: startDate?.toISOString(),
@@ -152,7 +160,7 @@ export const useAuditLog = (): UseAuditLogReturn => {
 
     useEffect(() => {
         fetchData();
-    }, [page, pageSize, selectedUser, startDate, endDate]);
+    }, [page, pageSize, selectedUser, selectedAction, selectedModule, startDate, endDate]);
 
     const setDateRange = (start: Date | null, end: Date | null) => {
         setStartDate(start);
@@ -164,6 +172,8 @@ export const useAuditLog = (): UseAuditLogReturn => {
         items,
         users,
         selectedUser,
+        selectedAction,
+        selectedModule,
         loading,
         error,
         total,
@@ -172,6 +182,8 @@ export const useAuditLog = (): UseAuditLogReturn => {
         startDate,
         endDate,
         setSelectedUser,
+        setSelectedAction,
+        setSelectedModule,
         setPage,
         setPageSize,
         setDateRange

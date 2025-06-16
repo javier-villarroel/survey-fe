@@ -18,7 +18,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
     getActionIcon,
     getModuleIcon
 }) => {
-    const customizedMarker = (item: AuditLogItem) => {
+    const customMarker = (item: AuditLogItem) => {
         return (
             <div className="flex items-center justify-center" style={{ marginLeft: '16px' }}>
                 <i className={`${getActionIcon(item.action)} text-2xl`} />
@@ -26,7 +26,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
         );
     };
 
-    const customizedContent = (item: AuditLogItem) => {
+    const customContent = (item: AuditLogItem) => {
         return (
             <AuditLogCard
                 item={item}
@@ -42,8 +42,8 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                 value={items} 
                 align="left"
                 className="customized-timeline"
-                marker={customizedMarker}
-                content={customizedContent}
+                marker={customMarker}
+                content={customContent}
                 pt={{
                     content: {
                         className: 'p-0'
