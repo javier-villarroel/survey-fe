@@ -26,6 +26,7 @@ const LoginPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [twoFacData, setTwoFacData] = useState<any>(null);
     const [token, setToken] = useState('');
+    const [showOTP, setShowOTP] = useState(false);
 
     const { signIn, isPending } = useOnSubmit(toast, (data) => {
         if (data?.result?.twoFactorAuth) {
@@ -173,7 +174,8 @@ const LoginPage = () => {
                                 pt={{
                                     root: {
                                         style: {
-                                            position: 'relative'
+                                            position: 'relative',
+                                            width: '100%'
                                         }
                                     },
                                     input: {
@@ -190,7 +192,8 @@ const LoginPage = () => {
                                             right: '1rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            zIndex: 1
                                         }
                                     },
                                     showIcon: {
@@ -200,7 +203,8 @@ const LoginPage = () => {
                                             right: '1rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            zIndex: 1
                                         }
                                     }
                                 }}
@@ -311,24 +315,62 @@ const LoginPage = () => {
                 >
                     <ReactCodeInput
                         name="otp"
-                        type="text"
+                        type={showOTP ? "text" : "password"}
                         fields={4}
                         value={token}
                         onChange={handleTokenChange}
                         inputMode="numeric"
                         disabled={isVerifying}
                         inputStyle={{
-                            width: '3rem',
-                            height: '3rem',
+                            width: '3.5rem',
+                            height: '3.5rem',
                             fontSize: '1.5rem',
                             borderRadius: '0.5rem',
                             border: '2px solid #93d704',
                             background: '#23244a',
                             color: '#fff',
-                            margin: '0 0.3rem',
+                            margin: '0 0.5rem',
                             textAlign: 'center'
                         }}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            width: '100%',
+                            maxWidth: '600px',
+                            margin: '0 auto'
+                        }}
                     />
+                    <div className="flex justify-content-center mt-3">
+                        <Button
+                            icon={showOTP ? "pi pi-eye-slash" : "pi pi-eye"}
+                            className="p-button-rounded p-button-text p-button-lg"
+                            style={{ 
+                                color: '#fff',
+                                width: '3rem',
+                                height: '3rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'transparent',
+                                border: 'none',
+                                padding: 0
+                            }}
+                            onClick={() => setShowOTP(!showOTP)}
+                            pt={{
+                                root: {
+                                    style: {
+                                        background: 'transparent',
+                                        border: 'none'
+                                    }
+                                },
+                                icon: {
+                                    style: {
+                                        fontSize: '1.5rem'
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
             </Dialog>
         </div>

@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PrimeReactProvider, locale, addLocale } from "primereact/api";
 import { LayoutProvider } from "../layout/context/layoutcontext";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "primereact/resources/primereact.css";
 import "primeflex/primeflex.css";
@@ -50,21 +50,28 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
 	const [queryClient] = useState(() => new QueryClient());
 
+	useEffect(() => {
+		// Create theme-css element if it doesn't exist
+		if (!document.getElementById('theme-css')) {
+			const themeLink = document.createElement('link');
+			themeLink.id = 'theme-css';
+			themeLink.rel = 'stylesheet';
+			themeLink.href = '/themes/lara-light-indigo/theme.css';
+			document.head.appendChild(themeLink);
+		}
+	}, []);
+
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<head>
-				<link
-					id="theme-css"
-					href={`/themes/lara-light-indigo/theme.css`}
-					rel="stylesheet"
-				></link>
+				<link id="theme-css" rel="stylesheet" href="/themes/lara-light-indigo/theme.css" />
 			</head>
 			<body>
 				<LoaderBar />
 				<Toaster position="top-right" />
 
 				<QueryClientProvider client={queryClient}>
-					<PrimeReactProvider>
+					<PrimeReactProvider value={{ ripple: true, unstyled: false }}>
 						<LayoutProvider>{children}</LayoutProvider>
 					</PrimeReactProvider>
 				</QueryClientProvider>

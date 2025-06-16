@@ -3,10 +3,12 @@ import React, { useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
+import { InputSwitch } from 'primereact/inputswitch';
 
 const ProfileDetail = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [switchValue, setSwitchValue] = useState(false);
     const [phone, setPhone] = useState('');
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -216,6 +218,19 @@ const ProfileDetail = () => {
                                         },
                                         panel: { className: 'z-50' }
                                     }}
+                                />
+                            </div>
+                            <div className="field col-12 md:col-4">
+                                <label htmlFor="country">2FA</label>
+                                <InputSwitch
+                                    checked={switchValue}
+                                    onChange={(e) => setSwitchValue(e.value ?? false)}
+                                    className="w-full"
+                                    pt={{
+                                        root: { className: 'w-full' },
+                                        slider: { className: 'w-full' }
+                                    }}
+                                    style={{ width: '3rem', height: '1.75rem' }}
                                 />
                             </div>
                         </div>
