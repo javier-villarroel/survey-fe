@@ -77,7 +77,8 @@ const LoginPage = () => {
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 minHeight: '100vh',
-                minWidth: '100vw'
+                minWidth: '100vw',
+                padding: '0 0 0 5vw'
             }}
         >
             <Toast
@@ -87,7 +88,13 @@ const LoginPage = () => {
                     closeButton: { style: { color: '#fff' } }
                 }}
             />
-            <div className="flex flex-column align-items-center justify-content-center ml-5" style={{ marginLeft: '7vw' }}>
+            <div className="flex flex-column align-items-center justify-content-center" style={{ 
+                width: '100%',
+                maxWidth: '700px',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center'
+            }}>
                 <div
                     style={{
                         position: 'relative',
@@ -97,8 +104,7 @@ const LoginPage = () => {
                         border: 'none',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                         overflow: 'hidden',
-                        width: '100%',
-                        maxWidth: '600px'
+                        width: '100%'
                     }}
                 >
                     {/* Borde superior degradado */}
@@ -121,7 +127,8 @@ const LoginPage = () => {
                             borderRadius: '53px',
                             position: 'relative',
                             zIndex: 3,
-                            background: '#2b2d4d'
+                            background: '#2b2d4d',
+                            padding: '3rem'
                         }}
                     >
                         <div
@@ -129,12 +136,12 @@ const LoginPage = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                marginBottom: '2rem'
+                                marginBottom: '3rem'
                             }}
                         >
-                            <img src={`/layout/images/logo-${layoutConfig.colorScheme === 'dark' ? 'light' : 'white'}.png`} alt="Genios logo" style={{ width: '18rem', height: 'auto' }} />
+                            <img src={`/layout/images/logo-${layoutConfig.colorScheme === 'dark' ? 'light' : 'white'}.png`} alt="Genios logo" style={{ width: '22rem', height: 'auto' }} />
                         </div>
-                        <div>
+                        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                             <label htmlFor="email1" className="block text-xl font-medium mb-2" style={{ color: '#fff' }}>
                                 Correo
                             </label>
@@ -142,12 +149,13 @@ const LoginPage = () => {
                                 id="email1"
                                 type="text"
                                 placeholder="Ingrese su correo electrónico"
-                                className="w-full md:w-30rem mb-5"
+                                className="w-full mb-5"
                                 style={{
-                                    padding: '1rem',
+                                    padding: '1.2rem',
                                     background: 'transparent',
                                     color: '#fff',
-                                    borderColor: '#fff'
+                                    borderColor: '#fff',
+                                    fontSize: '1.1rem'
                                 }}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -163,19 +171,23 @@ const LoginPage = () => {
                                 placeholder="Ingrese su contraseña"
                                 toggleMask
                                 className="w-full mb-5"
-                                inputClassName="w-full md:w-30rem"
+                                inputClassName="w-full"
                                 feedback={false}
+                                style={{ width: '100%' }}
                                 inputStyle={{
+                                    width: '100%',
+                                    padding: '1.2rem',
+                                    paddingRight: '3rem',
                                     background: 'transparent',
                                     color: '#fff',
                                     borderColor: '#fff',
-                                    padding: '1rem'
+                                    fontSize: '1.1rem'
                                 }}
                                 pt={{
                                     root: {
                                         style: {
-                                            position: 'relative',
-                                            width: '100%'
+                                            width: '100%',
+                                            position: 'relative'
                                         }
                                     },
                                     input: {
@@ -189,28 +201,40 @@ const LoginPage = () => {
                                         style: {
                                             color: '#fff',
                                             position: 'absolute',
-                                            right: '1rem',
+                                            right: '1.2rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                             cursor: 'pointer',
-                                            zIndex: 1
+                                            zIndex: 1,
+                                            fontSize: '1.2rem',
+                                            margin: 0,
+                                            padding: 0,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
                                         }
                                     },
                                     showIcon: {
                                         style: {
                                             color: '#fff',
                                             position: 'absolute',
-                                            right: '1rem',
+                                            right: '1.2rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                             cursor: 'pointer',
-                                            zIndex: 1
+                                            zIndex: 1,
+                                            fontSize: '1.2rem',
+                                            margin: 0,
+                                            padding: 0,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
                                         }
                                     }
                                 }}
                             />
 
-                            <div className="flex flex-column align-items-center mb-4" style={{ marginTop: '1rem' }}>
+                            <div className="flex flex-column align-items-center mb-4" style={{ marginTop: '2rem' }}>
                                 <div className="flex justify-content-center w-full">
                                     <HCaptcha
                                         ref={hcaptchaRef}
@@ -222,7 +246,7 @@ const LoginPage = () => {
                             </div>
 
                             <div className="flex align-items-center justify-content-between mb-5 gap-5">
-                                <a onClick={() => router.push('/auth/forgot')} className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: '#fff' }}>
+                                <a onClick={() => router.push('/auth/forgot')} className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: '#fff', fontSize: '1.1rem' }}>
                                     ¿Olvidaste la clave?
                                 </a>
                             </div>
@@ -231,6 +255,11 @@ const LoginPage = () => {
                                 className="w-full p-3 text-xl" 
                                 onClick={handleLogin} 
                                 disabled={isPending || !captchaToken}
+                                style={{ 
+                                    height: '3.5rem',
+                                    fontSize: '1.2rem',
+                                    fontWeight: '600'
+                                }}
                             />
                         </div>
                     </div>

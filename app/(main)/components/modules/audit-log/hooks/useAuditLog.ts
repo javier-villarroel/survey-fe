@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { getAuditLogs, getModules, getActions } from '../services/auditLogService';
+import { getModules, getActions } from '../services/auditLogService';
 import { AuditLogEntry, AuditLogFilters } from '../types';
 
 // Datos mockeados
@@ -128,15 +128,15 @@ const useAuditLog = () => {
 
     const fetchData = async () => {
         setLoading(true);
-        try {
-            const response = await getAuditLogs(page, pageSize, filters);
-            setData(response.items);
-            setTotal(response.total);
-        } catch (error) {
-            console.error('Error fetching audit logs:', error);
-        } finally {
-            setLoading(false);
-        }
+        // try {
+        //     const response = await getAuditLogs(page, pageSize, filters);
+        //     setData(response.items);
+        //     setTotal(response.total);
+        // } catch (error) {
+        //     console.error('Error fetching audit logs:', error);
+        // } finally {
+        //     setLoading(false);
+        // }
     };
 
     useEffect(() => {
