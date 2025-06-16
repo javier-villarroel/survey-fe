@@ -3,7 +3,6 @@
 import React from 'react';
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
-import { Divider } from 'primereact/divider';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AuditLogItem } from '../types';
@@ -35,42 +34,49 @@ export const AuditLogCard: React.FC<AuditLogCardProps> = ({
     };
 
     return (
-        <Card 
-            className="mb-4 border-left-3 surface-border cursor-pointer hover:shadow-lg" 
+        <Card
+            className="mb-4 border-left-3 surface-border cursor-pointer hover:shadow-lg"
             onClick={() => onClick(item)}
-            style={{ width: '105%' }}
+            style={{ width: '100%' }}
         >
-            <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                    <div className="flex-1 flex items-center gap-2 min-w-0">
-                        <div className="text-lg font-semibold truncate" style={{ maxWidth: '200px' }}>{item.user.name}</div>
-                        <span className="text-sm text-gray-500 whitespace-nowrap" style={{ marginRight: '2rem' }}>
-                            ({item.user.email})
-                        </span>
-                    </div>
-                    <div className="text-sm text-gray-500 whitespace-nowrap">
+            <div className="flex flex-col gap-2">
+                {/* Grid: Nombre | Correo | Fecha | Módulo | Descripción | Acción */}
+                <div
+                    className="grid w-full items-center text-center"
+                    style={{
+                        gridTemplateColumns: 'minmax(140px,1fr) minmax(220px,2fr) 160px 160px 2fr 120px',
+                        gap: '1rem',
+                        alignItems: 'center',
+                        justifyItems: 'center'
+                    }}
+                >
+                    {/* Nombre */}
+                    <span className="text-lg font-semibold truncate" title={item.user.name}>
+                        {item.user.name}
+                    </span>
+                    {/* Correo */}
+                    <span className="text-sm text-gray-500 truncate" title={item.user.email}>
+                        {item.user.email}
+                    </span>
+                    {/* Fecha */}
+                    <span className="text-sm text-gray-500 whitespace-nowrap">
                         {format(new Date(item.created_at), 'dd MMM yyyy, HH:mm', { locale: es })}
-                    </div>
-                </div>
-                <div className="flex items-center w-full">
-                    {/* Izquierda */}
-                    <div className="flex items-center gap-2 flex-1">
+                    </span>
+                    {/* Módulo */}
+                    <span className="flex items-center gap-2 justify-center">
                         <i className={`${getModuleIcon(item.module)} text-xl`} />
                         <span className="font-medium">{item.module}</span>
-                    </div>
-                    {/* Divider centrado */}
-                    <div className="flex items-center justify-center" style={{ minWidth: 0 }}>
-                        {/* <Divider layout="vertical" className="h-8" /> */}
-                    </div>
-                    {/* Derecha */}
-                    <div className="flex items-center gap-2 flex-1 justify-end">
-                        <Tag 
-                            value={item.action} 
+                    </span>
+                    {/* Descripción */}
+                    <span className="text-gray-700 truncate">{item.description}</span>
+                    {/* Acción */}
+                    <span className="flex justify-center">
+                        <Tag
+                            value={item.action}
                             severity={getActionSeverity(item.action)}
                             className="action-tag"
                         />
-                        <span className="text-gray-700 m-0">{item.description}</span>
-                    </div>
+                    </span>
                 </div>
             </div>
         </Card>
