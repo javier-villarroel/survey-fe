@@ -1,13 +1,16 @@
+'use client';
+
 import React from 'react';
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Divider } from 'primereact/divider';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { AuditLogItem } from '../types';
 
 interface AuditLogCardProps {
-    item: any;
-    onClick: (item: any) => void;
+    item: AuditLogItem;
+    onClick: (item: AuditLogItem) => void;
     getModuleIcon: (module: string) => string;
 }
 
