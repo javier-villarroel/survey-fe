@@ -35,7 +35,7 @@ export const useHandleOTP = (): UseHandleOTPReturn => {
             }
 
             if (response.result) {
-                toast.success('Inicio de sesión exitoso');
+                // toast.success('Inicio de sesión exitoso');
                 router.push('/'); // O la ruta que corresponda después del login
                 return true;
             }

@@ -12,6 +12,7 @@ import { Dialog } from 'primereact/dialog';
 import ReactCodeInput from 'react-code-input';
 import { useHandleOTP } from '../hooks/login/useHandleOTP';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { setCookie } from 'typescript-cookie';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -26,7 +27,6 @@ const LoginPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [twoFacData, setTwoFacData] = useState<any>(null);
     const [token, setToken] = useState('');
-    const [showOTP, setShowOTP] = useState(false);
 
     const { signIn, isPending } = useOnSubmit(toast, (data) => {
         if (data?.result?.twoFactorAuth) {
@@ -42,11 +42,23 @@ const LoginPage = () => {
     const handleTokenChange = async (value: string) => {
         setToken(value);
         if (value.length === 4 && twoFacData?.passToken) {
-            const success = await handleOTPComplete(value, twoFacData.passToken);
-            if (success) {
+            const otpResult = await handleOTPComplete(value, twoFacData.passToken);
+            // if (otpResult && otpResult.info?.status === 201) {
                 setShowModal(false);
                 setToken('');
-            }
+
+                // DATOS DE PRUEBA TEMPORALES PARA 2FA
+                const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphdmMyODA0QGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE3NTAxMDAxMjMsImV4cCI6MTc1MDEwNzMyM30.SiBTvSESRN4DQwA5MYz9SRojkdKIAWmnCNdIVTLvm64";
+                const passToken = "205f02b713f4d963aa481280155a75cd";
+
+                setCookie('accessToken', accessToken);
+                setCookie('refreshToken', passToken); // O usa refreshToken si lo tienes
+
+                // Si tienes un contexto de usuario, puedes setear un usuario de prueba aquí si lo necesitas
+                // setUser({ ... });
+
+                router.push('/');
+            // }
         }
     };
 
@@ -77,8 +89,7 @@ const LoginPage = () => {
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 minHeight: '100vh',
-                minWidth: '100vw',
-                padding: '0 0 0 5vw'
+                minWidth: '100vw'
             }}
         >
             <Toast
@@ -88,13 +99,7 @@ const LoginPage = () => {
                     closeButton: { style: { color: '#fff' } }
                 }}
             />
-            <div className="flex flex-column align-items-center justify-content-center" style={{ 
-                width: '100%',
-                maxWidth: '700px',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center'
-            }}>
+            <div className="flex flex-column align-items-center justify-content-center ml-5" style={{ marginLeft: '7vw' }}>
                 <div
                     style={{
                         position: 'relative',
@@ -104,7 +109,8 @@ const LoginPage = () => {
                         border: 'none',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                         overflow: 'hidden',
-                        width: '100%'
+                        width: '100%',
+                        maxWidth: '600px'
                     }}
                 >
                     {/* Borde superior degradado */}
@@ -127,8 +133,7 @@ const LoginPage = () => {
                             borderRadius: '53px',
                             position: 'relative',
                             zIndex: 3,
-                            background: '#2b2d4d',
-                            padding: '3rem'
+                            background: '#2b2d4d'
                         }}
                     >
                         <div
@@ -136,12 +141,12 @@ const LoginPage = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                marginBottom: '3rem'
+                                marginBottom: '2rem'
                             }}
                         >
-                            <img src={`/layout/images/logo-${layoutConfig.colorScheme === 'dark' ? 'light' : 'white'}.png`} alt="Genios logo" style={{ width: '22rem', height: 'auto' }} />
+                            <img src={`/layout/images/logo-${layoutConfig.colorScheme === 'dark' ? 'light' : 'white'}.png`} alt="Genios logo" style={{ width: '18rem', height: 'auto' }} />
                         </div>
-                        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                        <div>
                             <label htmlFor="email1" className="block text-xl font-medium mb-2" style={{ color: '#fff' }}>
                                 Correo
                             </label>
@@ -149,13 +154,12 @@ const LoginPage = () => {
                                 id="email1"
                                 type="text"
                                 placeholder="Ingrese su correo electrónico"
-                                className="w-full mb-5"
+                                className="w-full md:w-30rem mb-5"
                                 style={{
-                                    padding: '1.2rem',
+                                    padding: '1rem',
                                     background: 'transparent',
                                     color: '#fff',
-                                    borderColor: '#fff',
-                                    fontSize: '1.1rem'
+                                    borderColor: '#fff'
                                 }}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -171,22 +175,17 @@ const LoginPage = () => {
                                 placeholder="Ingrese su contraseña"
                                 toggleMask
                                 className="w-full mb-5"
-                                inputClassName="w-full"
+                                inputClassName="w-full md:w-30rem"
                                 feedback={false}
-                                style={{ width: '100%' }}
                                 inputStyle={{
-                                    width: '100%',
-                                    padding: '1.2rem',
-                                    paddingRight: '3rem',
                                     background: 'transparent',
                                     color: '#fff',
                                     borderColor: '#fff',
-                                    fontSize: '1.1rem'
+                                    padding: '1rem'
                                 }}
                                 pt={{
                                     root: {
                                         style: {
-                                            width: '100%',
                                             position: 'relative'
                                         }
                                     },
@@ -201,40 +200,26 @@ const LoginPage = () => {
                                         style: {
                                             color: '#fff',
                                             position: 'absolute',
-                                            right: '1.2rem',
+                                            right: '1rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
-                                            cursor: 'pointer',
-                                            zIndex: 1,
-                                            fontSize: '1.2rem',
-                                            margin: 0,
-                                            padding: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
+                                            cursor: 'pointer'
                                         }
                                     },
                                     showIcon: {
                                         style: {
                                             color: '#fff',
                                             position: 'absolute',
-                                            right: '1.2rem',
+                                            right: '1rem',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
-                                            cursor: 'pointer',
-                                            zIndex: 1,
-                                            fontSize: '1.2rem',
-                                            margin: 0,
-                                            padding: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
+                                            cursor: 'pointer'
                                         }
                                     }
                                 }}
                             />
 
-                            <div className="flex flex-column align-items-center mb-4" style={{ marginTop: '2rem' }}>
+                            <div className="flex flex-column align-items-center mb-4" style={{ marginTop: '1rem' }}>
                                 <div className="flex justify-content-center w-full">
                                     <HCaptcha
                                         ref={hcaptchaRef}
@@ -246,7 +231,7 @@ const LoginPage = () => {
                             </div>
 
                             <div className="flex align-items-center justify-content-between mb-5 gap-5">
-                                <a onClick={() => router.push('/auth/forgot')} className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: '#fff', fontSize: '1.1rem' }}>
+                                <a onClick={() => router.push('/auth/forgot')} className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: '#fff' }}>
                                     ¿Olvidaste la clave?
                                 </a>
                             </div>
@@ -255,11 +240,6 @@ const LoginPage = () => {
                                 className="w-full p-3 text-xl" 
                                 onClick={handleLogin} 
                                 disabled={isPending || !captchaToken}
-                                style={{ 
-                                    height: '3.5rem',
-                                    fontSize: '1.2rem',
-                                    fontWeight: '600'
-                                }}
                             />
                         </div>
                     </div>
@@ -344,62 +324,24 @@ const LoginPage = () => {
                 >
                     <ReactCodeInput
                         name="otp"
-                        type={showOTP ? "text" : "password"}
+                        type="text"
                         fields={4}
                         value={token}
                         onChange={handleTokenChange}
                         inputMode="numeric"
                         disabled={isVerifying}
                         inputStyle={{
-                            width: '3.5rem',
-                            height: '3.5rem',
+                            width: '3rem',
+                            height: '3rem',
                             fontSize: '1.5rem',
                             borderRadius: '0.5rem',
                             border: '2px solid #93d704',
                             background: '#23244a',
                             color: '#fff',
-                            margin: '0 0.5rem',
+                            margin: '0 0.3rem',
                             textAlign: 'center'
                         }}
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            width: '100%',
-                            maxWidth: '600px',
-                            margin: '0 auto'
-                        }}
                     />
-                    <div className="flex justify-content-center mt-3">
-                        <Button
-                            icon={showOTP ? "pi pi-eye-slash" : "pi pi-eye"}
-                            className="p-button-rounded p-button-text p-button-lg"
-                            style={{ 
-                                color: '#fff',
-                                width: '3rem',
-                                height: '3rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'transparent',
-                                border: 'none',
-                                padding: 0
-                            }}
-                            onClick={() => setShowOTP(!showOTP)}
-                            pt={{
-                                root: {
-                                    style: {
-                                        background: 'transparent',
-                                        border: 'none'
-                                    }
-                                },
-                                icon: {
-                                    style: {
-                                        fontSize: '1.5rem'
-                                    }
-                                }
-                            }}
-                        />
-                    </div>
                 </div>
             </Dialog>
         </div>
