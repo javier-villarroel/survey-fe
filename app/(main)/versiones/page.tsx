@@ -15,37 +15,44 @@ interface Version {
 
 const VersionsPage = () => {
     const versions: Version[] = [
+        // {
+        //     version: "1.2.0",
+        //     date: "2024-03-15",
+        //     title: "Mejoras en la UI y Nuevas Funcionalidades",
+        //     description: "Rediseño completo del perfil de usuario, mejoras en la responsividad y nuevas opciones de configuración.",
+        //     type: "feature"
+        // },
+        // {
+        //     version: "1.1.2",
+        //     date: "2024-03-01",
+        //     title: "Correcciones de Rendimiento",
+        //     description: "Optimización en la carga de imágenes y mejoras en la velocidad de respuesta del sistema.",
+        //     type: "improvement"
+        // },
+        // {
+        //     version: "1.1.1",
+        //     date: "2024-02-15",
+        //     title: "Corrección de Errores",
+        //     description: "Solución a problemas de validación en formularios y errores de navegación.",
+        //     type: "fix"
+        // },
+        // {
+        //     version: "1.1.0",
+        //     date: "2024-02-01",
+        //     title: "Módulo de Usuarios",
+        //     description: "Implementación del módulo de gestión de usuarios con funcionalidades CRUD.",
+        //     type: "feature"
+        // },
         {
-            version: "1.2.0",
-            date: "2024-03-15",
-            title: "Mejoras en la UI y Nuevas Funcionalidades",
-            description: "Rediseño completo del perfil de usuario, mejoras en la responsividad y nuevas opciones de configuración.",
+            version: "0.1.0",
+            date: "2025-06-20",
+            title: "Modulo de inicio de sesión",
+            description: "Implementación del módulo de inicio de sesión con autenticación básica y validación de usuarios.",
             type: "feature"
         },
         {
-            version: "1.1.2",
-            date: "2024-03-01",
-            title: "Correcciones de Rendimiento",
-            description: "Optimización en la carga de imágenes y mejoras en la velocidad de respuesta del sistema.",
-            type: "improvement"
-        },
-        {
-            version: "1.1.1",
-            date: "2024-02-15",
-            title: "Corrección de Errores",
-            description: "Solución a problemas de validación en formularios y errores de navegación.",
-            type: "fix"
-        },
-        {
-            version: "1.1.0",
-            date: "2024-02-01",
-            title: "Módulo de Usuarios",
-            description: "Implementación del módulo de gestión de usuarios con funcionalidades CRUD.",
-            type: "feature"
-        },
-        {
-            version: "1.0.0",
-            date: "2024-01-15",
+            version: "0.0.0",
+            date: "2025-06-16",
             title: "Lanzamiento Inicial",
             description: "Primera versión estable del sistema con funcionalidades básicas.",
             type: "feature"

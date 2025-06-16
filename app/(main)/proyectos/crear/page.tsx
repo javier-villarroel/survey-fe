@@ -11,14 +11,23 @@ import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockStimuli, Stimulus } from '@/app/(main)/components/modules/projects/services/types';
+import { mockStimuli, Stimulus, StimulusType } from '@/app/(main)/components/modules/projects/services/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Dialog } from 'primereact/dialog';
+import { ColorPicker } from 'primereact/colorpicker';
 
 const projectStatuses = [
     { label: 'Activo', value: 'active' },
     { label: 'Inactivo', value: 'inactive' },
     { label: 'Completado', value: 'completed' }
+];
+
+const stimulusTypes = [
+    { label: 'Color', value: 'color' },
+    { label: 'Sonido', value: 'sound' },
+    { label: 'Video', value: 'video' },
+    { label: 'Imagen', value: 'image' }
 ];
 
 const CreateProject = () => {
@@ -31,7 +40,15 @@ const CreateProject = () => {
     });
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [stimuli] = useState<Stimulus[]>(mockStimuli);
+    const [stimuli, setStimuli] = useState<Stimulus[]>(mockStimuli);
+    
+    // Estados para el modal de estímulos
+    const [showStimulusModal, setShowStimulusModal] = useState(false);
+    const [selectedStimulusType, setSelectedStimulusType] = useState<StimulusType | null>(null);
+    const [stimulusName, setStimulusName] = useState('');
+    const [stimulusValue, setStimulusValue] = useState('');
+    const [stimulusPreview, setStimulusPreview] = useState<string | null>(null);
+    const [stimulusFile, setStimulusFile] = useState<File | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -65,6 +82,139 @@ const CreateProject = () => {
                 }));
             };
             reader.readAsDataURL(file);
+        }
+    };
+
+    const handleStimulusTypeChange = (e: { value: StimulusType }) => {
+        setSelectedStimulusType(e.value);
+        setStimulusValue('');
+        setStimulusPreview(null);
+        setStimulusFile(null);
+    };
+
+    const handleStimulusFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setStimulusFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setStimulusPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleAddStimulus = () => {
+        if (!selectedStimulusType || !stimulusName) return;
+
+        const newStimulus: Stimulus = {
+            id: Date.now().toString(),
+            type: selectedStimulusType,
+            name: stimulusName,
+            value: selectedStimulusType === 'color' ? stimulusValue : stimulusPreview || '',
+            size: stimulusFile?.size,
+            createdAt: new Date().toISOString()
+        };
+
+        setStimuli(prev => [...prev, newStimulus]);
+        setShowStimulusModal(false);
+        resetStimulusForm();
+    };
+
+    const resetStimulusForm = () => {
+        setSelectedStimulusType(null);
+        setStimulusName('');
+        setStimulusValue('');
+        setStimulusPreview(null);
+        setStimulusFile(null);
+    };
+
+    const renderStimulusInput = () => {
+        if (!selectedStimulusType) return null;
+
+        switch (selectedStimulusType) {
+            case 'color':
+                return (
+                    <div className="field">
+                        <label htmlFor="colorPicker">Color</label>
+                        <div className="flex align-items-center gap-2">
+                            <ColorPicker
+                                id="colorPicker"
+                                value={stimulusValue.replace('#', '')}
+                                onChange={(e) => setStimulusValue('#' + e.value)}
+                                className="w-2rem"
+                            />
+                            <InputText
+                                value={stimulusValue}
+                                onChange={(e) => setStimulusValue(e.target.value)}
+                                placeholder="#FFFFFF"
+                                className="w-full"
+                            />
+                            {stimulusValue && (
+                                <div
+                                    className="w-3rem h-3rem border-1 border-round"
+                                    style={{ backgroundColor: stimulusValue }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                );
+            case 'sound':
+                return (
+                    <div className="field">
+                        <label htmlFor="soundFile">Archivo de audio</label>
+                        <input
+                            type="file"
+                            id="soundFile"
+                            accept="audio/*"
+                            onChange={handleStimulusFileChange}
+                            className="w-full"
+                        />
+                        {stimulusPreview && (
+                            <audio controls className="mt-2 w-full">
+                                <source src={stimulusPreview} />
+                            </audio>
+                        )}
+                    </div>
+                );
+            case 'video':
+                return (
+                    <div className="field">
+                        <label htmlFor="videoFile">Archivo de video</label>
+                        <input
+                            type="file"
+                            id="videoFile"
+                            accept="video/*"
+                            onChange={handleStimulusFileChange}
+                            className="w-full"
+                        />
+                        {stimulusPreview && (
+                            <video controls className="mt-2 w-full">
+                                <source src={stimulusPreview} />
+                            </video>
+                        )}
+                    </div>
+                );
+            case 'image':
+                return (
+                    <div className="field">
+                        <label htmlFor="imageFile">Archivo de imagen</label>
+                        <input
+                            type="file"
+                            id="imageFile"
+                            accept="image/*"
+                            onChange={handleStimulusFileChange}
+                            className="w-full"
+                        />
+                        {stimulusPreview && (
+                            <img
+                                src={stimulusPreview}
+                                alt="Preview"
+                                className="mt-2 w-full max-w-20rem"
+                            />
+                        )}
+                    </div>
+                );
         }
     };
 
@@ -114,9 +264,9 @@ const CreateProject = () => {
                     return 'info';
                 case 'video':
                     return 'warning';
-                case 'audio':
+                case 'sound':
                     return 'success';
-                case 'text':
+                case 'color':
                     return 'secondary';
                 default:
                     return null;
@@ -136,6 +286,21 @@ const CreateProject = () => {
 
     const dateBodyTemplate = (rowData: Stimulus) => {
         return formatDate(rowData.createdAt);
+    };
+
+    const valueBodyTemplate = (rowData: Stimulus) => {
+        if (rowData.type === 'color') {
+            return (
+                <div className="flex align-items-center">
+                    <div
+                        className="w-2rem h-2rem border-1 border-round mr-2"
+                        style={{ backgroundColor: rowData.value }}
+                    />
+                    {rowData.value}
+                </div>
+            );
+        }
+        return rowData.value;
     };
 
     return (
@@ -266,6 +431,7 @@ const CreateProject = () => {
                                     <Button
                                         icon="pi pi-plus"
                                         label="Agregar Estímulo"
+                                        onClick={() => setShowStimulusModal(true)}
                                         style={{
                                             backgroundColor: '#2dabd2',
                                             borderColor: '#2dabd2'
@@ -273,21 +439,23 @@ const CreateProject = () => {
                                     />
                                 </div>
                             </div>
+
                             <DataTable
                                 value={stimuli}
                                 paginator
                                 rows={5}
                                 rowsPerPageOptions={[5, 10, 25]}
                                 className="p-datatable-gridlines"
-                                emptyMessage="No se encontraron estímulos"
+                                showGridlines
+                                stripedRows
+                                emptyMessage="No hay estímulos agregados"
                             >
-                                <Column field="name" header="Nombre" sortable style={{ minWidth: '14rem' }} />
-                                <Column field="description" header="Descripción" sortable style={{ minWidth: '14rem' }} />
-                                <Column field="type" header="Tipo" body={typeBodyTemplate} sortable style={{ minWidth: '10rem' }} />
-                                <Column field="format" header="Formato" sortable style={{ minWidth: '8rem' }} />
-                                <Column field="size" header="Tamaño" body={sizeBodyTemplate} sortable style={{ minWidth: '8rem' }} />
-                                <Column field="duration" header="Duración" body={durationBodyTemplate} sortable style={{ minWidth: '8rem' }} />
-                                <Column field="createdAt" header="Fecha" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }} />
+                                <Column field="name" header="Nombre" />
+                                <Column field="type" header="Tipo" body={typeBodyTemplate} />
+                                <Column field="value" header="Valor" body={valueBodyTemplate} />
+                                <Column field="size" header="Tamaño" body={sizeBodyTemplate} />
+                                <Column field="duration" header="Duración" body={durationBodyTemplate} />
+                                <Column field="createdAt" header="Fecha de creación" body={dateBodyTemplate} />
                             </DataTable>
                         </div>
                     </div>
@@ -313,6 +481,62 @@ const CreateProject = () => {
                     </div>
                 </div>
             </Card>
+
+            <Dialog
+                header="Agregar Estímulo"
+                visible={showStimulusModal}
+                onHide={() => {
+                    setShowStimulusModal(false);
+                    resetStimulusForm();
+                }}
+                style={{ width: '50vw' }}
+                modal
+                footer={
+                    <div>
+                        <Button
+                            label="Cancelar"
+                            icon="pi pi-times"
+                            onClick={() => {
+                                setShowStimulusModal(false);
+                                resetStimulusForm();
+                            }}
+                            className="p-button-text"
+                        />
+                        <Button
+                            label="Agregar"
+                            icon="pi pi-check"
+                            onClick={handleAddStimulus}
+                            disabled={!selectedStimulusType || !stimulusName || (!stimulusValue && !stimulusPreview)}
+                        />
+                    </div>
+                }
+            >
+                <div className="grid formgrid p-fluid">
+                    <div className="field col-12">
+                        <label htmlFor="stimulusName">Nombre del estímulo</label>
+                        <InputText
+                            id="stimulusName"
+                            value={stimulusName}
+                            onChange={(e) => setStimulusName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="field col-12">
+                        <label htmlFor="stimulusType">Tipo de estímulo</label>
+                        <Dropdown
+                            id="stimulusType"
+                            value={selectedStimulusType}
+                            options={stimulusTypes}
+                            onChange={handleStimulusTypeChange}
+                            placeholder="Seleccione un tipo"
+                            required
+                        />
+                    </div>
+                    <div className="field col-12">
+                        {renderStimulusInput()}
+                    </div>
+                </div>
+            </Dialog>
         </div>
     );
 };

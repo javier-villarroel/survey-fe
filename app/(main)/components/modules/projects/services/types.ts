@@ -3,8 +3,7 @@ export interface Project {
     name: string;
     description: string;
     status: 'active' | 'inactive' | 'completed';
-    startDate: string;
-    endDate?: string;
+    logo?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -20,43 +19,36 @@ export interface ProjectsListResponse {
     };
 }
 
+export type StimulusType = 'color' | 'sound' | 'video' | 'image';
+
 export interface Stimulus {
     id: string;
+    type: StimulusType;
     name: string;
-    description: string;
-    type: 'image' | 'video' | 'audio' | 'text';
-    url: string;
-    duration?: number; // en segundos
-    size?: number; // en bytes
-    format?: string;
+    value: string; // URL para archivos, código hexadecimal para colores
+    size?: number;
+    duration?: number;
     createdAt: string;
-    updatedAt: string;
 }
 
 // Mock data for stimuli
 export const mockStimuli: Stimulus[] = [
     {
         id: '1',
-        name: 'Imagen de producto A',
-        description: 'Fotografía del producto en alta resolución',
         type: 'image',
-        url: 'https://example.com/images/product-a.jpg',
-        format: 'jpg',
-        size: 2048576, // 2MB
-        createdAt: '2024-03-15T10:00:00Z',
-        updatedAt: '2024-03-15T10:00:00Z'
+        name: 'Imagen de prueba',
+        value: 'https://example.com/image.jpg',
+        size: 1024 * 1024, // 1MB
+        createdAt: new Date().toISOString()
     },
     {
         id: '2',
-        name: 'Video promocional',
-        description: 'Video explicativo del servicio',
         type: 'video',
-        url: 'https://example.com/videos/promo.mp4',
-        duration: 120,
-        format: 'mp4',
-        size: 15728640, // 15MB
-        createdAt: '2024-03-14T15:30:00Z',
-        updatedAt: '2024-03-14T15:30:00Z'
+        name: 'Video de prueba',
+        value: 'https://example.com/video.mp4',
+        size: 5 * 1024 * 1024, // 5MB
+        duration: 120, // 2 minutos
+        createdAt: new Date().toISOString()
     },
     {
         id: '3',
