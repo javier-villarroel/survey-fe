@@ -30,16 +30,18 @@ export const useUsersTable = () => {
             limit: queryParams.limit,
             search: queryParams.search
         }),
-        staleTime: 5 * 60 * 1000, // 5 minutos
+        staleTime: 0, // Siempre considerar los datos como obsoletos
+        refetchOnMount: true, // Refetch al montar el componente
+        refetchOnWindowFocus: true // Refetch cuando la ventana recupera el foco
     });
 
-        const onTableChange = (event: DataTableStateEvent) => {
-            setQueryParams(prev => ({
-                ...prev,
-                page: (event.page ?? 0) + 1,
-                limit: event.rows ?? prev.limit
-            }));
-        };
+    const onTableChange = (event: DataTableStateEvent) => {
+        setQueryParams(prev => ({
+            ...prev,
+            page: (event.page ?? 0) + 1,
+            limit: event.rows ?? prev.limit
+        }));
+    };
 
     const handleFilter = (params: TablePaginationParams) => {
         setQueryParams(prev => ({

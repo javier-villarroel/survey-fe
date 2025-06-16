@@ -221,17 +221,18 @@ const ProfileDetail = () => {
                                 />
                             </div>
                             <div className="field col-12 md:col-4">
-                                <label htmlFor="country">2FA</label>
-                                <InputSwitch
-                                    checked={switchValue}
-                                    onChange={(e) => setSwitchValue(e.value ?? false)}
-                                    className="w-full"
-                                    pt={{
-                                        root: { className: 'w-full' },
-                                        slider: { className: 'w-full' }
-                                    }}
-                                    style={{ width: '3rem', height: '1.75rem' }}
-                                />
+                                <label htmlFor="twoFactorAuth">2FA</label>
+                                <div className="flex align-items-center">
+                                    <InputSwitch
+                                        id="twoFactorAuth"
+                                        checked={switchValue}
+                                        onChange={(e) => setSwitchValue(e.value ?? false)}
+                                        className="mt-2"
+                                    />
+                                    <span className="ml-2 mt-2 text-sm text-gray-500">
+                                        {switchValue ? 'Activado' : 'Desactivado'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div className="flex justify-content-end mt-4">

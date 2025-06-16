@@ -37,7 +37,9 @@ export const menuModel: any[] = [
 				items: [
 					{
 						label: "Bitacora",
-						icon: "pi pi-fw pi-calendar",					},
+						icon: "pi pi-fw pi-calendar",		
+						to: "/bitacora" 		
+					},
 				],
 			},
 		],
