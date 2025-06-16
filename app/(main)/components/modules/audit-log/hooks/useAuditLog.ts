@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getModules, getActions } from '../services/auditLogService';
-import { AuditLogEntry, AuditLogFilters } from '../types';
+import { AuditLogEntry, AuditLogFilters, AuditLogItem, User } from '../types';
+import { auditLogService } from '../services/auditLogService';
 
 // Datos mockeados
 const mockUsers = [
@@ -96,7 +97,88 @@ const mockData: AuditLogEntry[] = [
     }
 ];
 
-const useAuditLog = () => {
+interface UseAuditLogReturn {
+    items: AuditLogItem[];
+    users: User[];
+    selectedUser: User | null;
+    loading: boolean;
+    error: Error | null;
+    total: number;
+    page: number;
+    pageSize: number;
+    startDate: Date | null;
+    endDate: Date | null;
+    setSelectedUser: (user: User | null) => void;
+    setPage: (page: number) => void;
+    setPageSize: (pageSize: number) => void;
+    setDateRange: (start: Date | null, end: Date | null) => void;
+}
+
+export const useAuditLog = (): UseAuditLogReturn => {
+    const [items, setItems] = useState<AuditLogItem[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [selectedUser, setSelectedUser] = useState<User | null>({ id: 'all', name: 'Todos los usuarios', email: '' });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [logsResponse, usersResponse] = await Promise.all([
+                auditLogService.getAuditLogs({
+                    userId: selectedUser?.id === 'all' ? undefined : selectedUser?.id,
+                    page,
+                    pageSize,
+                    startDate: startDate?.toISOString(),
+                    endDate: endDate?.toISOString()
+                }),
+                auditLogService.getUsers()
+            ]);
+
+            setItems(logsResponse.data);
+            setTotal(logsResponse.total);
+            setUsers([{ id: 'all', name: 'Todos los usuarios', email: '' }, ...usersResponse]);
+        } catch (err) {
+            setError(err instanceof Error ? err : new Error('Error al cargar los datos'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [page, pageSize, selectedUser, startDate, endDate]);
+
+    const setDateRange = (start: Date | null, end: Date | null) => {
+        setStartDate(start);
+        setEndDate(end);
+        setPage(1); // Resetear a la primera página al cambiar las fechas
+    };
+
+    return {
+        items,
+        users,
+        selectedUser,
+        loading,
+        error,
+        total,
+        page,
+        pageSize,
+        startDate,
+        endDate,
+        setSelectedUser,
+        setPage,
+        setPageSize,
+        setDateRange
+    };
+};
+
+const useAuditLogOld = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<AuditLogEntry[]>([]);
     const [total, setTotal] = useState(0);
@@ -216,4 +298,4 @@ const useAuditLog = () => {
     };
 };
 
-export { useAuditLog }; 
+export { useAuditLogOld }; 

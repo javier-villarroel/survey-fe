@@ -12,7 +12,7 @@ export const mockAuditLogs: AuditLogItem[] = [
     {
         id: '1',
         user: mockUsers[0],
-        created_at: '2024-03-15T10:30:00Z',
+        created_at: '2025-03-15T10:30:00Z',
         module: 'Encuestas',
         action: 'Crear',
         description: 'Se creó una nueva encuesta de satisfacción',
