@@ -4,7 +4,8 @@ export const mockUsers: User[] = [
     { id: '1', name: 'Juan Pérez', email: 'juan.perez@example.com' },
     { id: '2', name: 'María García', email: 'maria.garcia@example.com' },
     { id: '3', name: 'Carlos López', email: 'carlos.lopez@example.com' },
-    { id: '4', name: 'Ana Martínez', email: 'ana.martinez@example.com' },
+    // { id: '4', name: 'Ana Martínez', email: 'ana.martinez@example.com' },
+    { id: '4', name: 'Juan Pérez', email: 'juan.perez@example.com' },
     { id: '5', name: 'Pedro Sánchez', email: 'pedro.sanchez@example.com' }
 ];
 

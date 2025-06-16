@@ -38,15 +38,16 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
 
     return (
         <div className="w-full">
-            <Timeline 
-                value={items} 
+            <Timeline
+                value={items}
                 align="left"
                 className="customized-timeline"
                 marker={customMarker}
                 content={customContent}
                 pt={{
                     content: {
-                        className: 'p-0'
+                        className: 'p-0',
+                        style: { width: '100%' }
                     },
                     marker: {
                         className: 'border-none bg-transparent'

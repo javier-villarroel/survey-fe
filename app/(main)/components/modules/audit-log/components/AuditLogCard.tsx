@@ -38,29 +38,41 @@ export const AuditLogCard: React.FC<AuditLogCardProps> = ({
         <Card 
             className="mb-4 border-left-3 surface-border cursor-pointer hover:shadow-lg" 
             onClick={() => onClick(item)}
+            style={{ width: '105%' }}
         >
             <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                        <div className="text-lg font-semibold">{item.user.name}</div>
-                        <div className="text-sm text-gray-500">{item.user.email}</div>
+                    <div className="flex-1 flex items-center gap-2 min-w-0">
+                        <div className="text-lg font-semibold truncate" style={{ maxWidth: '200px' }}>{item.user.name}</div>
+                        <span className="text-sm text-gray-500 whitespace-nowrap" style={{ marginRight: '2rem' }}>
+                            ({item.user.email})
+                        </span>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-500 whitespace-nowrap">
                         {format(new Date(item.created_at), 'dd MMM yyyy, HH:mm', { locale: es })}
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <i className={`${getModuleIcon(item.module)} text-xl`} />
-                    <span className="font-medium">{item.module}</span>
-                    <Divider layout="vertical" />
-                    <Tag 
-                        value={item.action} 
-                        severity={getActionSeverity(item.action)}
-                        className="action-tag"
-                    />
+                <div className="flex items-center w-full">
+                    {/* Izquierda */}
+                    <div className="flex items-center gap-2 flex-1">
+                        <i className={`${getModuleIcon(item.module)} text-xl`} />
+                        <span className="font-medium">{item.module}</span>
+                    </div>
+                    {/* Divider centrado */}
+                    <div className="flex items-center justify-center" style={{ minWidth: 0 }}>
+                        {/* <Divider layout="vertical" className="h-8" /> */}
+                    </div>
+                    {/* Derecha */}
+                    <div className="flex items-center gap-2 flex-1 justify-end">
+                        <Tag 
+                            value={item.action} 
+                            severity={getActionSeverity(item.action)}
+                            className="action-tag"
+                        />
+                        <span className="text-gray-700 m-0">{item.description}</span>
+                    </div>
                 </div>
-                <p className="text-gray-700 m-0">{item.description}</p>
             </div>
         </Card>
     );
-}; 
+};
