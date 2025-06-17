@@ -26,6 +26,7 @@ const LoginPage = () => {
     // Estados para 2FA
     const [showModal, setShowModal] = useState(false);
     const [twoFacData, setTwoFacData] = useState<any>(null);
+    const [code, setCode] = useState('');
     const [accessToken, setAccessToken] = useState('');
     const [passToken, setPassToken] = useState('');
 
@@ -318,7 +319,7 @@ const LoginPage = () => {
                         name="otp"
                         type="text"
                         fields={4}
-                        value={accessToken}
+                        value={code}
                         onChange={handleTokenChange}
                         inputMode="numeric"
                         disabled={isVerifying}
