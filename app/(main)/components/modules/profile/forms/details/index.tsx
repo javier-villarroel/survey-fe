@@ -4,15 +4,35 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
 import { InputSwitch } from 'primereact/inputswitch';
+import { useProfile } from '../../hooks/useProfile';
+import { useUpdateProfile } from '../../hooks/useUpdateProfile';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const ProfileDetail = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
+    const { user, isLoading: isLoadingProfile, error: profileError, refreshProfile } = useProfile();
+    const { updateProfile, isLoading: isUpdating } = useUpdateProfile();
+    const [username, setUsername] = useState(user?.userName || '');
+    const [name, setName] = useState(user?.name || '');
+    const [lastName, setLastName] = useState(user?.lastName || '');
+    const [email, setEmail] = useState(user?.email || '');
+    const [phone, setPhone] = useState(user?.phone || '');
     const [switchValue, setSwitchValue] = useState(false);
-    const [phone, setPhone] = useState('');
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+
+    React.useEffect(() => {
+        if (user) {
+            setUsername(user.userName || '');
+            setName(user.name || '');
+            setLastName(user.lastName || '');
+            setEmail(user.email || '');
+            setPhone(user.phone || '');
+            setSwitchValue(user.twoFactorAuth || false);
+        }
+    }, [user]);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
@@ -29,6 +49,48 @@ const ProfileDetail = () => {
         }
     };
 
+    const handleSubmit = async () => {
+        if (password && password !== confirmPassword) {
+            setPasswordError('Las contraseñas no coinciden');
+            return;
+        }
+        setPasswordError(null);
+
+        const result = await updateProfile({
+            userName: username,
+            name,
+            lastName,
+            email,
+            phone,
+            password: password || undefined
+        });
+
+        if (result) {
+            setPassword('');
+            setConfirmPassword('');
+            refreshProfile();
+        }
+    };
+
+    if (isLoadingProfile) {
+        return (
+            <div className="flex justify-content-center align-items-center" style={{ height: '70vh' }}>
+                <ProgressSpinner />
+            </div>
+        );
+    }
+
+    if (profileError) {
+        return (
+            <div className="flex justify-content-center align-items-center" style={{ height: '70vh' }}>
+                <div className="text-center">
+                    <i className="pi pi-exclamation-circle text-red-500" style={{ fontSize: '2rem' }}></i>
+                    <p className="text-red-500 mt-3">{profileError}</p>
+                </div>
+            </div>
+        );
+    }
+
     const passwordHeader = <h6>Ingrese una contraseña</h6>;
     const passwordFooter = (
         <div className="p-2">
@@ -44,7 +106,7 @@ const ProfileDetail = () => {
 
     return (
         <>
-        <h5>Perfil de usuario</h5>
+            <h5>Perfil de usuario</h5>
             <div className="grid">
                 <div className="col-12 lg:col-4">
                     <div className="card">
@@ -75,7 +137,7 @@ const ProfileDetail = () => {
                                             <i className="pi pi-camera text-white text-2xl"></i>
                                         </div>
                                     </div>
-                                ) : (
+                                ) :
                                     <div className="relative hover:shadow-lg transition-shadow">
                                         <i className="pi pi-user mt-3 p-5" style={{ 
                                             fontSize: '5em', 
@@ -92,7 +154,7 @@ const ProfileDetail = () => {
                                             <i className="pi pi-camera text-white text-2xl"></i>
                                         </div>
                                     </div>
-                                )}
+                                }
                             </div>
                             <input
                                 type="file"
@@ -101,142 +163,120 @@ const ProfileDetail = () => {
                                 accept="image/*"
                                 className="hidden"
                             />
-                            <small className="text-gray-500"> El tamaño recomendado es de 300x300 y peso de 2MB</small>
+                            <small className="text-gray-500">El tamaño recomendado es de 300x300 y peso de 2MB</small>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 lg:col-8">
                     <div className="card">
-                        <h5>Informacion personal</h5>
+                        <h5>Información personal</h5>
                         <div className="grid formgrid p-fluid">
-                            <div className="field col-12 md:col-4">
-                                <label htmlFor="nombre">Nombre</label>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="username">Usuario</label>
+                                <InputText                                     
+                                    placeholder="Nombre de usuario"
+                                    id="username" 
+                                    value={username} 
+                                    onChange={(e) => setUsername(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="email">Correo electrónico</label>
+                                <InputText                                     
+                                    placeholder="Correo electrónico"
+                                    id="email" 
+                                    value={email} 
+                                    onChange={(e) => setEmail(e.target.value)} 
+                                    required 
+                                />
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="name">Nombre</label>
                                 <InputText                                     
                                     placeholder="Ingrese su nombre"
-                                    id="nombre" value={username} onChange={(e) => setUsername(e.target.value)} required 
+                                    id="name" 
+                                    value={name} 
+                                    onChange={(e) => setName(e.target.value)} 
+                                    required 
                                 />
                             </div>
-                            <div className="field col-12 md:col-4">
-                                <label htmlFor="apellido">Apellido</label>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="lastName">Apellido</label>
                                 <InputText                                     
                                     placeholder="Ingrese su apellido"
-                                    id="apellido" value={email} onChange={(e) => setEmail(e.target.value)} required 
+                                    id="lastName" 
+                                    value={lastName} 
+                                    onChange={(e) => setLastName(e.target.value)} 
+                                    required 
                                 />
                             </div>
-                            <div className="field col-12 md:col-4">
+                            <div className="field col-12 md:col-6">
                                 <label htmlFor="phone">Teléfono</label>
                                 <InputText                                     
                                     placeholder="Ingrese su teléfono"
-                                    id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} 
+                                    id="phone" 
+                                    value={phone} 
+                                    onChange={(e) => setPhone(e.target.value)} 
                                 />
                             </div>
-                            <div className="field col-12 md:col-4">
-                                <label htmlFor="city">Clave</label>
-                                <Password
-                                    inputId="password1"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Ingrese su contraseña"
-                                    toggleMask
-                                    header={passwordHeader}
-                                    footer={passwordFooter}
-                                    weakLabel="Débil"
-                                    mediumLabel="Media"
-                                    strongLabel="Fuerte"
-                                    promptLabel="Ingrese una contraseña"
-                                    className="w-full"
-                                    pt={{
-                                        root: { 
-                                            className: 'w-full relative'
-                                        },
-                                        input: { 
-                                            className: 'w-full pr-8',
-                                            style: { paddingRight: '2.5rem' }
-                                        },
-                                        showIcon: { 
-                                            className: 'absolute',
-                                            style: { 
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                                right: '0.75rem',
-                                                zIndex: 1
-                                            }
-                                        },
-                                        hideIcon: { 
-                                            className: 'absolute',
-                                            style: { 
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                                right: '0.75rem',
-                                                zIndex: 1
-                                            }
-                                        },
-                                        panel: { className: 'z-50' }
-                                    }}
-                                />
-                            </div>
-                            <div className="field col-12 md:col-4">
-                                <label htmlFor="country">Repetir clave</label>
-                               <Password
-                                    inputId="password1"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Ingrese su contraseña"
-                                    toggleMask
-                                    header={passwordHeader}
-                                    footer={passwordFooter}
-                                    weakLabel="Débil"
-                                    mediumLabel="Media"
-                                    strongLabel="Fuerte"
-                                    promptLabel="Ingrese una contraseña"
-                                    className="w-full"
-                                    pt={{
-                                        root: { 
-                                            className: 'w-full relative'
-                                        },
-                                        input: { 
-                                            className: 'w-full pr-8',
-                                            style: { paddingRight: '2.5rem' }
-                                        },
-                                        showIcon: { 
-                                            className: 'absolute',
-                                            style: { 
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                                right: '0.75rem',
-                                                zIndex: 1
-                                            }
-                                        },
-                                        hideIcon: { 
-                                            className: 'absolute',
-                                            style: { 
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                                right: '0.75rem',
-                                                zIndex: 1
-                                            }
-                                        },
-                                        panel: { className: 'z-50' }
-                                    }}
-                                />
-                            </div>
-                            <div className="field col-12 md:col-4">
-                                <label htmlFor="twoFactorAuth">2FA</label>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="twoFactorAuth">Autenticación de doble paso (2FA)</label>
                                 <div className="flex align-items-center">
-                                    <InputSwitch
-                                        id="twoFactorAuth"
-                                        checked={switchValue}
-                                        onChange={(e) => setSwitchValue(e.value ?? false)}
-                                        className="mt-2"
-                                    />
-                                    <span className="ml-2 mt-2 text-sm text-gray-500">
-                                        {switchValue ? 'Activado' : 'Desactivado'}
-                                    </span>
+                                    <div className="p-field-checkbox">
+                                        <InputSwitch
+                                            inputId="twoFactorAuth"
+                                            checked={switchValue}
+                                            onChange={(e) => setSwitchValue(e.value ?? false)}
+                                            className="mr-2"
+                                        />
+                                        <label htmlFor="twoFactorAuth" className="ml-2 text-sm text-gray-500">
+                                            {switchValue ? 'Activado' : 'Desactivado'}
+                                        </label>
+                                    </div>
                                 </div>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="password">Nueva contraseña</label>
+                                <Password
+                                    inputId="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Ingrese nueva contraseña"
+                                    toggleMask
+                                    header={passwordHeader}
+                                    footer={passwordFooter}
+                                    weakLabel="Débil"
+                                    mediumLabel="Media"
+                                    strongLabel="Fuerte"
+                                    promptLabel="Ingrese una contraseña"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                                <Password
+                                    inputId="confirmPassword"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirme su contraseña"
+                                    toggleMask
+                                    feedback={false}
+                                    className={`w-full ${passwordError ? 'p-invalid' : ''}`}
+                                />
+                                {passwordError && (
+                                    <small className="p-error block mt-1">{passwordError}</small>
+                                )}
                             </div>
                         </div>
                         <div className="flex justify-content-end mt-4">
-                            <Button label="Guardar cambios" icon="pi pi-save" className="p-button-primary" />
+                            <Button 
+                                label="Guardar cambios" 
+                                icon="pi pi-save" 
+                                className="p-button-primary"
+                                onClick={handleSubmit}
+                                loading={isUpdating}
+                            />
                         </div>
                     </div>
                 </div>

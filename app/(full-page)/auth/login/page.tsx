@@ -32,12 +32,15 @@ const LoginPage = () => {
     const [hasError, setHasError] = useState(false);
     const [accessToken, setAccessToken] = useState('');
     const [passToken, setPassToken] = useState('');
+    const [userId, setUserId] = useState('');
 
     const { signIn, isPending } = useOnSubmit(toast, (data) => {
         if (data?.result?.twoFactorAuth) {
             setTwoFacData(data.result);
             setAccessToken(data?.result?.accessToken);
             setPassToken(data?.result?.passToken);
+            setUserId(data?.result?.userId);
+            setEmail(data?.result?.email);
             setHasError(false);
             setCode('');
             setShowModal(true);
@@ -60,6 +63,8 @@ const LoginPage = () => {
                     setCode('');
                     setCookie('accessToken', accessToken);
                     setCookie('refreshToken', passToken); 
+                    setCookie('userId', userId); 
+                    setCookie('email', email); 
                     router.push('/');
                 } else {
                     setHasError(true);

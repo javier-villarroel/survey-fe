@@ -4,9 +4,13 @@ import { PrimeReactProvider, locale, addLocale } from "primereact/api";
 import { LayoutProvider } from "../layout/context/layoutcontext";
 import React, { useState, useEffect } from "react";
 
-import "primereact/resources/primereact.css";
-import "primeflex/primeflex.css";
-import "primeicons/primeicons.css";
+// Theme and core CSS
+import "primereact/resources/themes/lara-light-indigo/theme.css";  // theme
+import "primereact/resources/primereact.css";    // core css
+import "primeicons/primeicons.css";             // icons
+import "primeflex/primeflex.css";              // flex & grid
+
+// Custom styles - must be imported after PrimeReact styles
 import "../styles/layout/layout.scss";
 import "../styles/demo/Demos.scss";
 import LoaderBar from "./(main)/components/common/components/loaderBar";
@@ -64,14 +68,36 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<head>
-				<link id="theme-css" rel="stylesheet" href="/themes/lara-light-indigo/theme.css" />
+				<link 
+					id="theme-css" 
+					rel="stylesheet" 
+					href="/themes/lara-light-indigo/theme.css"
+					type="text/css" 
+				/>
 			</head>
 			<body>
 				<LoaderBar />
 				<Toaster position="top-right" />
 
 				<QueryClientProvider client={queryClient}>
-					<PrimeReactProvider value={{ ripple: true, unstyled: false }}>
+					<PrimeReactProvider value={{ 
+						ripple: true, 
+						unstyled: false,
+						pt: {
+							inputswitch: {
+								root: { className: 'w-3rem h-1.75rem' },
+								slider: { className: 'bg-surface-400' }
+							},
+							radiobutton: {
+								root: { className: 'w-1.25rem h-1.25rem' },
+								input: { className: 'w-full h-full' }
+							},
+							checkbox: {
+								root: { className: 'w-1.25rem h-1.25rem' },
+								input: { className: 'w-full h-full' }
+							}
+						}
+					}}>
 						<LayoutProvider>{children}</LayoutProvider>
 					</PrimeReactProvider>
 				</QueryClientProvider>

@@ -79,7 +79,7 @@ export const projectsService = {
                 count: filteredProjects.length,
                 hasNextPage: endIndex < filteredProjects.length,
                 hasPrevPage: params.page > 1
-            }
+            } as any
         };
     }
 }; 

@@ -6,6 +6,8 @@ export interface Project {
     logo?: string;
     createdAt: string;
     updatedAt: string;
+    startDate?: string; // Fecha de inicio del proyecto
+    endDate?: string; // Fecha de fin del proyecto
 }
 
 export interface ProjectsListResponse {
@@ -16,10 +18,12 @@ export interface ProjectsListResponse {
         count: number;
         hasNextPage: boolean;
         hasPrevPage: boolean;
+        startDate: string;
+        endDate: string;
     };
 }
 
-export type StimulusType = 'color' | 'sound' | 'video' | 'image';
+export type StimulusType = 'color' | 'audio' | 'video' | 'image' |'text';
 
 export interface Stimulus {
     id: string;
@@ -29,6 +33,10 @@ export interface Stimulus {
     size?: number;
     duration?: number;
     createdAt: string;
+    description?: string;
+    url?: string; // URL del archivo (para audio, texto, etc.)
+    format?: string; // Formato del archivo (por ejemplo, mp3, txt, jpg)
+    updatedAt?: string; // Fecha de última actualización
 }
 
 export interface StimulusImport {
@@ -66,36 +74,26 @@ export const mockStimuli: Stimulus[] = [
     },
     {
         id: '3',
-        name: 'Mensaje de bienvenida',
-        description: 'Audio de introducción',
         type: 'audio',
-        url: 'https://example.com/audio/welcome.mp3',
-        duration: 45,
-        format: 'mp3',
-        size: 1048576, // 1MB
-        createdAt: '2024-03-13T09:15:00Z',
-        updatedAt: '2024-03-13T09:15:00Z'
+        name: 'Audio de prueba',
+        value: 'https://example.com/audio.mp3',
+        size: 3 * 1024 * 1024, // 3MB
+        duration: 180, // 3 minutos
+        createdAt: new Date().toISOString()
     },
     {
         id: '4',
-        name: 'Descripción del producto',
-        description: 'Texto detallado sobre características',
         type: 'text',
-        url: 'https://example.com/texts/description.txt',
-        format: 'txt',
-        size: 2048, // 2KB
-        createdAt: '2024-03-12T14:20:00Z',
-        updatedAt: '2024-03-12T14:20:00Z'
+        name: 'Texto de prueba',
+        value: 'Este es un texto de ejemplo.',
+        createdAt: new Date().toISOString()
     },
     {
         id: '5',
-        name: 'Imagen de empaque',
-        description: 'Fotografía del empaque del producto',
-        type: 'image',
-        url: 'https://example.com/images/packaging.jpg',
-        format: 'jpg',
-        size: 3145728, // 3MB
-        createdAt: '2024-03-11T11:45:00Z',
-        updatedAt: '2024-03-11T11:45:00Z'
+        type: 'color',
+        name: 'Color de prueba',
+        value: '#FF5733', // Código hexadecimal
+        createdAt: new Date().toISOString()
     }
+    
 ]; 

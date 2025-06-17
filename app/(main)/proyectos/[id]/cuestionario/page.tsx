@@ -235,13 +235,17 @@ const ProjectQuestionnaire = () => {
                         </label>
                         <div className="flex flex-col gap-2">
                             {component.options?.map((option) => (
-                                <div key={option.value} className="flex items-center gap-2">
+                                <div key={option.value} className="p-field-radiobutton flex items-center gap-2">
                                     <RadioButton
                                         inputId={`${component.id}-${option.value}`}
                                         name={component.id}
                                         value={option.value}
+                                        onChange={(e) => {}}
+                                        checked={false}
                                     />
-                                    <label htmlFor={`${component.id}-${option.value}`}>{option.label}</label>
+                                    <label htmlFor={`${component.id}-${option.value}`} className="text-sm">
+                                        {option.label}
+                                    </label>
                                 </div>
                             ))}
                         </div>

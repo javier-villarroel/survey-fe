@@ -141,7 +141,7 @@ const ListProjects = () => {
             sortable: true,
             filter: true,
             filterPlaceholder: 'Filtrar por fecha de inicio',
-            body: (rowData: Project) => dateBodyTemplate(rowData.startDate),
+            body: (rowData: any) => dateBodyTemplate(rowData.startDate),
             style: { minWidth: '12rem', padding: '1rem' }
         },
         {

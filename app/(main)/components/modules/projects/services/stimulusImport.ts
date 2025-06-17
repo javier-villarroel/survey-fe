@@ -1,113 +1,101 @@
-import { STIMULUS_TEMPLATE_HEADERS, StimulusImport, Stimulus } from './types';
+import { IStimulus, IStimulusImport, StimulusType } from '../types/project.types';
 import * as XLSX from 'xlsx';
 
 export const generateTemplateFile = () => {
-    const ws = XLSX.utils.json_to_sheet([{}], {
-        header: STIMULUS_TEMPLATE_HEADERS.map(h => h.header)
-    });
+    const template = [
+        {
+            name: 'Ejemplo Color',
+            type: 'color',
+            value: '#FF0000'
+        },
+        {
+            name: 'Ejemplo Sonido',
+            type: 'sound',
+            value: 'Nombre del archivo de audio'
+        },
+        {
+            name: 'Ejemplo Video',
+            type: 'video',
+            value: 'Nombre del archivo de video'
+        },
+        {
+            name: 'Ejemplo Imagen',
+            type: 'image',
+            value: 'Nombre del archivo de imagen'
+        }
+    ];
 
-    // Agregar validaciones y comentarios
-    ws['!cols'] = STIMULUS_TEMPLATE_HEADERS.map(() => ({ wch: 20 }));
-    
+    const ws = XLSX.utils.json_to_sheet(template);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Estímulos');
-    
-    // Generar el archivo
     XLSX.writeFile(wb, 'plantilla_estimulos.xlsx');
 };
 
-export const processImportedFile = async (file: File): Promise<StimulusImport[]> => {
+export const processImportedFile = async (file: File): Promise<IStimulusImport[]> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        
         reader.onload = (e) => {
             try {
-                const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
+                const data = e.target?.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                // Mapear los datos al formato esperado
-                const stimuli: StimulusImport[] = jsonData.map((row: any) => ({
-                    name: row['Nombre del Estímulo'],
-                    type: row['Tipo (color/sound/video/image)'].toLowerCase(),
-                    value: row['Valor (código hex para colores)'] || '',
-                    filePath: row['Ruta del Archivo (para sound/video/image)'] || ''
+
+                const stimuli: IStimulusImport[] = jsonData.map((row: any) => ({
+                    name: row.name,
+                    type: row.type as StimulusType,
+                    value: row.value
                 }));
-                
+
                 resolve(stimuli);
             } catch (error) {
-                reject(new Error('Error al procesar el archivo: ' + error));
+                reject(new Error('Error al procesar el archivo'));
             }
         };
-        
-        reader.onerror = () => {
-            reject(new Error('Error al leer el archivo'));
-        };
-        
-        reader.readAsArrayBuffer(file);
+        reader.onerror = () => reject(new Error('Error al leer el archivo'));
+        reader.readAsBinaryString(file);
     });
 };
 
-export const validateStimulus = (stimulus: StimulusImport): string[] => {
+export const validateStimulus = (stimulus: IStimulusImport): string[] => {
     const errors: string[] = [];
-    
+
     if (!stimulus.name) {
         errors.push('El nombre es requerido');
     }
-    
-    if (!['color', 'sound', 'video', 'image'].includes(stimulus.type)) {
-        errors.push('Tipo de estímulo inválido');
+
+    if (!stimulus.type) {
+        errors.push('El tipo es requerido');
+    } else if (!['color', 'sound', 'video', 'image'].includes(stimulus.type)) {
+        errors.push('Tipo de estímulo no válido');
     }
-    
-    if (stimulus.type === 'color') {
-        if (!stimulus.value || !/^#[0-9A-F]{6}$/i.test(stimulus.value)) {
-            errors.push('El código de color debe ser un valor hexadecimal válido (ej: #FF0000)');
-        }
-    } else {
-        if (!stimulus.filePath) {
-            errors.push('La ruta del archivo es requerida para este tipo de estímulo');
-        }
+
+    if (!stimulus.value) {
+        errors.push('El valor es requerido');
+    } else if (stimulus.type === 'color' && !/^#[0-9A-F]{6}$/i.test(stimulus.value)) {
+        errors.push('El valor del color debe ser un código hexadecimal válido (ej: #FF0000)');
     }
-    
+
     return errors;
 };
 
-export const processFile = async (file: File): Promise<ArrayBuffer> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
-        reader.onerror = () => reject(new Error('Error al leer el archivo'));
-        reader.readAsArrayBuffer(file);
-    });
-};
-
 export const convertImportToStimulus = async (
-    importData: StimulusImport,
+    importData: IStimulusImport,
     file?: File
-): Promise<Stimulus> => {
+): Promise<IStimulus> => {
     let value = importData.value;
     let size: number | undefined;
-    let duration: number | undefined;
 
     if (file) {
-        const arrayBuffer = await processFile(file);
-        size = arrayBuffer.byteLength;
-        
-        if (importData.type === 'video' || importData.type === 'sound') {
-            // Aquí se podría agregar lógica para obtener la duración del archivo
-            // Por ahora lo dejamos undefined
-        }
-        
-        // Convertir el archivo a base64 para preview
-        const base64 = btoa(
-            new Uint8Array(arrayBuffer)
-                .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        );
-        value = `data:${file.type};base64,${base64}`;
+        size = file.size;
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+        value = reader.result as string;
     }
 
     return {
@@ -116,7 +104,6 @@ export const convertImportToStimulus = async (
         name: importData.name,
         value,
         size,
-        duration,
         createdAt: new Date().toISOString()
     };
 }; 

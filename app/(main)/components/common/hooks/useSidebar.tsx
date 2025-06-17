@@ -11,6 +11,8 @@ export const useSideBar = () => {
 			NProgress.start();
 			removeCookie("accessToken");
 			removeCookie("refreshToken");
+			removeCookie("email");
+			removeCookie("userId");
 			await push("/auth/login");
 		} finally {
 			NProgress.done();

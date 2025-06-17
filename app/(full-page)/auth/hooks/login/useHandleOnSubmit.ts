@@ -2,7 +2,7 @@ import { formatAllowedSidebarModules } from '@/app/(main)/components/common/lib/
 import { formatPermissionsForAuth } from '@/app/(main)/components/common/lib/permissions/utils/format-permissions';
 import { signInServices } from '../../services/Auth/auth.services';
 import { useMutation } from '@tanstack/react-query';
-import { setCookie } from 'typescript-cookie';
+import { getCookie, setCookie } from 'typescript-cookie';
 import { useRouter } from 'next/navigation';
 
 import { FormLogin } from '../../lib/schemas';
@@ -37,7 +37,9 @@ export const useOnSubmit = (toastRef: MutableRefObject<Toast | null>, onTwoFacto
                 if (data && data?.result?.accessToken) {
                     setCookie('accessToken', data?.result?.accessToken);
                     setCookie('refreshToken', data?.result?.refreshToken);
-
+                    setCookie('email', data?.result?.email);
+                    setCookie('userId', data?.result?.userId);
+                    
                     const { permissions, ...restOfResult } = data?.result as any;
 
                     setUser({

@@ -16,7 +16,7 @@ const loginRoutes = [
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const url = request.url;
-
+    
     const accessToken = request.cookies.get("accessToken")?.value;
     const isAuthenticated = !!accessToken;
 

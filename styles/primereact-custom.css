@@ -107,4 +107,165 @@ button.p-button[label="Guardar cambios"] {
 
 .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-raised):not(.p-button-rounded):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-help):not(.p-button-danger):enabled:focus {
     box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2dabd2, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Estilos para el InputSwitch */
+.p-inputswitch {
+    position: relative;
+    display: inline-block;
+    width: 3rem !important;
+    height: 1.75rem !important;
+}
+
+.p-inputswitch .p-inputswitch-slider {
+    border-radius: 30px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--surface-400);
+    transition: .3s;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: #2dabd2 !important;
+}
+
+.p-inputswitch .p-inputswitch-slider:before {
+    border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 1.25rem;
+    width: 1.25rem;
+    left: 0.25rem;
+    bottom: 0.25rem;
+    background-color: #ffffff;
+    transition: .3s;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+    transform: translateX(1.25rem);
+}
+
+/* Estilos para RadioButton */
+.p-radiobutton {
+    width: 20px;
+    height: 20px;
+}
+
+.p-radiobutton .p-radiobutton-box {
+    border: 2px solid var(--surface-400);
+    background: #ffffff;
+    width: 20px;
+    height: 20px;
+}
+
+.p-radiobutton .p-radiobutton-box.p-highlight {
+    border-color: #2dabd2;
+    background: #2dabd2;
+}
+
+.p-radiobutton .p-radiobutton-box .p-radiobutton-icon {
+    width: 12px;
+    height: 12px;
+    transition-duration: 0.2s;
+    background-color: #ffffff;
+}
+
+.p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
+    border-color: #2dabd2;
+}
+
+.p-field-radiobutton {
+    margin-bottom: 0.5rem;
+}
+
+.p-field-radiobutton label {
+    margin-left: 0.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* Estilos para Checkbox */
+.p-checkbox {
+    width: 20px;
+    height: 20px;
+}
+
+.p-checkbox .p-checkbox-box {
+    border: 2px solid var(--surface-400);
+    background: #ffffff;
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+    border-radius: 4px;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #2dabd2;
+    background: #2dabd2;
+}
+
+.p-checkbox .p-checkbox-box .p-checkbox-icon {
+    font-size: 14px;
+    transition-duration: 0.2s;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+    border-color: #2dabd2;
+}
+
+.p-field-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.p-field-checkbox label {
+    margin-left: 0.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* Estilos para los formularios */
+.field {
+    margin-bottom: 1.5rem;
+}
+
+.field > label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.p-inputtext:enabled:focus {
+    border-color: #2dabd2;
+    box-shadow: 0 0 0 1px #2dabd2;
+}
+
+.p-button.p-button-text:enabled:hover {
+    background: rgba(45, 171, 210, 0.04);
+    color: #2dabd2;
+    border-color: transparent;
+}
+
+/* Ajustes para el modo oscuro */
+[data-theme="dark"] .p-inputswitch .p-inputswitch-slider {
+    background: var(--surface-600);
+}
+
+[data-theme="dark"] .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: #2dabd2 !important;
+}
+
+[data-theme="dark"] .p-radiobutton .p-radiobutton-box {
+    background: var(--surface-900);
+    border-color: var(--surface-400);
+}
+
+[data-theme="dark"] .p-checkbox .p-checkbox-box {
+    background: var(--surface-900);
+    border-color: var(--surface-400);
 } 

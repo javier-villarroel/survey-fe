@@ -1,6 +1,7 @@
 export interface IUser {
   id: number;
   userName: string;
+  twoFactorAuth: boolean;
   name: string;
   lastName: string;
   email: string;
