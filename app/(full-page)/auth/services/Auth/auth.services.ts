@@ -88,7 +88,7 @@ export const verifyOTPService = async (verifyData: IVerifyOTPRequest): Promise<S
 			return {
 				error:
 					error.response?.data?.info?.message_to_show ||
-					"Error al verificar el código",
+					"Error assl verificar el código",
 			};
 		}
 		throw error;
@@ -106,7 +106,7 @@ export const verifySignInOTPService = async (verifyData: IVerifySignInOTPRequest
 		if (error instanceof AxiosError) {
 			return {
 				error:
-					error.response?.data?.info?.message_to_show ||
+					error.response?.data?.message ||
 					"Error al verificar el código",
 			};
 		}

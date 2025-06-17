@@ -1,0 +1,17 @@
+.otp-input-dark {
+    input {
+        background-color: #23244a !important;
+        background: #23244a !important;
+        color: #fff !important;
+        
+        &:focus,
+        &:active,
+        &:hover,
+        &[disabled],
+        &:disabled {
+            background-color: #23244a !important;
+            background: #23244a !important;
+            color: #fff !important;
+        }
+    }
+} 

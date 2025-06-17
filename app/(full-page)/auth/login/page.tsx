@@ -13,6 +13,7 @@ import ReactCodeInput from 'react-code-input';
 import { useHandleOTP } from '../hooks/login/useHandleOTP';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { setCookie } from 'typescript-cookie';
+import '@/app/styles/otp.scss';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ const LoginPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [twoFacData, setTwoFacData] = useState<any>(null);
     const [code, setCode] = useState('');
+    const [hasError, setHasError] = useState(false);
     const [accessToken, setAccessToken] = useState('');
     const [passToken, setPassToken] = useState('');
 
@@ -35,6 +37,8 @@ const LoginPage = () => {
             setTwoFacData(data.result);
             setAccessToken(data?.result?.accessToken);
             setPassToken(data?.result?.passToken);
+            setHasError(false);
+            setCode('');
             setShowModal(true);
         } else {
             router.push('/');
@@ -44,13 +48,23 @@ const LoginPage = () => {
     const { handleOTPComplete, isVerifying } = useHandleOTP();
 
     const handleTokenChange = async (value: string) => {
+        setCode(value);
+        setHasError(false);
+        
         if (value.length === 4) {
-            const otpResult = await handleOTPComplete(value, twoFacData.passToken);
-            if (otpResult) {
-                setShowModal(false);
-                setCookie('accessToken', accessToken);
-                setCookie('refreshToken', passToken); 
-                router.push('/');
+            try {
+                const otpResult = await handleOTPComplete(value, twoFacData.passToken);
+                if (otpResult) {
+                    setShowModal(false);
+                    setCode('');
+                    setCookie('accessToken', accessToken);
+                    setCookie('refreshToken', passToken); 
+                    router.push('/');
+                } else {
+                    setHasError(true);
+                }
+            } catch (error) {
+                setHasError(true);
             }
         }
     };
@@ -323,16 +337,23 @@ const LoginPage = () => {
                         onChange={handleTokenChange}
                         inputMode="numeric"
                         disabled={isVerifying}
+                        className="otp-input-dark"
                         inputStyle={{
                             width: '3rem',
                             height: '3rem',
                             fontSize: '1.5rem',
                             borderRadius: '0.5rem',
-                            border: '2px solid #93d704',
-                            background: '#23244a',
+                            border: `2px solid ${hasError ? '#ff4444' : '#93d704'}`,
+                            background: '#23244a !important',
+                            backgroundColor: '#23244a !important',
                             color: '#fff',
                             margin: '0 0.3rem',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'none',
+                            appearance: 'none',
+                            transition: 'all 0.3s ease',
+                            outline: 'none'
                         }}
                     />
                 </div>

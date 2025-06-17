@@ -43,7 +43,8 @@ export const useHandleOTP = (): UseHandleOTPReturn => {
             toast.error('Código inválido');
             return false;
         } catch (error) {
-            toast.error('Error al verificar el código');
+            console.log(error)
+            toast.error('Error al versificar el código');
             return false;
         } finally {
             setIsVerifying(false);
