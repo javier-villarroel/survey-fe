@@ -1,12 +1,20 @@
 import { useRouter } from "next/navigation";
 import { removeCookie } from "typescript-cookie";
+import NProgress from "nprogress";
+import "@/app/styles/nprogress.scss";
 
 export const useSideBar = () => {
 	const { push } = useRouter();
 	const logout = async () => {
-		removeCookie("accessToken");
-		removeCookie("refreshToken");
-		await push("/auth");
+		try {
+			NProgress.configure({ showSpinner: false });
+			NProgress.start();
+			removeCookie("accessToken");
+			removeCookie("refreshToken");
+			await push("/auth/login");
+		} finally {
+			NProgress.done();
+		}
 	};
 	return {
 		logout,

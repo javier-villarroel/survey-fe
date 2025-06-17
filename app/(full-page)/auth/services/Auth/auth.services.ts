@@ -41,8 +41,6 @@ export const signInServices = async (credentials: FormLogin): Promise<ServiceRes
 		);
 		return data;
 	} catch (error) {
-		console.log('Error en signInServices:', error);
-		
 		if (error instanceof AxiosError) {
 			return {
 				error:

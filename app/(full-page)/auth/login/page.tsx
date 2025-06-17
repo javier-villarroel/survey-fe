@@ -13,6 +13,7 @@ import ReactCodeInput from 'react-code-input';
 import { useHandleOTP } from '../hooks/login/useHandleOTP';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { setCookie } from 'typescript-cookie';
+import '@/app/styles/toast.scss';
 import '@/app/styles/otp.scss';
 
 const LoginPage = () => {
@@ -101,10 +102,7 @@ const LoginPage = () => {
         >
             <Toast
                 ref={toast}
-                pt={{
-                    content: { style: { background: '#f44336', color: '#fff' } },
-                    closeButton: { style: { color: '#fff' } }
-                }}
+                position="top-right"
             />
             <div className="flex flex-column align-items-center justify-content-center ml-5" style={{ marginLeft: '7vw' }}>
                 <div

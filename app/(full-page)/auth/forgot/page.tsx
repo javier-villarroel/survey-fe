@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import '@/app/styles/toast.scss';
 
 const Forgot = () => {
     const { onSubmit, handleOTPComplete, passToken,  userId } = useOnSubmit();
@@ -96,17 +97,7 @@ const Forgot = () => {
         >
             <Toast
                 ref={toast}
-                pt={{
-                    content: { 
-                        className: 'custom-toast-content',
-                        style: { 
-                            background: 'var(--toast-bg)',
-                            color: '#fff'
-                        } 
-                    },
-                    closeButton: { style: { color: '#fff' } }
-                }}
-                className="custom-toast"
+                position="top-right"
             />
 
             <Dialog
