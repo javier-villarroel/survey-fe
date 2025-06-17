@@ -344,14 +344,17 @@ const LoginPage = () => {
                             border: `2px solid ${hasError ? '#ff4444' : '#93d704'}`,
                             background: '#23244a !important',
                             backgroundColor: '#23244a !important',
-                            color: '#fff',
+                            color: '#ffffff !important',
                             margin: '0 0.3rem',
                             textAlign: 'center',
                             WebkitAppearance: 'none',
                             MozAppearance: 'none',
                             appearance: 'none',
                             transition: 'all 0.3s ease',
-                            outline: 'none'
+                            outline: 'none',
+                            boxShadow: '0 0 0 30px #23244a inset !important',
+                            WebkitTextFillColor: '#ffffff !important',
+                            WebkitBackgroundClip: 'unset !important'
                         }}
                     />
                 </div>

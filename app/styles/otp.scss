@@ -3,15 +3,25 @@
         background-color: #23244a !important;
         background: #23244a !important;
         color: #fff !important;
+        -webkit-text-fill-color: #fff !important;
+        -webkit-background-clip: unset !important;
         
         &:focus,
         &:active,
         &:hover,
         &[disabled],
-        &:disabled {
+        &:disabled,
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:focus,
+        &:-webkit-autofill:active {
             background-color: #23244a !important;
             background: #23244a !important;
             color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            -webkit-background-clip: unset !important;
+            transition: background-color 5000s ease-in-out 0s;
+            box-shadow: 0 0 0 30px #23244a inset !important;
         }
     }
 } 

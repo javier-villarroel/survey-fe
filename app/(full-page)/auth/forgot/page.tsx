@@ -18,6 +18,7 @@ const Forgot = () => {
     const toast = useRef<Toast>(null);
     const [email, setEmail] = React.useState('');
     const [token, setToken] = React.useState('');
+    const [hasError, setHasError] = React.useState(false);
     const router = useRouter();
 
     const containerClassName = classNames('surface-ground min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
@@ -36,6 +37,8 @@ const Forgot = () => {
         const success = await onSubmit(email);
         if (success) {
             setShowModal(true);
+            setHasError(false);
+            setToken('');
         } else {
             toast.current?.show({ 
                 severity: 'error', 
@@ -48,6 +51,8 @@ const Forgot = () => {
 
     const handleTokenChange = (value: string) => {
         setToken(value);
+        setHasError(false);
+        
         if (value.length === 4) {
             handleOTPComplete(value).then(success => {
                 if (success) {
@@ -66,6 +71,7 @@ const Forgot = () => {
                         router.push(`/auth/reset-password?${params.toString()}`);
                     }, 1500);
                 } else {
+                    setHasError(true);
                     toast.current?.show({ 
                         severity: 'error', 
                         summary: 'Error', 
@@ -183,16 +189,26 @@ const Forgot = () => {
                         value={token}
                         onChange={handleTokenChange}
                         inputMode="numeric"
+                        className="otp-input-dark"
                         inputStyle={{
                             width: '3rem',
                             height: '3rem',
                             fontSize: '1.5rem',
                             borderRadius: '0.5rem',
-                            border: '2px solid #93d704',
-                            background: '#23244a',
-                            color: '#fff',
+                            border: `2px solid ${hasError ? '#ff4444' : '#93d704'}`,
+                            background: '#23244a !important',
+                            backgroundColor: '#23244a !important',
+                            color: '#ffffff !important',
                             margin: '0 0.3rem',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'none',
+                            appearance: 'none',
+                            transition: 'all 0.3s ease',
+                            outline: 'none',
+                            boxShadow: '0 0 0 30px #23244a inset !important',
+                            WebkitTextFillColor: '#ffffff !important',
+                            WebkitBackgroundClip: 'unset !important'
                         }}
                     />
                 </div>
