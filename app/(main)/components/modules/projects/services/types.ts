@@ -31,6 +31,20 @@ export interface Stimulus {
     createdAt: string;
 }
 
+export interface StimulusImport {
+    name: string;
+    type: StimulusType;
+    value: string;
+    filePath?: string; // Ruta local del archivo
+}
+
+export const STIMULUS_TEMPLATE_HEADERS = [
+    { field: 'name', header: 'Nombre del Estímulo' },
+    { field: 'type', header: 'Tipo (color/sound/video/image)' },
+    { field: 'value', header: 'Valor (código hex para colores)' },
+    { field: 'filePath', header: 'Ruta del Archivo (para sound/video/image)' }
+];
+
 // Mock data for stimuli
 export const mockStimuli: Stimulus[] = [
     {

@@ -16,6 +16,8 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Dialog } from 'primereact/dialog';
 import { ColorPicker } from 'primereact/colorpicker';
+import { generateTemplateFile, processImportedFile, validateStimulus, convertImportToStimulus } from '@/app/(main)/components/modules/projects/services/stimulusImport';
+import { Toast } from 'primereact/toast';
 
 const projectStatuses = [
     { label: 'Activo', value: 'active' },
@@ -32,13 +34,15 @@ const stimulusTypes = [
 
 const CreateProject = () => {
     const router = useRouter();
+    const toast = useRef<Toast>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const importFileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         status: 'active',
         logo: null as string | null
     });
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [stimuli, setStimuli] = useState<Stimulus[]>(mockStimuli);
     
@@ -49,6 +53,12 @@ const CreateProject = () => {
     const [stimulusValue, setStimulusValue] = useState('');
     const [stimulusPreview, setStimulusPreview] = useState<string | null>(null);
     const [stimulusFile, setStimulusFile] = useState<File | null>(null);
+
+    // Estado para el modal de importación
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importedStimuli, setImportedStimuli] = useState<StimulusImport[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});
+    const [importErrors, setImportErrors] = useState<{ [key: string]: string[] }>({});
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -303,8 +313,82 @@ const CreateProject = () => {
         return rowData.value;
     };
 
+    const handleDownloadTemplate = () => {
+        generateTemplateFile();
+    };
+
+    const handleImportFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const importedData = await processImportedFile(file);
+            setImportedStimuli(importedData);
+            setShowImportModal(true);
+            
+            // Limpiar errores anteriores
+            setImportErrors({});
+            
+            // Validar cada estímulo
+            const errors: { [key: string]: string[] } = {};
+            importedData.forEach((stimulus, index) => {
+                const validationErrors = validateStimulus(stimulus);
+                if (validationErrors.length > 0) {
+                    errors[index] = validationErrors;
+                }
+            });
+            
+            setImportErrors(errors);
+        } catch (error) {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al procesar el archivo',
+                life: 3000
+            });
+        }
+    };
+
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedFiles(prev => ({
+                ...prev,
+                [index]: file
+            }));
+        }
+    };
+
+    const handleImportStimuli = async () => {
+        const newStimuli: Stimulus[] = [];
+        
+        for (let i = 0; i < importedStimuli.length; i++) {
+            const importData = importedStimuli[i];
+            const file = selectedFiles[i];
+            
+            try {
+                const stimulus = await convertImportToStimulus(importData, file);
+                newStimuli.push(stimulus);
+            } catch (error) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Error al procesar el estímulo ${importData.name}`,
+                    life: 3000
+                });
+            }
+        }
+        
+        setStimuli(prev => [...prev, ...newStimuli]);
+        setShowImportModal(false);
+        setImportedStimuli([]);
+        setSelectedFiles({});
+        setImportErrors({});
+    };
+
     return (
         <div className="w-full overflow-x-hidden">
+            <Toast ref={toast} />
             <Card>
                 <div className="flex align-items-center justify-content-between mb-4">
                     <h5 className="m-0">Crear Proyecto</h5>
@@ -420,14 +504,27 @@ const CreateProject = () => {
                             <div className="flex justify-content-between align-items-center mb-4">
                                 <h5 className="m-0">Estímulos</h5>
                                 <div className="flex gap-2">
-                                    <FileUpload
-                                        mode="basic"
-                                        accept=".csv"
-                                        maxFileSize={1000000}
-                                        chooseLabel="Importar CSV"
-                                        className="w-auto"
-                                        onSelect={handleImportCSV}
+                                    <Button
+                                        icon="pi pi-download"
+                                        label="Descargar Plantilla"
+                                        className="p-button-secondary"
+                                        onClick={handleDownloadTemplate}
                                     />
+                                    <div className="relative">
+                                        <Button
+                                            icon="pi pi-upload"
+                                            label="Importar Excel"
+                                            className="p-button-success"
+                                            onClick={() => importFileInputRef.current?.click()}
+                                        />
+                                        <input
+                                            type="file"
+                                            ref={importFileInputRef}
+                                            onChange={handleImportFile}
+                                            accept=".xlsx,.xls"
+                                            className="hidden"
+                                        />
+                                    </div>
                                     <Button
                                         icon="pi pi-plus"
                                         label="Agregar Estímulo"
@@ -535,6 +632,93 @@ const CreateProject = () => {
                     <div className="field col-12">
                         {renderStimulusInput()}
                     </div>
+                </div>
+            </Dialog>
+
+            {/* Modal de importación */}
+            <Dialog
+                header="Importar Estímulos"
+                visible={showImportModal}
+                onHide={() => {
+                    setShowImportModal(false);
+                    setImportedStimuli([]);
+                    setSelectedFiles({});
+                    setImportErrors({});
+                }}
+                style={{ width: '70vw' }}
+                modal
+                footer={
+                    <div>
+                        <Button
+                            label="Cancelar"
+                            icon="pi pi-times"
+                            onClick={() => {
+                                setShowImportModal(false);
+                                setImportedStimuli([]);
+                                setSelectedFiles({});
+                                setImportErrors({});
+                            }}
+                            className="p-button-text"
+                        />
+                        <Button
+                            label="Importar"
+                            icon="pi pi-check"
+                            onClick={handleImportStimuli}
+                            disabled={
+                                importedStimuli.length === 0 ||
+                                Object.keys(importErrors).length > 0 ||
+                                importedStimuli.some((s, i) => 
+                                    s.type !== 'color' && !selectedFiles[i]
+                                )
+                            }
+                        />
+                    </div>
+                }
+            >
+                <div className="grid formgrid p-fluid">
+                    {importedStimuli.map((stimulus, index) => (
+                        <div key={index} className="col-12 border-bottom-1 surface-border p-3">
+                            <div className="flex align-items-center justify-content-between">
+                                <div className="flex-grow-1">
+                                    <h6 className="mt-0 mb-2">{stimulus.name}</h6>
+                                    <div className="flex align-items-center gap-3">
+                                        <Tag value={stimulus.type} />
+                                        {stimulus.type === 'color' ? (
+                                            <div className="flex align-items-center">
+                                                <div
+                                                    className="w-2rem h-2rem border-1 border-round mr-2"
+                                                    style={{ backgroundColor: stimulus.value }}
+                                                />
+                                                {stimulus.value}
+                                            </div>
+                                        ) : (
+                                            <div className="flex-grow-1">
+                                                <input
+                                                    type="file"
+                                                    onChange={(e) => handleFileSelect(e, index)}
+                                                    accept={
+                                                        stimulus.type === 'image' ? 'image/*' :
+                                                        stimulus.type === 'video' ? 'video/*' :
+                                                        'audio/*'
+                                                    }
+                                                    className="w-full"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            {importErrors[index]?.length > 0 && (
+                                <div className="mt-2">
+                                    {importErrors[index].map((error, errorIndex) => (
+                                        <div key={errorIndex} className="text-red-500 text-sm">
+                                            {error}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </Dialog>
         </div>

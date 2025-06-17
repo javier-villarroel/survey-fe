@@ -26,11 +26,14 @@ const LoginPage = () => {
     // Estados para 2FA
     const [showModal, setShowModal] = useState(false);
     const [twoFacData, setTwoFacData] = useState<any>(null);
-    const [token, setToken] = useState('');
+    const [accessToken, setAccessToken] = useState('');
+    const [passToken, setPassToken] = useState('');
 
     const { signIn, isPending } = useOnSubmit(toast, (data) => {
         if (data?.result?.twoFactorAuth) {
             setTwoFacData(data.result);
+            setAccessToken(data?.result?.accessToken);
+            setPassToken(data?.result?.passToken);
             setShowModal(true);
         } else {
             router.push('/');
@@ -40,25 +43,14 @@ const LoginPage = () => {
     const { handleOTPComplete, isVerifying } = useHandleOTP();
 
     const handleTokenChange = async (value: string) => {
-        setToken(value);
-        if (value.length === 4 && twoFacData?.passToken) {
+        if (value.length === 4) {
             const otpResult = await handleOTPComplete(value, twoFacData.passToken);
-            // if (otpResult && otpResult.info?.status === 201) {
+            if (otpResult) {
                 setShowModal(false);
-                setToken('');
-
-                // DATOS DE PRUEBA TEMPORALES PARA 2FA
-                const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphdmMyODA0QGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE3NTAxMDAxMjMsImV4cCI6MTc1MDEwNzMyM30.SiBTvSESRN4DQwA5MYz9SRojkdKIAWmnCNdIVTLvm64";
-                const passToken = "205f02b713f4d963aa481280155a75cd";
-
                 setCookie('accessToken', accessToken);
-                setCookie('refreshToken', passToken); // O usa refreshToken si lo tienes
-
-                // Si tienes un contexto de usuario, puedes setear un usuario de prueba aquí si lo necesitas
-                // setUser({ ... });
-
+                setCookie('refreshToken', passToken); 
                 router.push('/');
-            // }
+            }
         }
     };
 
@@ -264,7 +256,7 @@ const LoginPage = () => {
                             position: 'relative'
                         }}
                     >
-                        Verificación de dos factores
+                        Verificación de doble autenticación
                         <span
                             onClick={() => setShowModal(false)}
                             style={{
@@ -326,7 +318,7 @@ const LoginPage = () => {
                         name="otp"
                         type="text"
                         fields={4}
-                        value={token}
+                        value={accessToken}
                         onChange={handleTokenChange}
                         inputMode="numeric"
                         disabled={isVerifying}

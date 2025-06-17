@@ -50,6 +50,12 @@ const Forgot = () => {
         if (value.length === 4) {
             handleOTPComplete(value).then(success => {
                 if (success) {
+                    toast.current?.show({ 
+                        severity: 'success', 
+                        summary: 'Éxito', 
+                        detail: 'Código verificado correctamente', 
+                        life: 3000 
+                    });
                     setShowModal(false);
                     setTimeout(() => {
                         const params = new URLSearchParams({
@@ -91,9 +97,16 @@ const Forgot = () => {
             <Toast
                 ref={toast}
                 pt={{
-                    content: { style: { background: '#f44336', color: '#fff' } },
+                    content: { 
+                        className: 'custom-toast-content',
+                        style: { 
+                            background: 'var(--toast-bg)',
+                            color: '#fff'
+                        } 
+                    },
                     closeButton: { style: { color: '#fff' } }
                 }}
+                className="custom-toast"
             />
 
             <Dialog
