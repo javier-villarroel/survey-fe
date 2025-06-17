@@ -56,13 +56,12 @@ export interface ICreateUserRequest {
 }
 
 export interface IUpdateUserRequest {
-  userName?: string;
-  name?: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string;
-  roleId?: number;
-  status?: boolean;
+  twoFactorAuth?: boolean;
+  status?: string;
   password?: string;
 }
 

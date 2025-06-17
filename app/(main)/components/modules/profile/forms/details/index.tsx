@@ -7,6 +7,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { useProfile } from '../../hooks/useProfile';
 import { useUpdateProfile } from '../../hooks/useUpdateProfile';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { toast } from 'sonner';
 
 const ProfileDetail = () => {
     const { user, isLoading: isLoadingProfile, error: profileError, refreshProfile } = useProfile();
@@ -16,7 +17,7 @@ const ProfileDetail = () => {
     const [lastName, setLastName] = useState(user?.lastName || '');
     const [email, setEmail] = useState(user?.email || '');
     const [phone, setPhone] = useState(user?.phone || '');
-    const [switchValue, setSwitchValue] = useState(false);
+    const [switchValue, setSwitchValue] = useState(user?.twoFactorAuth || false);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [password, setPassword] = useState('');
@@ -50,19 +51,28 @@ const ProfileDetail = () => {
     };
 
     const handleSubmit = async () => {
-        if (password && password !== confirmPassword) {
-            setPasswordError('Las contraseñas no coinciden');
-            return;
+        if (password || confirmPassword) {
+            if (password !== confirmPassword) {
+                setPasswordError('Las contraseñas no coinciden');
+                toast.error('Las contraseñas no coinciden');
+                return;
+            }
+            if (password.length < 8) {
+                setPasswordError('La contraseña debe tener al menos 8 caracteres');
+                toast.error('La contraseña debe tener al menos 8 caracteres');
+                return;
+            }
         }
         setPasswordError(null);
 
         const result = await updateProfile({
-            userName: username,
-            name,
+            firstName: name,
             lastName,
             email,
             phone,
-            password: password || undefined
+            twoFactorAuth: switchValue,
+            status: 'ACTIVE',
+            ...(password && password === confirmPassword ? { password } : {})
         });
 
         if (result) {

@@ -212,7 +212,6 @@ const LoginPage = () => {
                                             position: 'absolute',
                                             right: '1rem',
                                             top: '50%',
-                                            transform: 'translateY(-50%)',
                                             cursor: 'pointer'
                                         }
                                     },
@@ -222,7 +221,6 @@ const LoginPage = () => {
                                             position: 'absolute',
                                             right: '1rem',
                                             top: '50%',
-                                            transform: 'translateY(-50%)',
                                             cursor: 'pointer'
                                         }
                                     }
