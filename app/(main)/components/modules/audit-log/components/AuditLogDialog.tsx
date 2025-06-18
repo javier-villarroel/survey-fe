@@ -2,99 +2,132 @@ import React from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Tag } from 'primereact/tag';
 import { Divider } from 'primereact/divider';
-import { format } from 'date-fns';
+import { AuditLogItem } from '../types';
+import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface AuditLogDialogProps {
     visible: boolean;
     onHide: () => void;
-    selectedItem: any;
-    getModuleIcon: (module: string) => string;
+    selectedItem: AuditLogItem | null;
 }
+
+const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Fecha no disponible';
+    
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Fecha inválida';
+        
+        return formatDistanceToNow(date, { 
+            addSuffix: true,
+            locale: es 
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return 'Error en fecha';
+    }
+};
 
 export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
     visible,
     onHide,
-    selectedItem,
-    getModuleIcon
+    selectedItem
 }) => {
     if (!selectedItem) return null;
 
-    const getActionSeverity = (action: string) => {
-        switch (action.toLowerCase()) {
-            case 'crear':
+    const timeAgo = formatDate(selectedItem.createdAt);
+
+    const getEventSeverity = (event: string) => {
+        switch (event.toLowerCase()) {
+            case 'create':
                 return 'success';
-            case 'modificar':
+            case 'update':
                 return 'warning';
-            case 'eliminar':
+            case 'delete':
                 return 'danger';
-            case 'ver':
+            case 'read':
                 return 'info';
             default:
                 return 'info';
         }
     };
 
-    return (
-        <Dialog 
-            header="Detalle del cambio" 
-            visible={visible} 
-            style={{ width: '90vw', maxWidth: 700 }} 
-            onHide={onHide} 
-            draggable={false} 
-            resizable={false}
-            className="audit-log-dialog"
-        >
-            <div>
-                <div className="mb-4">
-                    <div className="text-lg font-semibold">{selectedItem.user.name}</div>
-                    <div className="text-sm text-gray-500">{selectedItem.user.email}</div>
-                    <div className="text-sm text-gray-500 mt-1">
-                        {format(new Date(selectedItem.created_at), 'dd MMM yyyy, HH:mm', { locale: es })}
+    const getEventLabel = (event: string) => {
+        switch (event.toLowerCase()) {
+            case 'create':
+                return 'Crear';
+            case 'update':
+                return 'Modificar';
+            case 'delete':
+                return 'Eliminar';
+            case 'read':
+                return 'Ver';
+            default:
+                return event;
+        }
+    };
+
+    const renderDataComparison = () => {
+        if (!selectedItem.oldData && !selectedItem.newData) return null;
+
+        return (
+            <div className="mt-4">
+                <h3 className="text-xl font-semibold mb-3">Cambios realizados</h3>
+                <div className="grid">
+                    <div className="col-6">
+                        <h4 className="text-lg mb-2">Datos anteriores</h4>
+                        <pre className="p-3 surface-ground border-round">
+                            {JSON.stringify(selectedItem.oldData, null, 2)}
+                        </pre>
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
-                        <i className={`${getModuleIcon(selectedItem.module)} text-xl`} />
-                        <span className="font-medium">{selectedItem.module}</span>
-                        <Divider layout="vertical" />
-                        <Tag 
-                            value={selectedItem.action} 
-                            severity={getActionSeverity(selectedItem.action)}
-                            className="action-tag"
-                        />
+                    <div className="col-6">
+                        <h4 className="text-lg mb-2">Datos nuevos</h4>
+                        <pre className="p-3 surface-ground border-round">
+                            {JSON.stringify(selectedItem.newData, null, 2)}
+                        </pre>
                     </div>
-                    <p className="text-gray-700 m-0 mt-2">{selectedItem.description}</p>
                 </div>
-                <div className="flex flex-col gap-4">
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">Antes</h3>
-                        <div className="flex flex-col gap-2">
-                            {Object.entries(selectedItem.metadata.Antes).length > 0 ? (
-                                Object.entries(selectedItem.metadata.Antes).map(([key, value]: [string, any]) => (
-                                    <div key={key} className="flex items-center gap-2">
-                                        <span className="font-semibold min-w-[120px] capitalize">{key}:</span>
-                                        <span className="text-gray-700">{String(value)}</span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-gray-500 italic">Sin cambios previos</div>
-                            )}
+            </div>
+        );
+    };
+
+    return (
+        <Dialog
+            header="Detalles de la actividad"
+            visible={visible}
+            onHide={onHide}
+            style={{ width: '90vw', maxWidth: '1200px' }}
+            modal
+            className="p-fluid"
+        >
+            <div className="grid">
+                <div className="col-12">
+                    <div className="flex flex-column gap-3">
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-user text-xl"></i>
+                            <span className="font-bold">Usuario:</span>
+                            <span>{selectedItem.newData?.firstName} {selectedItem.newData?.lastName}</span>
+                        </div>
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-envelope text-xl"></i>
+                            <span className="font-bold">Correo:</span>
+                            <span>{selectedItem.newData?.email}</span>
+                        </div>
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-clock text-xl"></i>
+                            <span className="font-bold">Fecha:</span>
+                            <span>{timeAgo}</span>
+                        </div>
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-info-circle text-xl"></i>
+                            <span className="font-bold">Descripción:</span>
+                            <span>{selectedItem.description}</span>
                         </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">Después</h3>
-                        <div className="flex flex-col gap-2">
-                            {Object.entries(selectedItem.metadata.Despues).length > 0 ? (
-                                Object.entries(selectedItem.metadata.Despues).map(([key, value]) => (
-                                    <div key={key} className="flex items-center gap-2">
-                                        <span className="font-semibold min-w-[120px] capitalize">{key}:</span>
-                                        <span className="text-gray-700">{String(value)}</span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-gray-500 italic">Sin cambios posteriores</div>
-                            )}
-                        </div>
-                    </div>
+                </div>
+                <div className="col-12">
+                    {renderDataComparison()}
                 </div>
             </div>
         </Dialog>

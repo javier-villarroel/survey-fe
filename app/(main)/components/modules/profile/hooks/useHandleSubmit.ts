@@ -48,7 +48,7 @@ export const useHandleSubmit = () => {
 
             // Preparar datos para la actualización
             const updateData = {
-                firstName: data.name,
+                firstName: data.firstName,
                 lastName: data.lastName,
                 email: data.email,
                 phone: data.phone,

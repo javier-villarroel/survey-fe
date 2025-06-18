@@ -1,7 +1,13 @@
+import { AuditModule, AuditEvent } from '../constants/enums';
+
 export interface User {
-    id: string;
-    name: string;
+    id: number;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    twoFactorAuth: boolean;
     email: string;
+    status: string;
 }
 
 export interface AuditLogMetadata {
@@ -10,13 +16,14 @@ export interface AuditLogMetadata {
 }
 
 export interface AuditLogItem {
-    id: string;
-    user: User;
-    created_at: string;
-    module: string;
-    action: string;
+    _id: string;
+    event: AuditEvent;
+    module: AuditModule;
     description: string;
-    metadata: AuditLogMetadata;
+    userId: string;
+    oldData?: any;
+    newData?: any;
+    createdAt?: string;
 }
 
 export interface AuditLogState {
@@ -42,16 +49,54 @@ export interface AuditLogEntry {
 }
 
 export interface AuditLogFilters {
-    module?: string;
-    action?: string;
-    startDate?: Date;
-    endDate?: Date;
+    module?: AuditModule;
+    event?: AuditEvent;
     userId?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
-export interface AuditLogResponse {
-    items: AuditLogEntry[];
-    total: number;
+export interface AuditLogPagination {
+    totalDocs: number;
+    totalPages: number;
+    count: number;
     page: number;
-    pageSize: number;
+    skip: number;
+    hasPrevPage: boolean;
+    prevPage: boolean | number;
+    nextPage: boolean | number;
+    hasNextPage: boolean;
+    limit: number;
+    offset: number;
+    perPage: number;
+    pagingCounter: number;
+}
+
+export interface ApiInfo {
+    status: number;
+    message: string;
+    code: string;
+    message_to_show: string;
+}
+
+export interface ApiResponse<T> {
+    info: ApiInfo;
+    result: T[];
+    pagination: AuditLogPagination;
+}
+
+export type AuditLogResponse = ApiResponse<AuditLogItem>;
+export type UserResponse = ApiResponse<User>;
+
+export interface AuditLogParams {
+    pagination: {
+        page: number;
+        limit: number;
+    };
+    filters?: {
+        module?: AuditModule;
+        event?: AuditEvent;
+        startDate?: string;
+        endDate?: string;
+    };
 } 

@@ -5,65 +5,72 @@ import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { User } from '../types';
+import { 
+    AuditModule, 
+    AuditEvent, 
+    ModuleTranslations, 
+    EventTranslations 
+} from '../constants/enums';
 
 interface AuditLogHeaderProps {
     users: User[];
     selectedUser: User | null;
-    onUserChange: (user: User | null) => void;
+    selectedModule: AuditModule | null;
+    selectedEvent: AuditEvent | null;
     startDate: Date | null;
     endDate: Date | null;
-    onDateChange: (start: Date | null, end: Date | null) => void;
-    selectedAction: string | null;
-    onActionChange: (action: string | null) => void;
-    selectedModule: string | null;
-    onModuleChange: (module: string | null) => void;
+    onUserChange: (user: User | null) => void;
+    onModuleChange: (module: AuditModule | null) => void;
+    onEventChange: (event: AuditEvent | null) => void;
+    onDateRangeChange: (start: Date | null, end: Date | null) => void;
+    usersLoading: boolean;
 }
 
-const actions = [
-    { label: 'Todas las acciones', value: null },
-    { label: 'Crear', value: 'crear' },
-    { label: 'Modificar', value: 'modificar' },
-    { label: 'Eliminar', value: 'eliminar' },
-    { label: 'Ver', value: 'ver' }
+const moduleOptions = [
+    { label: 'Todos los módulos', value: null },
+    ...Object.entries(ModuleTranslations).map(([value, label]) => ({
+        label,
+        value: value as AuditModule
+    }))
 ];
 
-const modules = [
-    { label: 'Todos los módulos', value: null },
-    { label: 'Encuestas', value: 'encuestas' },
-    { label: 'Usuarios', value: 'usuarios' },
-    { label: 'Preguntas', value: 'preguntas' },
-    { label: 'Respuestas', value: 'respuestas' },
-    { label: 'Reportes', value: 'reportes' }
+const eventOptions = [
+    { label: 'Todos los eventos', value: null },
+    ...Object.entries(EventTranslations).map(([value, label]) => ({
+        label,
+        value: value as AuditEvent
+    }))
 ];
 
 export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
-    users,
+    users = [],
     selectedUser,
-    onUserChange,
+    selectedModule,
+    selectedEvent,
     startDate,
     endDate,
-    onDateChange,
-    selectedAction,
-    onActionChange,
-    selectedModule,
-    onModuleChange
+    onUserChange,
+    onModuleChange,
+    onEventChange,
+    onDateRangeChange,
+    usersLoading
 }) => {
-    const handleStartDateChange = (date: Date | null) => {
-        onDateChange(date, endDate);
-    };
-
-    const handleEndDateChange = (date: Date | null) => {
-        onDateChange(startDate, date);
-    };
+    const userOptions = [
+        { label: 'Todos los usuarios', value: null },
+        ...(Array.isArray(users) ? users.map(user => ({
+            label: `${user.firstName} ${user.lastName} - ${user.email}`,
+            value: user
+        })) : [])
+    ];
 
     const handleClearFilters = () => {
-        onUserChange({ id: 'all', name: 'Todos los usuarios', email: '' });
-        onDateChange(null, null);
-        onActionChange(null);
+        onUserChange(null);
+        onDateRangeChange(null, null);
+        onEventChange(null);
         onModuleChange(null);
     };
 
-    const hasActiveFilters = selectedUser?.id !== 'all' || startDate || endDate || selectedAction || selectedModule;
+    const hasActiveFilters = startDate || endDate || selectedEvent || selectedModule;
 
     return (
         <div className="flex flex-column gap-4">
@@ -92,24 +99,30 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                         <Dropdown
                             id="userFilter"
                             value={selectedUser}
-                            options={users}
+                            options={userOptions}
                             onChange={(e) => onUserChange(e.value)}
-                            optionLabel="name"
                             placeholder="Seleccionar usuario"
                             className="w-full"
+                            loading={usersLoading}
+                            disabled={usersLoading}
+                            optionLabel="label"
+                            emptyMessage="No hay usuarios disponibles"
+                            filter
+                            filterBy="label"
                         />
                     </div>
                     <div className="flex flex-column gap-2 w-full sm:w-4">
-                        <label htmlFor="actionFilter" className="font-medium">
+                        <label htmlFor="eventFilter" className="font-medium">
                             Acción
                         </label>
                         <Dropdown
-                            id="actionFilter"
-                            value={selectedAction}
-                            options={actions}
-                            onChange={(e) => onActionChange(e.value)}
-                            placeholder="Seleccionar acción"
+                            id="eventFilter"
+                            value={selectedEvent}
+                            options={eventOptions}
+                            onChange={(e) => onEventChange(e.value)}
+                            placeholder="Seleccionar evento"
                             className="w-full"
+                            optionLabel="label"
                         />
                     </div>
                     <div className="flex flex-column gap-2 w-full sm:w-4">
@@ -119,35 +132,33 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                         <Dropdown
                             id="moduleFilter"
                             value={selectedModule}
-                            options={modules}
+                            options={moduleOptions}
                             onChange={(e) => onModuleChange(e.value)}
                             placeholder="Seleccionar módulo"
                             className="w-full"
+                            optionLabel="label"
                         />
                     </div>
                     <div className="flex flex-column gap-2 w-full sm:w-8">
                         <label htmlFor="dateRange" className="font-medium">
                             Rango de Fechas
                         </label>
-                        <div className="flex flex-column sm:flex-row gap-2 align-items-stretch sm:align-items-center">
+                        <div className="flex gap-2">
                             <Calendar
                                 id="startDate"
                                 value={startDate}
-                                onChange={(e) => handleStartDateChange(e.value as Date | null)}
+                                onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
                                 showIcon
-                                dateFormat="dd/mm/yy"
-                                placeholder="Fecha inicio"
+                                placeholder="Fecha inicial"
                                 className="w-full"
                                 maxDate={endDate || undefined}
                             />
-                            <span className="text-gray-500 text-center">hasta</span>
                             <Calendar
                                 id="endDate"
                                 value={endDate}
-                                onChange={(e) => handleEndDateChange(e.value as Date | null)}
+                                onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
                                 showIcon
-                                dateFormat="dd/mm/yy"
-                                placeholder="Fecha fin"
+                                placeholder="Fecha final"
                                 className="w-full"
                                 minDate={startDate || undefined}
                             />

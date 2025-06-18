@@ -23,15 +23,11 @@
 
 .customized-timeline .p-timeline-event-content {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
 }
 
 .customized-timeline .p-timeline-event-connector {
-    background-color: #e5e7eb;
     width: 2px;
-    margin-left: 1rem;
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.4) 100%);
 }
 
 .customized-timeline .p-card {
@@ -57,24 +53,25 @@
 }
 
 .customized-timeline .p-timeline-event {
-    min-height: 100px;
+    min-height: 70px;
     display: flex;
     align-items: center;
     position: relative;
-    padding: 1rem 0;
+    padding: 0 1.5rem;
 }
 
 .customized-timeline .p-timeline-event-marker {
-    border: 2px solid #e5e7eb;
-    background-color: white;
-    width: 2rem;
-    height: 2rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 1rem;
-    z-index: 1;
+    border: 2px solid var(--primary-color);
+    background-color: #ffffff;
+    margin-top: 0.1rem;
+}
+
+.customized-timeline .p-timeline-event-marker:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .customized-timeline .custom-marker {
@@ -258,6 +255,16 @@
     .audit-log-dialog .p-dialog-content .flex.flex-col > div > div > span:first-child {
         min-width: 100px;
     }
+
+    .customized-timeline .grid .col-12 {
+        padding: 0.5rem;
+    }
+
+    .customized-timeline .grid .col-12:first-child {
+        border-bottom: 1px solid var(--surface-200);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -319,59 +326,32 @@
 .p-paginator {
     background: transparent !important;
     border: none !important;
-    padding: 0.5rem 0 !important;
-    margin-top: 1rem;
 }
 
 .p-paginator .p-paginator-pages .p-paginator-page {
     min-width: 2.5rem;
     height: 2.5rem;
-    margin: 0 0.2rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin: 0 2px;
 }
 
-.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.p-paginator .p-paginator-first,
-.p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-next,
-.p-paginator .p-paginator-last {
-    min-width: 2.5rem;
-    height: 2.5rem;
-    margin: 0 0.2rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+.p-paginator .p-paginator-current {
+    margin-left: auto;
 }
 
 .p-paginator .p-dropdown {
-    min-width: 5rem;
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    margin-left: 0.5rem;
 }
 
-.p-paginator .p-paginator-first:hover,
-.p-paginator .p-paginator-prev:hover,
-.p-paginator .p-paginator-next:hover,
-.p-paginator .p-paginator-last:hover,
-.p-paginator .p-paginator-pages .p-paginator-page:hover {
-    background: #e9ecef;
-    border-color: #dee2e6;
+/* Estilos para los spinners */
+.p-progress-spinner {
+    width: 50px;
+    height: 50px;
 }
 
-.p-paginator .p-paginator-pages .p-paginator-page.p-highlight:hover {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+.p-progress-spinner-circle {
+    stroke: var(--primary-color) !important;
+    animation-duration: 1.5s !important;
 }
 
 /* Responsive */
@@ -383,7 +363,6 @@
     .p-paginator .p-paginator-pages .p-paginator-page {
         min-width: 2rem;
         height: 2rem;
-        margin: 0 0.1rem;
     }
 
     .p-paginator .p-paginator-first,
@@ -392,7 +371,6 @@
     .p-paginator .p-paginator-last {
         min-width: 2rem;
         height: 2rem;
-        margin: 0 0.1rem;
     }
 
     .p-paginator .p-dropdown {
@@ -409,7 +387,6 @@
     .p-paginator .p-paginator-pages .p-paginator-page {
         min-width: 1.8rem;
         height: 1.8rem;
-        margin: 0 0.1rem;
         font-size: 0.9rem;
     }
 
@@ -419,7 +396,6 @@
     .p-paginator .p-paginator-last {
         min-width: 1.8rem;
         height: 1.8rem;
-        margin: 0 0.1rem;
         font-size: 0.9rem;
     }
 
@@ -428,4 +404,55 @@
         height: 1.8rem;
         font-size: 0.9rem;
     }
+}
+
+/* Hover effects */
+.customized-timeline .surface-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.customized-timeline .surface-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Tag styles */
+.p-tag {
+    padding: 0.3rem 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 576px) {
+    .customized-timeline .p-timeline-event-content,
+    .customized-timeline .p-timeline-event-opposite {
+        padding: 0 1rem;
+    }
+
+    .p-tag {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.875rem;
+    }
+
+    .customized-timeline .surface-card {
+        margin-left: 0.5rem !important;
+    }
+}
+
+/* Timeline connector styles */
+.customized-timeline .p-timeline-event:not(:last-child) .p-timeline-event-connector {
+    height: calc(100% + 1rem);
+}
+
+/* Avatar styles */
+.p-avatar.p-avatar-lg {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.2rem;
+}
+
+.p-avatar.p-avatar-lg:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s;
 } 
