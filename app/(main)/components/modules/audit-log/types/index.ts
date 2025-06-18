@@ -24,6 +24,7 @@ export interface AuditLogItem {
     oldData?: any;
     newData?: any;
     createdAt?: string;
+    status?: 'SUCCESS' | 'FAILED' | 'FALLIDO';
 }
 
 export interface AuditLogState {

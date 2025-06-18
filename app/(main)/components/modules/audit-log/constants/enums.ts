@@ -4,7 +4,9 @@ export enum AuditModule {
     SURVEY = 'SURVEY',
     QUESTION = 'QUESTION',
     ANSWER = 'ANSWER',
-    AUTH = 'AUTH'
+    AUTH = 'AUTH',
+    ROLE = 'ROLE',
+    PERMISSION = 'PERMISSION'
 }
 
 export enum AuditEvent {
@@ -21,7 +23,9 @@ export const ModuleTranslations: Record<AuditModule, string> = {
     [AuditModule.SURVEY]: 'Encuestas',
     [AuditModule.QUESTION]: 'Preguntas',
     [AuditModule.ANSWER]: 'Respuestas',
-    [AuditModule.AUTH]: 'Autenticación'
+    [AuditModule.AUTH]: 'Autenticación',
+    [AuditModule.ROLE]: 'Roles',
+    [AuditModule.PERMISSION]: 'Permisos'
 };
 
 export const EventTranslations: Record<AuditEvent, string> = {
@@ -38,7 +42,9 @@ export const ModuleIcons: Record<AuditModule, string> = {
     [AuditModule.SURVEY]: 'pi pi-list',
     [AuditModule.QUESTION]: 'pi pi-question-circle',
     [AuditModule.ANSWER]: 'pi pi-check-square',
-    [AuditModule.AUTH]: 'pi pi-lock'
+    [AuditModule.AUTH]: 'pi pi-lock',
+    [AuditModule.ROLE]: 'pi pi-users',
+    [AuditModule.PERMISSION]: 'pi pi-shield'
 };
 
 export const EventIcons: Record<AuditEvent, string> = {
@@ -73,5 +79,7 @@ export const ModuleColors: Record<AuditModule, string> = {
     [AuditModule.SURVEY]: '#A855F7',     // Púrpura
     [AuditModule.QUESTION]: '#F97316',   // Naranja
     [AuditModule.ANSWER]: '#14B8A6',     // Teal
-    [AuditModule.AUTH]: '#8B5CF6'        // Violeta
+    [AuditModule.AUTH]: '#8B5CF6',        // Violeta
+    [AuditModule.ROLE]: '#06B6D4',      // Cyan
+    [AuditModule.PERMISSION]: '#6366F1'   // Indigo
 }; 
