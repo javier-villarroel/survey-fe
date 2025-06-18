@@ -1,21 +1,25 @@
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import apiWithAuth from "@/app/api/axios";
-import { IUser, IUpdateUserRequest, IUserResponse } from "./types";
+import { IUpdateUserRequest } from './types';
+import apiWithAuth from '@/app/api/axios';
 import { USER_API_BASE } from "./constants";
 
-export const updateUserService = async (
-  id: number | string, 
-  userData: IUpdateUserRequest
-): Promise<IUser | null> => {
-  try {
-    const { data } = await apiWithAuth.patch<IUserResponse>(`${USER_API_BASE}/${id}`, userData);
-    toast.success(data.info.message_to_show || "Usuario actualizado exitosamente");
-    return data.result;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      toast.error(error.response?.data?.info?.message_to_show || "Error al actualizar usuario");
+export const updateUserService = async (userId: string, data: IUpdateUserRequest) => {
+    try {
+        const config = data instanceof FormData ? {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        } : {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+
+        const response = await apiWithAuth.put(`/users/${userId}`, data, config);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user:', error);
+        return null;
     }
-    return null;
-  }
 }; 

@@ -3,7 +3,7 @@ import { getCookie } from 'typescript-cookie';
 import { getUserByIdService } from '../services/getUserByIdService';
 import { IUser } from '../services/types';
 
-export const useProfile = () => {
+export const useFetchProfile = () => {
     const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

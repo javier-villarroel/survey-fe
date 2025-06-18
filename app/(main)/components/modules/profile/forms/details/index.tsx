@@ -1,86 +1,27 @@
 'use client';
-import React, { useState, useRef } from 'react';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Password } from 'primereact/password';
-import { InputSwitch } from 'primereact/inputswitch';
-import { useProfile } from '../../hooks/useProfile';
-import { useUpdateProfile } from '../../hooks/useUpdateProfile';
+import { useHandleOnSubmit } from '../../hooks/update/useHandleOnSubmit';
+import { useFetchProfile } from '../../hooks/useFetchProfile';
+import { useProfileImage } from '../../hooks/useProfileImage';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { toast } from 'sonner';
+import { useProfileInfo } from '../../hooks/useProfileInfo';
+import type { ProfileFormData } from '../../lib/schemas';
+import { Controller, useForm } from 'react-hook-form';
+import { InputSwitch } from 'primereact/inputswitch';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import { classNames } from 'primereact/utils';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 
 const ProfileDetail = () => {
-    const { user, isLoading: isLoadingProfile, error: profileError, refreshProfile } = useProfile();
-    const { updateProfile, isLoading: isUpdating } = useUpdateProfile();
-    const [username, setUsername] = useState(user?.userName || '');
-    const [name, setName] = useState(user?.name || '');
-    const [lastName, setLastName] = useState(user?.lastName || '');
-    const [email, setEmail] = useState(user?.email || '');
-    const [phone, setPhone] = useState(user?.phone || '');
-    const [switchValue, setSwitchValue] = useState(user?.twoFactorAuth || false);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordError, setPasswordError] = useState<string | null>(null);
-
-    React.useEffect(() => {
-        if (user) {
-            setUsername(user.userName || '');
-            setName(user.name || '');
-            setLastName(user.lastName || '');
-            setEmail(user.email || '');
-            setPhone(user.phone || '');
-            setSwitchValue(user.twoFactorAuth || false);
-        }
-    }, [user]);
-
-    const handleImageClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleSubmit = async () => {
-        if (password || confirmPassword) {
-            if (password !== confirmPassword) {
-                setPasswordError('Las contraseñas no coinciden');
-                toast.error('Las contraseñas no coinciden');
-                return;
-            }
-            if (password.length < 8) {
-                setPasswordError('La contraseña debe tener al menos 8 caracteres');
-                toast.error('La contraseña debe tener al menos 8 caracteres');
-                return;
-            }
-        }
-        setPasswordError(null);
-
-        const result = await updateProfile({
-            firstName: name,
-            lastName,
-            email,
-            phone,
-            twoFactorAuth: switchValue,
-            status: 'ACTIVE',
-            ...(password && password === confirmPassword ? { password } : {})
-        });
-
-        if (result) {
-            setPassword('');
-            setConfirmPassword('');
-            refreshProfile();
-        }
-    };
+    const form = useForm<ProfileFormData>({});
+    const { previewImage, fileInputRef, handleImageClick, handleImageChange } = useProfileImage({ 
+        setValue: form.setValue 
+    });
+    const { refreshProfile } = useProfileInfo(form);
+    const { isLoading: isLoadingProfile } = useFetchProfile();
+    const { isUpdating, onSubmit, toast } = useHandleOnSubmit({ form, refreshProfile });
+    const { control, handleSubmit, formState: { errors } } = form;
 
     if (isLoadingProfile) {
         return (
@@ -90,32 +31,15 @@ const ProfileDetail = () => {
         );
     }
 
-    if (profileError) {
-        return (
-            <div className="flex justify-content-center align-items-center" style={{ height: '70vh' }}>
-                <div className="text-center">
-                    <i className="pi pi-exclamation-circle text-red-500" style={{ fontSize: '2rem' }}></i>
-                    <p className="text-red-500 mt-3">{profileError}</p>
-                </div>
-            </div>
-        );
-    }
-
-    const passwordHeader = <h6>Ingrese una contraseña</h6>;
-    const passwordFooter = (
-        <div className="p-2">
-            <h6>La contraseña debe contener:</h6>
-            <ul className="pl-4 ml-2 mt-0 text-sm">
-                <li>Al menos una minúscula</li>
-                <li>Al menos una mayúscula</li>
-                <li>Al menos un número</li>
-                <li>Mínimo 8 caracteres</li>
-            </ul>
-        </div>
-    );
+    const getFormErrorMessage = (name: keyof ProfileFormData) => {
+        return errors[name] ? (
+            <small className="p-error">{errors[name]?.message}</small>
+        ) : null;
+    };
 
     return (
         <>
+            <Toast ref={toast} />
             <h5>Perfil de usuario</h5>
             <div className="grid">
                 <div className="col-12 lg:col-4">
@@ -124,7 +48,7 @@ const ProfileDetail = () => {
                         <div className="flex flex-column align-items-center gap-4">
                             <div 
                                 onClick={handleImageClick}
-                                className="flex flex-col items-center cursor-pointer hover:opacity-90 transition-opacity"
+                                className="flex flex-column align-items-center cursor-pointer relative"
                             >
                                 {previewImage ? (
                                     <div className="relative overflow-hidden" style={{ 
@@ -139,155 +63,167 @@ const ProfileDetail = () => {
                                                 width: '100%',
                                                 height: '100%',
                                                 objectFit: 'cover',
-                                                backgroundColor: 'var(--surface-b)',
+                                                backgroundColor: 'var(--surface-ground)',
                                                 borderRadius: '50%',
                                             }}
                                         />
-                                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                            <i className="pi pi-camera text-white text-2xl"></i>
+                                        <div className="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center transition-all transition-duration-300 hover:bg-black-alpha-50">
+                                            <i className="pi pi-camera text-2xl text-white"></i>
                                         </div>
                                     </div>
-                                ) :
-                                    <div className="relative hover:shadow-lg transition-shadow">
-                                        <i className="pi pi-user mt-3 p-5" style={{ 
-                                            fontSize: '5em', 
-                                            borderRadius: '50%', 
-                                            backgroundColor: 'var(--surface-b)', 
-                                            color: 'var(--surface-d)',
-                                            width: '12rem',
-                                            height: '12rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}></i>
-                                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-full">
-                                            <i className="pi pi-camera text-white text-2xl"></i>
+                                ) : (
+                                    <div className="flex justify-content-center align-items-center bg-surface-100 relative" style={{ 
+                                        width: '12rem',
+                                        height: '12rem',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'var(--surface-ground)'
+                                    }}>
+                                        <i className="pi pi-user text-6xl text-surface-500"></i>
+                                        <div className="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center transition-all transition-duration-300 hover:bg-black-alpha-50">
+                                            <i className="pi pi-camera text-2xl text-white"></i>
                                         </div>
                                     </div>
-                                }
+                                )}
                             </div>
                             <input
                                 type="file"
                                 ref={fileInputRef}
                                 onChange={handleImageChange}
                                 accept="image/*"
-                                className="hidden"
+                                style={{ display: 'none' }}
                             />
-                            <small className="text-gray-500">El tamaño recomendado es de 300x300 y peso de 2MB</small>
                         </div>
                     </div>
                 </div>
                 <div className="col-12 lg:col-8">
                     <div className="card">
                         <h5>Información personal</h5>
-                        <div className="grid formgrid p-fluid">
+                        <form onSubmit={handleSubmit(onSubmit)} className="grid formgrid p-fluid">
                             <div className="field col-12 md:col-6">
-                                <label htmlFor="username">Usuario</label>
-                                <InputText                                     
-                                    placeholder="Nombre de usuario"
-                                    id="username" 
-                                    value={username} 
-                                    onChange={(e) => setUsername(e.target.value)} 
-                                    required 
+                                <label htmlFor="name">Nombre</label>
+                                <Controller
+                                    name="firstName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="Ingrese su nombre"
+                                        />
+                                    )}
                                 />
+                                {getFormErrorMessage('firstName')}
+                            </div>
+                             <div className="field col-12 md:col-6">
+                                <label htmlFor="lastName">Apellido</label>
+                                <Controller
+                                    name="lastName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="Ingrese su apellido"
+                                        />
+                                    )}
+                                />
+                                {getFormErrorMessage('lastName')}
                             </div>
                             <div className="field col-12 md:col-6">
                                 <label htmlFor="email">Correo electrónico</label>
-                                <InputText                                     
-                                    placeholder="Correo electrónico"
-                                    id="email" 
-                                    value={email} 
-                                    onChange={(e) => setEmail(e.target.value)} 
-                                    required 
+                                <Controller
+                                    name="email"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="Correo electrónico"
+                                        />
+                                    )}
                                 />
+                                {getFormErrorMessage('email')}
                             </div>
-                            <div className="field col-12 md:col-6">
-                                <label htmlFor="name">Nombre</label>
-                                <InputText                                     
-                                    placeholder="Ingrese su nombre"
-                                    id="name" 
-                                    value={name} 
-                                    onChange={(e) => setName(e.target.value)} 
-                                    required 
-                                />
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <label htmlFor="lastName">Apellido</label>
-                                <InputText                                     
-                                    placeholder="Ingrese su apellido"
-                                    id="lastName" 
-                                    value={lastName} 
-                                    onChange={(e) => setLastName(e.target.value)} 
-                                    required 
-                                />
-                            </div>
+                            
+                           
                             <div className="field col-12 md:col-6">
                                 <label htmlFor="phone">Teléfono</label>
-                                <InputText                                     
-                                    placeholder="Ingrese su teléfono"
-                                    id="phone" 
-                                    value={phone} 
-                                    onChange={(e) => setPhone(e.target.value)} 
-                                />
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <label htmlFor="twoFactorAuth">Autenticación de doble paso (2FA)</label>
-                                <div className="flex align-items-center">
-                                    <div className="p-field-checkbox">
-                                        <InputSwitch
-                                            inputId="twoFactorAuth"
-                                            checked={switchValue}
-                                            onChange={(e) => setSwitchValue(e.value ?? false)}
-                                            className="mr-2"
+                                <Controller
+                                    name="phone"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="+584143654288"
                                         />
-                                        <label htmlFor="twoFactorAuth" className="ml-2 text-sm text-gray-500">
-                                            {switchValue ? 'Activado' : 'Desactivado'}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <label htmlFor="password">Nueva contraseña</label>
-                                <Password
-                                    inputId="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Ingrese nueva contraseña"
-                                    toggleMask
-                                    header={passwordHeader}
-                                    footer={passwordFooter}
-                                    weakLabel="Débil"
-                                    mediumLabel="Media"
-                                    strongLabel="Fuerte"
-                                    promptLabel="Ingrese una contraseña"
-                                    className="w-full"
+                                    )}
                                 />
+                                {getFormErrorMessage('phone')}
+                            </div>
+                            
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="password">Contraseña</label>
+                                <Controller
+                                    name="password"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <Password
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="Ingrese su nueva contraseña"
+                                            toggleMask
+                                            feedback={false}
+                                        />
+                                    )}
+                                />
+                                {getFormErrorMessage('password')}
                             </div>
                             <div className="field col-12 md:col-6">
                                 <label htmlFor="confirmPassword">Confirmar contraseña</label>
-                                <Password
-                                    inputId="confirmPassword"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Confirme su contraseña"
-                                    toggleMask
-                                    feedback={false}
-                                    className={`w-full ${passwordError ? 'p-invalid' : ''}`}
+                                <Controller
+                                    name="confirmPassword"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <Password
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.error })}
+                                            placeholder="Confirme su nueva contraseña"
+                                            toggleMask
+                                            feedback={false}
+                                        />
+                                    )}
                                 />
-                                {passwordError && (
-                                    <small className="p-error block mt-1">{passwordError}</small>
-                                )}
+                                {getFormErrorMessage('confirmPassword')}
                             </div>
-                        </div>
-                        <div className="flex justify-content-end mt-4">
-                            <Button 
-                                label="Guardar cambios" 
-                                icon="pi pi-save" 
-                                className="p-button-primary"
-                                onClick={handleSubmit}
-                                loading={isUpdating}
-                            />
-                        </div>
+                            <div className="field col-12 md:col-6">
+                                <label htmlFor="twoFactorAuth" className="block mb-2">Autenticación de dos factores</label>
+                                <Controller
+                                    name="twoFactorAuth"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <InputSwitch
+                                            id={field.name}
+                                            checked={field.value}
+                                            onChange={(e) => field.onChange(e.value)}
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <div className="col-12">
+                                <Button 
+                                    type="submit" 
+                                    label="Guardar cambios" 
+                                    className="w-auto" 
+                                    loading={isUpdating}
+                                />
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

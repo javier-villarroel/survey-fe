@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { getCookie } from 'typescript-cookie';
 import { updateUserService } from '../services/updateUserService';
 import { IUpdateUserRequest } from '../services/types';
+import { getCookie } from 'typescript-cookie';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 export const useUpdateProfile = () => {

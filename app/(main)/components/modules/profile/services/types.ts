@@ -1,8 +1,7 @@
 export interface IUser {
   id: number;
-  userName: string;
   twoFactorAuth: boolean;
-  name: string;
+  firstName: string;
   lastName: string;
   email: string;
   phone?: string;
@@ -14,6 +13,7 @@ export interface IUser {
   status: boolean;
   createdAt: string;
   updatedAt: string;
+  profileImage?: string;
 }
 
 export interface IPagination {
@@ -55,15 +55,15 @@ export interface ICreateUserRequest {
   status: boolean;
 }
 
-export interface IUpdateUserRequest {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
+export type IUpdateUserRequest = FormData | {
+  firstName: string;
+  lastName: string;
+  email: string;
   phone?: string;
-  twoFactorAuth?: boolean;
-  status?: string;
+  twoFactorAuth: boolean;
+  status: string;
   password?: string;
-}
+};
 
 // Tipos específicos para las respuestas de usuarios
 export type IUserResponse = IApiResponse<IUser>;
