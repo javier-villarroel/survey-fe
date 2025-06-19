@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Timeline } from 'primereact/timeline';
+import { Skeleton } from 'primereact/skeleton';
 import { AuditLogItem } from '../types';
 import { 
     AuditModule, 
@@ -23,6 +24,7 @@ import { Tooltip } from 'primereact/tooltip';
 interface AuditLogTimelineProps {
     items: AuditLogItem[];
     onItemClick: (item: AuditLogItem) => void;
+    loading?: boolean;
 }
 
 type StatusSeverity = 'success' | 'danger' | 'info';
@@ -115,8 +117,63 @@ const getModuleIcon = (moduleType: AuditModule, status?: string): string => {
 
 export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
     items,
-    onItemClick
+    onItemClick,
+    loading = false
 }) => {
+    const LoadingSkeleton = () => {
+        return Array(3).fill(0).map((_, index) => (
+            <div key={index} className="surface-card border-round shadow-1 mb-3" style={{ marginLeft: '4rem' }}>
+                <div className="p-3">
+                    {/* Header skeleton */}
+                    <div className="flex flex-column sm:flex-row align-items-start sm:align-items-center justify-content-between mb-3 gap-2">
+                        <div className="flex align-items-center gap-2">
+                            <Skeleton width="2rem" height="2rem" className="mr-2" />
+                            <Skeleton width="8rem" height="1.5rem" />
+                            <Skeleton width="6rem" height="1.5rem" className="ml-2" />
+                        </div>
+                        <div className="flex align-items-center gap-2">
+                            <Skeleton width="8rem" height="1.2rem" />
+                        </div>
+                    </div>
+
+                    {/* Content skeleton */}
+                    <div className="grid">
+                        <div className="col-12 md:col-4">
+                            <div className="flex align-items-center gap-2 mb-2 md:mb-0">
+                                <Skeleton shape="circle" size="3rem" />
+                                <div className="flex flex-column gap-2">
+                                    <Skeleton width="10rem" height="1rem" />
+                                    <Skeleton width="8rem" height="1rem" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-12 md:col-8">
+                            <div className="flex align-items-center h-full">
+                                <div className="w-full">
+                                    <Skeleton width="100%" height="2rem" className="mb-2" />
+                                    <Skeleton width="80%" height="1rem" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer skeleton */}
+                    <div className="flex justify-content-end align-items-center mt-3 pt-2 border-top-1 border-300">
+                        <Skeleton width="12rem" height="1rem" />
+                    </div>
+                </div>
+            </div>
+        ));
+    };
+
+    if (loading) {
+        return (
+            <div className="w-full px-4">
+                <LoadingSkeleton />
+            </div>
+        );
+    }
+
     const customMarker = (item: AuditLogItem) => {
         const event = item.event as AuditEvent;
         const backgroundColor = EventBackgroundColors[event];

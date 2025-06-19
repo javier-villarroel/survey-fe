@@ -85,8 +85,12 @@ export const AuditLog: React.FC = () => {
             />
 
             {loading ? (
-                <div className="flex align-items-center justify-content-center p-5">
-                    <ProgressSpinner />
+                <div className="flex flex-column gap-3">
+                    <AuditLogTimeline 
+                        items={[]} 
+                        onItemClick={() => {}}
+                        loading={true}
+                    />
                 </div>
             ) : items.length === 0 ? (
                 <div className="flex align-items-center justify-content-center p-5">
@@ -97,6 +101,7 @@ export const AuditLog: React.FC = () => {
                     <AuditLogTimeline 
                         items={items} 
                         onItemClick={handleItemClick}
+                        loading={false}
                     />
                     <div className="flex align-items-center justify-content-center gap-4">
                         <div className="flex align-items-center gap-2">
