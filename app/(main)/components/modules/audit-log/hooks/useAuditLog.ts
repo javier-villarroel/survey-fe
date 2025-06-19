@@ -24,6 +24,9 @@ interface UseAuditLogReturn {
     setSelectedEvent: (event: AuditEvent | null) => void;
     setSelectedUser: (user: User | null) => void;
     usersLoading: boolean;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
 }
 
 export const useAuditLog = (): UseAuditLogReturn => {
@@ -40,6 +43,9 @@ export const useAuditLog = (): UseAuditLogReturn => {
     const [selectedModule, setSelectedModule] = useState<AuditModule | null>(null);
     const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [totalPages, setTotalPages] = useState(0);
+    const [hasNextPage, setHasNextPage] = useState(false);
+    const [hasPrevPage, setHasPrevPage] = useState(false);
 
     const fetchUsers = async () => {
         try {
@@ -84,6 +90,9 @@ export const useAuditLog = (): UseAuditLogReturn => {
 
             setItems(response.result);
             setTotal(response.pagination.totalDocs);
+            setTotalPages(response.pagination.totalPages);
+            setHasNextPage(response.pagination.hasNextPage);
+            setHasPrevPage(response.pagination.hasPrevPage);
         } catch (err) {
             console.error('Error fetching audit logs:', err);
             setError(err as Error);
@@ -124,6 +133,9 @@ export const useAuditLog = (): UseAuditLogReturn => {
         setPage,
         setPageSize,
         setDateRange,
-        usersLoading
+        usersLoading,
+        totalPages,
+        hasNextPage,
+        hasPrevPage
     };
 }; 
