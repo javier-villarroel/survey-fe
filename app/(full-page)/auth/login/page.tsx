@@ -247,6 +247,7 @@ const LoginPage = () => {
                                 label="Iniciar sesión" 
                                 className="w-full p-3 text-xl" 
                                 onClick={handleLogin} 
+                                onKeyDown={handleLogin}
                                 disabled={isPending || !captchaToken}
                             />
                         </div>

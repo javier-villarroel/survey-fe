@@ -69,7 +69,7 @@ const AppMenu = () => {
                             className=" text-white text-sm font-bold px-6 py-2  shadow-sm cursor-pointer transition-colors"
                             onClick={() => router.push('/versiones')}
                         >
-                            Versión 0.0.0
+                            Versión 0.1.0
                         </span>
                     </div>
                 </div>

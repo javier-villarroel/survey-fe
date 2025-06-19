@@ -175,7 +175,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                  }}>
                 <div className="p-3">
                     {/* Encabezado con módulo, evento y tiempo */}
-                    <div className="flex align-items-center justify-content-between mb-3">
+                    <div className="flex flex-column sm:flex-row align-items-start sm:align-items-center justify-content-between mb-3 gap-2">
                         <div className="flex align-items-center gap-2 flex-wrap">
                             <i className={`${moduleIcon} text-xl`} 
                                style={{ color: iconColor }} />
@@ -202,18 +202,18 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                     <div className="grid">
                         {/* Columna izquierda: Usuario */}
                         <div className="col-12 md:col-4">
-                            <div className="flex align-items-center gap-2">
+                            <div className="flex align-items-center gap-2 mb-2 md:mb-0">
                                 <Avatar label={initials} 
                                         size="large" 
                                         shape="circle" 
                                         style={{ backgroundColor: moduleColor, color: '#ffffff' }} />
                                 <div className="flex flex-column">
-                                    <span className="font-semibold text-900">
+                                    <span className="font-semibold text-900 text-overflow-ellipsis overflow-hidden">
                                         {moduleType === AuditModule.AUTH && item.status === 'SUCCESS' 
                                             ? item.newData?.email 
                                             : `${item.newData?.firstName || ''} ${item.newData?.lastName || ''}`}
                                     </span>
-                                    <span className="text-500 text-sm">
+                                    <span className="text-500 text-sm text-overflow-ellipsis overflow-hidden">
                                         {moduleType === AuditModule.AUTH && item.status === 'SUCCESS' 
                                             ? 'Usuario autenticado'
                                             : item.newData?.email}
@@ -225,7 +225,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                         {/* Columna derecha: Descripción */}
                         <div className="col-12 md:col-8">
                             <div className="flex align-items-center h-full">
-                                <p className="text-700 line-height-3 m-0">
+                                <p className="text-700 line-height-3 m-0 text-break-word">
                                     {item.description}
                                 </p>
                             </div>

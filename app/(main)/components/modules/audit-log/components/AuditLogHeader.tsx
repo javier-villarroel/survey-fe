@@ -143,14 +143,14 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                         <label htmlFor="dateRange" className="font-medium">
                             Rango de Fechas
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-column sm:flex-row gap-2">
                             <Calendar
                                 id="startDate"
                                 value={startDate}
                                 onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
                                 showIcon
                                 placeholder="Fecha inicial"
-                                className="w-full"
+                                className="w-full mr-3"
                                 maxDate={endDate || undefined}
                             />
                             <Calendar
