@@ -34,7 +34,7 @@ export const useAuditLog = (): UseAuditLogReturn => {
     const [error, setError] = useState<Error | null>(null);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(5);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [selectedModule, setSelectedModule] = useState<AuditModule | null>(null);
@@ -44,10 +44,7 @@ export const useAuditLog = (): UseAuditLogReturn => {
     const fetchUsers = async () => {
         try {
             setUsersLoading(true);
-            const response = await auditLogService.getUsers({
-                page: 1,
-                limit: 100
-            });
+            const response = await auditLogService.getUsers();
             setUsers(response.result);
         } catch (err) {
             console.error('Error fetching users:', err);
@@ -62,13 +59,23 @@ export const useAuditLog = (): UseAuditLogReturn => {
             setLoading(true);
             setError(null);
 
-            const filters = {
-                ...(selectedModule && { module: selectedModule }),
-                ...(selectedEvent && { event: selectedEvent }),
-                ...(selectedUser && { userId: selectedUser.id.toString() }),
-                ...(startDate && { startDate: startDate.toISOString() }),
-                ...(endDate && { endDate: endDate.toISOString() })
-            };
+            const filters: Record<string, string> = {};
+
+            if (selectedModule) {
+                filters.module = selectedModule;
+            }
+            if (selectedEvent) {
+                filters.event = selectedEvent;
+            }
+            if (selectedUser) {
+                filters.userId = selectedUser.id.toString();
+            }
+            if (startDate) {
+                filters.startDate = startDate.toISOString();
+            }
+            if (endDate) {
+                filters.endDate = endDate.toISOString();
+            }
 
             const response = await auditLogService.getAuditLogs(
                 { page, limit: pageSize },
