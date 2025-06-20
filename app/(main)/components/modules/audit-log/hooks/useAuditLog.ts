@@ -65,7 +65,7 @@ export const useAuditLog = (): UseAuditLogReturn => {
             setLoading(true);
             setError(null);
 
-            const filters: Record<string, string> = {};
+            const filters: Record<string, any> = {};
 
             if (selectedModule) {
                 filters.module = selectedModule;
@@ -74,7 +74,9 @@ export const useAuditLog = (): UseAuditLogReturn => {
                 filters.event = selectedEvent;
             }
             if (selectedUser) {
-                filters.userId = selectedUser.id.toString();
+                filters.user = {
+                    email: selectedUser.email
+                };
             }
             if (startDate) {
                 filters.startDate = startDate.toISOString();

@@ -70,7 +70,7 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
         onModuleChange(null);
     };
 
-    const hasActiveFilters = startDate || endDate || selectedEvent || selectedModule;
+    const hasActiveFilters = selectedUser || startDate || endDate || selectedEvent || selectedModule;
 
     return (
         <div className="flex flex-column gap-4">
@@ -81,88 +81,94 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                         Registro detallado de todas las acciones realizadas en el sistema
                     </p>
                 </div>
-                {hasActiveFilters && (
-                    <Button
-                        icon="pi pi-filter-slash"
-                        label="Limpiar filtros"
-                        className="p-button-outlined p-button-secondary w-full sm:w-auto"
-                        onClick={handleClearFilters}
-                    />
-                )}
             </div>
             <div className="flex justify-content-center">
-                <div className="flex flex-column sm:flex-row gap-4 align-items-stretch sm:align-items-end w-full sm:w-auto" style={{ maxWidth: '1000px' }}>
-                    <div className="flex flex-column gap-2 w-full sm:w-4">
-                        <label htmlFor="userFilter" className="font-medium">
-                            Usuario
-                        </label>
-                        <Dropdown
-                            id="userFilter"
-                            value={selectedUser}
-                            options={userOptions}
-                            onChange={(e) => onUserChange(e.value)}
-                            placeholder="Seleccionar usuario"
-                            className="w-full"
-                            loading={usersLoading}
-                            disabled={usersLoading}
-                            optionLabel="label"
-                            emptyMessage="No hay usuarios disponibles"
-                            filter
-                            filterBy="label"
-                        />
-                    </div>
-                    <div className="flex flex-column gap-2 w-full sm:w-4">
-                        <label htmlFor="eventFilter" className="font-medium">
-                            Acción
-                        </label>
-                        <Dropdown
-                            id="eventFilter"
-                            value={selectedEvent}
-                            options={eventOptions}
-                            onChange={(e) => onEventChange(e.value)}
-                            placeholder="Seleccionar evento"
-                            className="w-full"
-                            optionLabel="label"
-                        />
-                    </div>
-                    <div className="flex flex-column gap-2 w-full sm:w-4">
-                        <label htmlFor="moduleFilter" className="font-medium">
-                            Módulo
-                        </label>
-                        <Dropdown
-                            id="moduleFilter"
-                            value={selectedModule}
-                            options={moduleOptions}
-                            onChange={(e) => onModuleChange(e.value)}
-                            placeholder="Seleccionar módulo"
-                            className="w-full"
-                            optionLabel="label"
-                        />
-                    </div>
-                    <div className="flex flex-column gap-2 w-full sm:w-8">
-                        <label htmlFor="dateRange" className="font-medium">
-                            Rango de Fechas
-                        </label>
-                        <div className="flex flex-column sm:flex-row gap-2">
-                            <Calendar
-                                id="startDate"
-                                value={startDate}
-                                onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
-                                showIcon
-                                placeholder="Fecha inicial"
-                                className="w-full mr-3"
-                                maxDate={endDate || undefined}
-                            />
-                            <Calendar
-                                id="endDate"
-                                value={endDate}
-                                onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
-                                showIcon
-                                placeholder="Fecha final"
-                                className="w-full"
-                                minDate={startDate || undefined}
+                <div className="flex flex-column gap-4 w-full" style={{ maxWidth: '1000px' }}>
+                    {hasActiveFilters && (
+                        <div className="flex justify-content-end">
+                            <Button
+                                icon="pi pi-filter-slash"
+                                label="Limpiar todos los filtros"
+                                severity="secondary"
+                                outlined
+                                className="p-button-sm"
+                                onClick={handleClearFilters}
                             />
                         </div>
+                    )}
+                    <div className="flex flex-column sm:flex-row gap-4 align-items-stretch sm:align-items-end w-full">
+                        <div className="flex flex-column gap-2 w-full sm:w-4">
+                            <label htmlFor="userFilter" className="font-medium">
+                                Usuario
+                            </label>
+                            <Dropdown
+                                id="userFilter"
+                                value={selectedUser}
+                                options={userOptions}
+                                onChange={(e) => onUserChange(e.value)}
+                                placeholder="Seleccionar usuario"
+                                className="w-full"
+                                loading={usersLoading}
+                                disabled={usersLoading}
+                                optionLabel="label"
+                                emptyMessage="No hay usuarios disponibles"
+                                filter
+                                filterBy="label"
+                            />
+                        </div>
+                        <div className="flex flex-column gap-2 w-full sm:w-4">
+                            <label htmlFor="eventFilter" className="font-medium">
+                                Acción
+                            </label>
+                            <Dropdown
+                                id="eventFilter"
+                                value={selectedEvent}
+                                options={eventOptions}
+                                onChange={(e) => onEventChange(e.value)}
+                                placeholder="Seleccionar evento"
+                                className="w-full"
+                                optionLabel="label"
+                            />
+                        </div>
+                        <div className="flex flex-column gap-2 w-full sm:w-4">
+                            <label htmlFor="moduleFilter" className="font-medium">
+                                Módulo
+                            </label>
+                            <Dropdown
+                                id="moduleFilter"
+                                value={selectedModule}
+                                options={moduleOptions}
+                                onChange={(e) => onModuleChange(e.value)}
+                                placeholder="Seleccionar módulo"
+                                className="w-full"
+                                optionLabel="label"
+                            />
+                        </div>
+                        {/* <div className="flex flex-column gap-2 w-full sm:w-8">
+                            <label htmlFor="dateRange" className="font-medium">
+                                Rango de Fechas
+                            </label>
+                            <div className="flex flex-column sm:flex-row gap-2">
+                                <Calendar
+                                    id="startDate"
+                                    value={startDate}
+                                    onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
+                                    showIcon
+                                    placeholder="Fecha inicial"
+                                    className="w-full"
+                                    maxDate={endDate || undefined}
+                                />
+                                <Calendar
+                                    id="endDate"
+                                    value={endDate}
+                                    onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
+                                    showIcon
+                                    placeholder="Fecha final"
+                                    className="w-full"
+                                    minDate={startDate || undefined}
+                                />
+                            </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

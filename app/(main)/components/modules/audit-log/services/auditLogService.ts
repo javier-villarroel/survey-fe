@@ -16,7 +16,7 @@ interface AuditLogParams {
     module?: string;
     action?: string;
     pagination?: string;
-    filters?: string;
+    queries?: string;
 }
 
 interface PaginationParams {
@@ -47,8 +47,8 @@ export const auditLogService = {
                 if (filters.event) {
                     queries.push({ field: 'event', text: filters.event });
                 }
-                if (filters.userId) {
-                    queries.push({ field: 'userId', text: filters.userId });
+                if (filters.user?.email) {
+                    queries.push({ field: 'user-email', text: filters.user.email });
                 }
                 if (filters.startDate) {
                     queries.push({ field: 'startDate', text: filters.startDate });
@@ -61,7 +61,8 @@ export const auditLogService = {
             // Construir los parámetros de la URL
             const params = {
                 pagination: JSON.stringify(pagination),
-                ...(queries.length > 0 && { queries: JSON.stringify(queries) })
+                ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
+                ordering: JSON.stringify({ createdAt: "desc" })
             };
 
             // Convertir los parámetros a string de consulta

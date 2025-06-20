@@ -20,14 +20,14 @@ export const menuModel: any[] = [
 			},
 		],
 	},
-	{
-		label: "",
-		items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
-	},
-	{
-		label: "",
-		items: [{ label: "Proyectos", icon: "pi pi-briefcase", to: "/proyectos" }],
-	},
+	// {
+	// 	label: "",
+	// 	items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
+	// },
+	// {
+	// 	label: "",
+	// 	items: [{ label: "Proyectos", icon: "pi pi-briefcase", to: "/proyectos" }],
+	// },
 	{
 		label: "Sistema",
 		items: [
