@@ -12,14 +12,60 @@ import { columns } from "./config/columns";
 import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { CreateUser } from "../create";
+import { Paginator } from 'primereact/paginator';
+import { Dropdown } from 'primereact/dropdown';
+import { DataTableStateEvent } from 'primereact/datatable';
+import { Skeleton } from 'primereact/skeleton';
+
+const pageSizeOptions = [
+	{ label: '5 por página', value: 5 },
+	{ label: '10 por página', value: 10 },
+	{ label: '20 por página', value: 20 }
+];
+
+const LoadingSkeleton = () => {
+	return (
+		<div className="w-full">
+			{/* Header skeleton */}
+			<div className="flex justify-between mb-4">
+				<Skeleton width="15rem" height="2rem" />
+				<Skeleton width="10rem" height="2.5rem" className="mr-2" />
+			</div>
+
+			{/* Table header skeleton */}
+			<div className="flex gap-3 mb-3">
+				{Array(5).fill(0).map((_, index) => (
+					<Skeleton key={`header-${index}`} width="15rem" height="3rem" />
+				))}
+			</div>
+
+			{/* Table rows skeleton */}
+			{Array(5).fill(0).map((_, rowIndex) => (
+				<div key={`row-${rowIndex}`} className="flex gap-3 mb-3">
+					{Array(5).fill(0).map((_, colIndex) => (
+						<Skeleton key={`cell-${rowIndex}-${colIndex}`} width="15rem" height="3rem" />
+					))}
+				</div>
+			))}
+
+			{/* Pagination skeleton */}
+			<div className="flex justify-content-between align-items-center mt-4">
+				<Skeleton width="10rem" height="2.5rem" />
+				<div className="flex gap-2">
+					{Array(5).fill(0).map((_, index) => (
+						<Skeleton key={`page-${index}`} width="3rem" height="2.5rem" />
+					))}
+				</div>
+			</div>
+		</div>
+	);
+};
 
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 	const { deleteUser, toggleUserStatus } = useUsers();
-	const { data, loading, pagination, onTableChange, handleFilter } = useUsersTable();
-
-
+	const { data, loading, pagination, handleFilter } = useUsersTable();
 
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
@@ -59,6 +105,29 @@ const ListUsers = () => {
 		setSelectedUser(null);
 	};
 
+	const onPageChange = (event: { first: number; rows: number; page: number }) => {
+		handleFilter({
+			page: event.page + 1,
+			limit: event.rows
+		});
+	};
+
+	const handlePageSizeChange = (e: { value: number }) => {
+		handleFilter({
+			page: 1,
+			limit: e.value
+		});
+	};
+
+	const handleTablePage = (event: DataTableStateEvent) => {
+		if (event.page !== undefined && event.rows !== undefined) {
+			handleFilter({
+				page: event.page + 1,
+				limit: event.rows
+			});
+		}
+	};
+
 	const actions = createActions({
 		onEdit: handleEdit,
 		onDelete: handleDelete,
@@ -74,8 +143,22 @@ const ListUsers = () => {
 		</div>
 	);
 
+	if (loading) {
+		return (
+			<>
+				<div className="relative w-full mb-4">
+					<h2 className="text-2xl font-bold">Gestión de usuarios</h2>
+				</div>
+				<Card className="w-full shadow-2">
+					<LoadingSkeleton />
+				</Card>
+			</>
+		);
+	}
+
 	return (
 		<>
+		<Card>
 			<div className="relative w-full mb-4">
 				<h2 className="text-2xl font-bold">Gestión de usuarios</h2>
 				<div className="absolute right-0 top-0 -mt-1">
@@ -118,15 +201,37 @@ const ListUsers = () => {
 						columns={columns}
 						value={data}
 						loading={loading}
-						onPage={onTableChange}
-						onFilter={handleFilter}
 						totalRecords={pagination?.totalDocs || 0}
 						actions={actions}
 						globalSearchFields={["userName", "name", "lastName", "email", "role.name"]}
 						emptyMessage="No se encontraron usuarios"
-						rowsPerPageOptions={[10, 25, 50]}
+						className="text-center"
+						onPage={handleTablePage}
+						onFilter={handleFilter}
+						rowsPerPageOptions={[5, 10, 20]}
+						showPaginator={false}
 					/>
+					<div className="flex align-items-center justify-content-center gap-4 mt-4">
+						<div className="flex align-items-center gap-2">
+							<span className="text-sm">Mostrar:</span>
+							<Dropdown
+								value={pagination?.rowsPerPage || 10}
+								options={pageSizeOptions}
+								onChange={handlePageSizeChange}
+								className="w-auto"
+							/>
+						</div>
+						<Paginator
+							first={((pagination?.currentPage || 0)) * (pagination?.rowsPerPage || 10)}
+							rows={pagination?.rowsPerPage || 10}
+							totalRecords={pagination?.totalDocs || 0}
+							onPageChange={onPageChange}
+							template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+							className="border-round-xl"
+						/>
+					</div>
 				</div>
+			</Card>
 			</Card>
 		</>
 	);

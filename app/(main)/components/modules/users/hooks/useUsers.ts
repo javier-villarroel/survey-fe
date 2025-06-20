@@ -4,9 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { IUser, ICreateUserRequest, IUpdateUserRequest, IUsersListResponse, IUserResponse } from "../services/types";
 import { TablePaginationParams } from "@/app/(main)/components/common/components/table/types";
 
-interface PaginationQueryParams {
-    pagination: string;
-    search?: string;
+interface Pagination {
+    page: number;
+    limit: number;
 }
 
 export const useUsers = () => {
@@ -17,19 +17,30 @@ export const useUsers = () => {
     const getUsers = async (params: TablePaginationParams): Promise<IUsersListResponse> => {
         try {
             setLoading(true);
-            const paginationParams: PaginationQueryParams = {
-                pagination: JSON.stringify({
-                    page: params.page,
-                    limit: params.limit
-                })
+            const pagination: Pagination = {
+                page: params.page,
+                limit: params.limit
             };
 
+            const filters: Record<string, any> = {};
+            if (params.filters) {
+                Object.entries(params.filters).forEach(([key, value]) => {
+                    if (value && value.value !== undefined && value.value !== '') {
+                        filters[key] = value.value;
+                    }
+                });
+            }
+
             if (params.search) {
-                paginationParams.search = params.search;
+                filters.search = params.search;
             }
 
             const response = await api.get("/user/table", {
-                params: paginationParams
+                params: {
+                    pagination: JSON.stringify(pagination),
+                    ...(Object.keys(filters).length > 0 && { queries: JSON.stringify(filters) }),
+                    ordering: JSON.stringify({ createdAt: "desc" })
+                }
             });
             return response.data;
         } catch (error) {

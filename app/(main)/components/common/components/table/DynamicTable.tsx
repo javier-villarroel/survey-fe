@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { DynamicTableProps, TableColumn, TableAction } from "./types";
+import { DynamicTableProps, TableColumn, TableAction, TablePaginationParams } from "./types";
 import { classNames } from "primereact/utils";
 
 const DEFAULT_FILTER_OPTIONS = [
@@ -57,8 +57,9 @@ export function DynamicTable<T extends Record<string, any>>({
     globalSearchFields,
     emptyMessage = "No se encontraron registros",
     className,
-    style
-}: DynamicTableProps<T>) {
+    style,
+    showPaginator = true
+}: DynamicTableProps<T> & { showPaginator?: boolean }) {
     const [filters, setFilters] = React.useState<DataTableFilterMeta>(
         defaultFilters || {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -169,7 +170,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 value={value}
                 lazy
                 dataKey="id"
-                paginator
+                paginator={showPaginator}
                 first={0}
                 rows={10}
                 totalRecords={totalRecords}
@@ -185,7 +186,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 stripedRows
                 showGridlines
                 responsiveLayout="scroll"
-                rowsPerPageOptions={[10, 25, 50]}
+                rowsPerPageOptions={rowsPerPageOptions}
                 style={{ ...defaultStyle, ...style }}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Página {currentPage} de {totalPages} (Total: {totalRecords} registros)"
@@ -221,6 +222,12 @@ export function DynamicTable<T extends Record<string, any>>({
                     />
                 )}
             </DataTable>
+            <style jsx global>{`
+                .p-datatable .p-datatable-emptymessage td {
+                    text-align: center !important;
+                    padding: 2rem !important;
+                }
+            `}</style>
         </div>
     );
 } 

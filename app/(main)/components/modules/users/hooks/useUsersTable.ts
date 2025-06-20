@@ -28,7 +28,8 @@ export const useUsersTable = () => {
         queryFn: () => getUsers({
             page: queryParams.page,
             limit: queryParams.limit,
-            search: queryParams.search
+            search: queryParams.search,
+            filters: queryParams.filters
         }),
         staleTime: 0, // Siempre considerar los datos como obsoletos
         refetchOnMount: true, // Refetch al montar el componente
@@ -36,10 +37,14 @@ export const useUsersTable = () => {
     });
 
     const onTableChange = (event: DataTableStateEvent) => {
+        const newFilters = event.filters || {};
+        
         setQueryParams(prev => ({
             ...prev,
             page: (event.page ?? 0) + 1,
-            limit: event.rows ?? prev.limit
+            limit: event.rows ?? prev.limit,
+            filters: newFilters,
+            search: event.globalFilter as string || ""
         }));
     };
 

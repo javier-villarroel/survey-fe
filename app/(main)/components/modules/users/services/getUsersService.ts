@@ -4,21 +4,63 @@ import apiWithAuth from "@/app/api/axios";
 import { IUsersListResponse } from "./types";
 import { USER_API_BASE } from "./constants";
 
-export const getUsersService = async (params?: { page?: number; limit?: number; search?: string }) => {
-  try {
-    const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.limit) queryParams.append("limit", params.limit.toString());
-    if (params?.search) queryParams.append("search", params.search);
+interface QueryFilter {
+    field: string;
+    text: string;
+}
 
-    const { data } = await apiWithAuth.get<IUsersListResponse>(
-      `${USER_API_BASE}/table?${queryParams.toString()}`
-    );
-    return data;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      toast.error(error.response?.data?.info?.message_to_show || "Error al obtener usuarios");
+interface Pagination {
+    page: number;
+    limit: number;
+}
+
+export const getUsersService = async (pagination: Pagination, filters?: Record<string, any>) => {
+    try {
+        // Construir los queries basados en los filtros
+        const queries: QueryFilter[] = [];
+        
+        if (filters) {
+            if (filters.userName) {
+                queries.push({ field: 'userName', text: filters.userName });
+            }
+            if (filters.name) {
+                queries.push({ field: 'name', text: filters.name });
+            }
+            if (filters.lastName) {
+                queries.push({ field: 'lastName', text: filters.lastName });
+            }
+            if (filters.email) {
+                queries.push({ field: 'email', text: filters.email });
+            }
+            if (filters.role) {
+                queries.push({ field: 'role', text: filters.role });
+            }
+            if (filters.status !== undefined) {
+                queries.push({ field: 'status', text: filters.status.toString() });
+            }
+        }
+
+        // Construir los parámetros de la URL
+        const params = {
+            pagination: JSON.stringify(pagination),
+            ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
+            ordering: JSON.stringify({ createdAt: "desc" })
+        };
+
+        // Convertir los parámetros a string de consulta
+        const queryString = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            queryString.append(key, value);
+        });
+
+        const { data } = await apiWithAuth.get<IUsersListResponse>(
+            `${USER_API_BASE}/table?${queryString}`
+        );
+        return data;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            toast.error(error.response?.data?.info?.message_to_show || "Error al obtener usuarios");
+        }
+        throw error;
     }
-    throw error;
-  }
 }; 
