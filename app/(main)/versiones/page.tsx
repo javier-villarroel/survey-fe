@@ -44,15 +44,22 @@ const VersionsPage = () => {
         //     type: "feature"
         // },
         {
-            version: "0.1.0",
-            date: "2025-06-20",
+            version: "0.1.1",
+            date: "20-06-2025",
             title: "Modulo de inicio de sesión",
+            description: "Otps implementados podrán bloquear al usuario si tiene un intento fallido, como también será de seis dígitos. Se agregó rango de fechas en la bitacora.",
+            type: "feature"
+        },
+        {
+            version: "0.1.0",
+            date: "20-06-2025",
+            title: "Módulo de inicio de sesión",
             description: "Implementación del módulo de inicio de sesión con autenticación básica y validación de usuarios.",
             type: "feature"
         },
         {
             version: "0.0.0",
-            date: "2025-06-16",
+            date: "16-06-2025",
             title: "Lanzamiento Inicial",
             description: "Primera versión estable del sistema con funcionalidades básicas.",
             type: "feature"
