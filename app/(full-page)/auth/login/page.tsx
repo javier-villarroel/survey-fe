@@ -52,10 +52,12 @@ const LoginPage = () => {
     const { handleOTPComplete, isVerifying } = useHandleOTP();
 
     const handleTokenChange = async (value: string) => {
+        console.log('first')
         setCode(value);
         setHasError(false);
         
-        if (value.length === 4) {
+        if (value.length === 6) {
+            console.log('ss')
             try {
                 const otpResult = await handleOTPComplete(value, twoFacData.passToken);
                 if (otpResult) {
@@ -334,7 +336,7 @@ const LoginPage = () => {
                     <ReactCodeInput
                         name="otp"
                         type="text"
-                        fields={4}
+                        fields={6}
                         value={code}
                         onChange={handleTokenChange}
                         inputMode="numeric"

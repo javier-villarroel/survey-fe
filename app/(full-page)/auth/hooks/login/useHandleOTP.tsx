@@ -13,7 +13,7 @@ export const useHandleOTP = (): UseHandleOTPReturn => {
     const router = useRouter();
 
     const handleOTPComplete = useCallback(async (code: string, passToken: string): Promise<boolean> => {
-        if (code.length !== 4 || !passToken) {
+        if (code.length !== 6 || !passToken) {
             return false;
         }
 
