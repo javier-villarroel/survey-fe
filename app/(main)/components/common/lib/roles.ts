@@ -1,0 +1,20 @@
+export enum USER_ROLES {
+	SYSTEM_ADMIN = "Administrador",
+	SYSTEM_AUDIT = "Auditor",
+	SYSTEM_CONSULTANT = "Consultor",
+}
+
+export const Roles = {
+	[USER_ROLES.SYSTEM_ADMIN]: "Administrador",
+	[USER_ROLES.SYSTEM_AUDIT]: "Auditor",
+	[USER_ROLES.SYSTEM_CONSULTANT]: "Consultor",
+};
+
+export enum UserRoles {
+	ADMINISTRATOR = "ADMINISTRATOR",
+	AUDITOR = "AUDITOR",
+	COORDINATOR = "COORDINATOR",
+	SUPERVISOR = "SUPERVISOR",
+	CONSULTANT = "CONSULTANT",
+	INSPECTOR = "INSPECTOR",
+}
