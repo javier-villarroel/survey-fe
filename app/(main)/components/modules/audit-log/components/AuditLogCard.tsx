@@ -37,7 +37,7 @@ const formatDate = (dateString: string | undefined): FormattedDate => {
                 addSuffix: true,
                 locale: es 
             }),
-            exact: format(date, "dd/MM/yyyy HH:mm:ss", { locale: es })
+            exact: format(date, "dd/MM/yyyy hh:mm a", { locale: es })
         };
     } catch (error) {
         console.error('Error formatting date:', error);

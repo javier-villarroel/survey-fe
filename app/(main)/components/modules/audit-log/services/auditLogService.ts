@@ -39,6 +39,7 @@ export const auditLogService = {
         try {
             // Construir los queries basados en los filtros
             const queries: QueryFilter[] = [];
+            let dateFilters: Record<string, any> | undefined;
             
             if (filters) {
                 if (filters.module) {
@@ -50,11 +51,13 @@ export const auditLogService = {
                 if (filters.user?.email) {
                     queries.push({ field: 'user-email', text: filters.user.email });
                 }
-                if (filters.startDate) {
-                    queries.push({ field: 'startDate', text: filters.startDate });
-                }
-                if (filters.endDate) {
-                    queries.push({ field: 'endDate', text: filters.endDate });
+                if (filters.startDate && filters.endDate) {
+                    dateFilters = {
+                        createdAt: {
+                            gte: filters.startDate,
+                            lte: filters.endDate
+                        }
+                    };
                 }
             }
 
@@ -62,6 +65,7 @@ export const auditLogService = {
             const params = {
                 pagination: JSON.stringify(pagination),
                 ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
+                ...(dateFilters && { filters: JSON.stringify(dateFilters) }),
                 ordering: JSON.stringify({ createdAt: "desc" })
             };
 

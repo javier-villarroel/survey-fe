@@ -9,7 +9,6 @@ import { AuditLogDialog } from './components/AuditLogDialog';
 import { useAuditLog } from './hooks/useAuditLog';
 import { AuditLogItem } from './types';
 import './styles.css';
-import { ProgressSpinner } from 'primereact/progressspinner';
 
 const pageSizeOptions = [
     { label: '5 por página', value: 5 },

@@ -27,7 +27,6 @@ interface AuditLogHeaderProps {
 }
 
 const moduleOptions = [
-    { label: 'Todos los módulos', value: null },
     ...Object.entries(ModuleTranslations).map(([value, label]) => ({
         label,
         value: value as AuditModule
@@ -35,7 +34,6 @@ const moduleOptions = [
 ];
 
 const eventOptions = [
-    { label: 'Todos los eventos', value: null },
     ...Object.entries(EventTranslations).map(([value, label]) => ({
         label,
         value: value as AuditEvent
@@ -56,7 +54,7 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
     usersLoading
 }) => {
     const userOptions = [
-        { label: 'Todos los usuarios', value: null },
+        // { label: 'Todos los usuarios', value: null },
         ...(Array.isArray(users) ? users.map(user => ({
             label: `${user.firstName} ${user.lastName} - ${user.email}`,
             value: user
@@ -83,7 +81,7 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                 </div>
             </div>
             <div className="flex justify-content-center">
-                <div className="flex flex-column gap-4 w-full" style={{ maxWidth: '1000px' }}>
+                <div className="flex flex-column gap-4 w-full" style={{ maxWidth: '1200px' }}>
                     {hasActiveFilters && (
                         <div className="flex justify-content-end">
                             <Button
@@ -96,79 +94,94 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                             />
                         </div>
                     )}
-                    <div className="flex flex-column sm:flex-row gap-4 align-items-stretch sm:align-items-end w-full">
-                        <div className="flex flex-column gap-2 w-full sm:w-4">
-                            <label htmlFor="userFilter" className="font-medium">
-                                Usuario
-                            </label>
-                            <Dropdown
-                                id="userFilter"
-                                value={selectedUser}
-                                options={userOptions}
-                                onChange={(e) => onUserChange(e.value)}
-                                placeholder="Seleccionar usuario"
-                                className="w-full"
-                                loading={usersLoading}
-                                disabled={usersLoading}
-                                optionLabel="label"
-                                emptyMessage="No hay usuarios disponibles"
-                                filter
-                                filterBy="label"
-                            />
-                        </div>
-                        <div className="flex flex-column gap-2 w-full sm:w-4">
-                            <label htmlFor="eventFilter" className="font-medium">
-                                Acción
-                            </label>
-                            <Dropdown
-                                id="eventFilter"
-                                value={selectedEvent}
-                                options={eventOptions}
-                                onChange={(e) => onEventChange(e.value)}
-                                placeholder="Seleccionar evento"
-                                className="w-full"
-                                optionLabel="label"
-                            />
-                        </div>
-                        <div className="flex flex-column gap-2 w-full sm:w-4">
-                            <label htmlFor="moduleFilter" className="font-medium">
-                                Módulo
-                            </label>
-                            <Dropdown
-                                id="moduleFilter"
-                                value={selectedModule}
-                                options={moduleOptions}
-                                onChange={(e) => onModuleChange(e.value)}
-                                placeholder="Seleccionar módulo"
-                                className="w-full"
-                                optionLabel="label"
-                            />
-                        </div>
-                        {/* <div className="flex flex-column gap-2 w-full sm:w-8">
-                            <label htmlFor="dateRange" className="font-medium">
-                                Rango de Fechas
-                            </label>
-                            <div className="flex flex-column sm:flex-row gap-2">
-                                <Calendar
-                                    id="startDate"
-                                    value={startDate}
-                                    onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
-                                    showIcon
-                                    placeholder="Fecha inicial"
+                    
+                    <div className="grid">
+                        <div className="col-12 md:col-3">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="userFilter" className="font-medium">
+                                    Usuario
+                                </label>
+                                <Dropdown
+                                    id="userFilter"
+                                    value={selectedUser}
+                                    options={userOptions}
+                                    onChange={(e) => onUserChange(e.value)}
+                                    placeholder="Seleccionar usuario"
                                     className="w-full"
-                                    maxDate={endDate || undefined}
-                                />
-                                <Calendar
-                                    id="endDate"
-                                    value={endDate}
-                                    onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
-                                    showIcon
-                                    placeholder="Fecha final"
-                                    className="w-full"
-                                    minDate={startDate || undefined}
+                                    loading={usersLoading}
+                                    disabled={usersLoading}
+                                    optionLabel="label"
+                                    emptyMessage="No hay usuarios disponibles"
+                                    filter
+                                    filterBy="label"
                                 />
                             </div>
-                        </div> */}
+                        </div>
+                        <div className="col-12 md:col-3">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="eventFilter" className="font-medium">
+                                    Acción
+                                </label>
+                                <Dropdown
+                                    id="eventFilter"
+                                    value={selectedEvent}
+                                    options={eventOptions}
+                                    onChange={(e) => onEventChange(e.value)}
+                                    placeholder="Seleccionar evento"
+                                    className="w-full"
+                                    optionLabel="label"
+                                />
+                            </div>
+                        </div>
+                        <div className="col-12 md:col-3">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="moduleFilter" className="font-medium">
+                                    Módulo
+                                </label>
+                                <Dropdown
+                                    id="moduleFilter"
+                                    value={selectedModule}
+                                    options={moduleOptions}
+                                    onChange={(e) => onModuleChange(e.value)}
+                                    placeholder="Seleccionar módulo"
+                                    className="w-full"
+                                    optionLabel="label"
+                                />
+                            </div>
+                        </div>
+                        <div className="col-12 md:col-3">
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="dateRange" className="font-medium">
+                                    Rango de Fechas
+                                </label>
+                                <div className="flex gap-2">
+                                    <Calendar
+                                        id="startDate"
+                                        value={startDate}
+                                        onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
+                                        showIcon
+                                        placeholder="Fecha inicial"
+                                        className="w-full"
+                                        maxDate={endDate || undefined}
+                                        dateFormat="dd/mm/yy"
+                                        locale="es"
+                                        style={{ minWidth: '200px' }}
+                                    />
+                                    <Calendar
+                                        id="endDate"
+                                        value={endDate}
+                                        onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
+                                        showIcon
+                                        placeholder="Fecha final"
+                                        className="w-full"
+                                        minDate={startDate || undefined}
+                                        dateFormat="dd/mm/yy"
+                                        locale="es"
+                                        style={{ minWidth: '200px' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
