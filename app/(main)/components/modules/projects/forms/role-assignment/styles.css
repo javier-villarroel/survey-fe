@@ -1,0 +1,16 @@
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-activo {
+    background-color: #22c55e;
+    color: white;
+}
+
+.status-inactivo {
+    background-color: #ef4444;
+    color: white;
+} 

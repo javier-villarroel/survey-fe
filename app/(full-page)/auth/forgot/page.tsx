@@ -237,7 +237,7 @@ const Forgot = () => {
                             height: '8px',
                             borderTopLeftRadius: '56px',
                             borderTopRightRadius: '56px',
-                            background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                            background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                             zIndex: 2
                         }}
                     />

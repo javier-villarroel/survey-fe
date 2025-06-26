@@ -62,8 +62,8 @@ const CreateProject = () => {
                             label="Crear Proyecto"
                             loading={isLoading}
                             style={{
-                                backgroundColor: '#2dabd2',
-                                borderColor: '#2dabd2'
+                                backgroundColor: '#000e28',
+                                borderColor: '#000e28'
                             }}
                         />
                     </div>

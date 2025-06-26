@@ -6,9 +6,16 @@ interface CreateActionsProps {
     onDelete: (projectId: string) => void;
     onToggleStatus: (project: Project) => void;
     onCreateQuestionnaire: (project: Project) => void;
+    onRoleAssignment: (project: Project) => void;
 }
 
-export const createActions = ({ onEdit, onDelete, onToggleStatus, onCreateQuestionnaire }: CreateActionsProps): TableAction[] => [
+export const createActions = ({ 
+    onEdit, 
+    onDelete, 
+    onToggleStatus, 
+    onCreateQuestionnaire,
+    onRoleAssignment 
+}: CreateActionsProps): TableAction[] => [
     {
         label: "Editar",
         icon: "pi pi-pencil",
@@ -35,5 +42,17 @@ export const createActions = ({ onEdit, onDelete, onToggleStatus, onCreateQuesti
         icon: "pi pi-file-edit",
         className: "text-purple-500",
         onClick: (project: Project) => onCreateQuestionnaire(project)
+    },
+    {
+        label: "Bitacora",
+        icon: "pi pi-history",
+        className: "text-orange-500",
+        onClick: (project: Project) => onCreateQuestionnaire(project)
+    },
+    {
+        label: "Asignación de roles",
+        icon: "pi pi-users",
+        className: "text-indigo-500",
+        onClick: (project: Project) => onRoleAssignment(project)
     }
 ]; 

@@ -78,7 +78,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
 
 	return (
 		<div className="layout-topbar" style={{
-			backgroundColor: layoutConfig.colorScheme !== "dark" ? "#2dabd2" : "",
+			backgroundColor: layoutConfig.colorScheme !== "dark" ? "#000e28" : "",
 			display: 'flex',
 			justifyContent: 'space-between',
 			alignItems: 'center',

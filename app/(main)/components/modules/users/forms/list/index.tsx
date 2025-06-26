@@ -167,8 +167,8 @@ const ListUsers = () => {
 						icon="pi pi-user-plus"
 						onClick={() => setShowModal(true)}
 						style={{
-							backgroundColor: '#2dabd2',
-							borderColor: '#2dabd2'
+							backgroundColor: '#000e28',
+							borderColor: '#000e28'
 						}}
 					/>
 				</div>

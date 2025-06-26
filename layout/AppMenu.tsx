@@ -65,7 +65,7 @@ const AppMenu = () => {
                     </ul>
                     <div className="w-full flex justify-center py-4 mt-auto border-t border-gray-200">
                         <span
-							style={{ marginLeft: '-100%', backgroundColor: '#2dabd2', borderRadius: '9999px' }}
+							style={{ marginLeft: '-100%', backgroundColor: '#000e28', borderRadius: '9999px' }}
                             className=" text-white text-sm font-bold px-6 py-2  shadow-sm cursor-pointer transition-colors"
                             onClick={() => router.push('/versiones')}
                         >

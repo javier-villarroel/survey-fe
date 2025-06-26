@@ -58,11 +58,16 @@ const ListProjects = () => {
         router.push(`/proyectos/${project.id}/cuestionario`);
     };
 
+    const handleRoleAssignment = (project: Project) => {
+        router.push(`/proyectos/${project.id}/roles`);
+    };
+
     const actions = createActions({
         onEdit: handleEdit,
         onDelete: handleDelete,
         onToggleStatus: handleToggleStatus,
-        onCreateQuestionnaire: handleCreateQuestionnaire
+        onCreateQuestionnaire: handleCreateQuestionnaire,
+        onRoleAssignment: handleRoleAssignment
     });
 
     const statusBodyTemplate = (project: Project) => {
@@ -174,8 +179,8 @@ const ListProjects = () => {
                         icon="pi pi-plus"
                         onClick={() => router.push('/proyectos/crear')}
                         style={{
-                            backgroundColor: '#2dabd2',
-                            borderColor: '#2dabd2'
+                            backgroundColor: '#000e28',
+                            borderColor: '#000e28'
                         }}
                     />
                 </div>

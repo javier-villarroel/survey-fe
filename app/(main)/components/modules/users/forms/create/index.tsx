@@ -190,8 +190,8 @@ export const CreateUser = ({ onSuccess, user, onCancel }: CreateUserProps) => {
                         loading={isLoading}
                         size="small"
                         style={{
-                            backgroundColor: '#2dabd2',
-                            borderColor: '#2dabd2'
+                            backgroundColor: '#000e28',
+                            borderColor: '#000e28'
                         }}
                     />
                     {onCancel && (

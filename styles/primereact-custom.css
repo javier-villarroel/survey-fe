@@ -3,8 +3,8 @@
 .p-button[label="Crear"],
 .p-button[label="Guardar"],
 .p-button[label="Guardar cambios"] {
-    background-color: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background-color: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
@@ -28,15 +28,15 @@
 .p-dialog .p-dialog-content .p-button[label="Crear"],
 .p-dialog .p-dialog-content .p-button[label="Guardar"],
 .p-dialog .p-dialog-content .p-button[label="Guardar cambios"] {
-    background-color: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background-color: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
 /* Estilos para botones primarios */
 .p-button.p-button-primary {
-    background-color: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background-color: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
@@ -55,20 +55,20 @@ button.p-button[label="Crear usuario"],
 button.p-button[label="Crear"],
 button.p-button[label="Guardar"],
 button.p-button[label="Guardar cambios"] {
-    background-color: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background-color: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
 .p-button.p-button-primary:enabled:focus {
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2dabd2, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #000e28, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Clase personalizada para los botones principales */
 .custom-primary-btn.p-button,
 .p-button.custom-primary-btn {
-    background-color: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background-color: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
@@ -86,12 +86,12 @@ button.p-button[label="Guardar cambios"] {
 
 .custom-primary-btn.p-button:enabled:focus,
 .p-button.custom-primary-btn:enabled:focus {
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2dabd2, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #000e28, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-raised):not(.p-button-rounded):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-help):not(.p-button-danger) {
-    background: #2dabd2 !important;
-    border-color: #2dabd2 !important;
+    background: #000e28 !important;
+    border-color: #000e28 !important;
     color: #ffffff !important;
 }
 
@@ -106,7 +106,7 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-raised):not(.p-button-rounded):not(.p-button-secondary):not(.p-button-info):not(.p-button-success):not(.p-button-warning):not(.p-button-help):not(.p-button-danger):enabled:focus {
-    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2dabd2, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #000e28, 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Estilos para el InputSwitch */
@@ -130,7 +130,7 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
-    background: #2dabd2 !important;
+    background: #000e28 !important;
 }
 
 .p-inputswitch .p-inputswitch-slider:before {
@@ -163,8 +163,8 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-radiobutton .p-radiobutton-box.p-highlight {
-    border-color: #2dabd2;
-    background: #2dabd2;
+    border-color: #000e28;
+    background: #000e28;
 }
 
 .p-radiobutton .p-radiobutton-box .p-radiobutton-icon {
@@ -175,7 +175,7 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
-    border-color: #2dabd2;
+    border-color: #000e28;
 }
 
 .p-field-radiobutton {
@@ -204,8 +204,8 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-checkbox .p-checkbox-box.p-highlight {
-    border-color: #2dabd2;
-    background: #2dabd2;
+    border-color: #000e28;
+    background: #000e28;
 }
 
 .p-checkbox .p-checkbox-box .p-checkbox-icon {
@@ -214,7 +214,7 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
-    border-color: #2dabd2;
+    border-color: #000e28;
 }
 
 .p-field-checkbox {
@@ -241,13 +241,13 @@ button.p-button[label="Guardar cambios"] {
 }
 
 .p-inputtext:enabled:focus {
-    border-color: #2dabd2;
-    box-shadow: 0 0 0 1px #2dabd2;
+    border-color: #000e28;
+    box-shadow: 0 0 0 1px #000e28;
 }
 
 .p-button.p-button-text:enabled:hover {
     background: rgba(45, 171, 210, 0.04);
-    color: #2dabd2;
+    color: #000e28;
     border-color: transparent;
 }
 
@@ -257,7 +257,7 @@ button.p-button[label="Guardar cambios"] {
 }
 
 [data-theme="dark"] .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
-    background: #2dabd2 !important;
+    background: #000e28 !important;
 }
 
 [data-theme="dark"] .p-radiobutton .p-radiobutton-box {
