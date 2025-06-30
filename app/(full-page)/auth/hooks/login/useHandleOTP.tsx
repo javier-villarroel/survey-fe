@@ -26,7 +26,7 @@ export const useHandleOTP = (): UseHandleOTPReturn => {
             const response = await verifySignInOTPService({
                 code,
                 passToken,
-                event: 'OTP_USER_SIGNIN'
+                event: 'LOGIN'
             });
 
             if ('error' in response) {

@@ -28,6 +28,24 @@ const ProjectQuestionnaire = () => {
     const [formComponents, setFormComponents] = useState<FormComponent[]>([]);
     const [currentComponent, setCurrentComponent] = useState<FormComponent | null>(null);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+
+    // Estados para el muestreo
+    const [totalSample, setTotalSample] = useState(0);
+    const [menCount, setMenCount] = useState(0);
+    const [womenCount, setWomenCount] = useState(0);
+    const [ageRange, setAgeRange] = useState({ min: '', max: '' });
+
+    const handleMenCountChange = (value: number) => {
+        if (value >= 0 && value + womenCount <= totalSample) {
+            setMenCount(value);
+        }
+    };
+
+    const handleWomenCountChange = (value: number) => {
+        if (value >= 0 && value + menCount <= totalSample) {
+            setWomenCount(value);
+        }
+    };
     
     const steps = [
         {
@@ -444,44 +462,150 @@ const ProjectQuestionnaire = () => {
     const renderQuestionConfig = () => {
         console.log('Renderizando QuestionConfig');
         return (
-            <div className="w-full bg-white p-4">
-                <div className="max-w-2xl mx-auto">
-                    <Card>
-                        <div className="grid grid-cols-2 gap-8">
-                            <div className="flex justify-center">
-                                <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center">
-                                    <i className="pi pi-image text-3xl text-gray-400"></i>
-                                    <span className="text-lg mt-2">1</span>
+            <div className="w-full p-4">
+                <Card>
+                    <div className="flex flex-col gap-4">
+                        {/* Filtros */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                            {/* Primera fila */}
+                            <div className="col-span-1 md:col-span-2">
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="totalSample" className="font-medium">Tamaño de muestra total</label>
+                                    <InputText
+                                        id="totalSample"
+                                        value={totalSample.toString()}
+                                        onChange={(e) => {
+                                            const value = parseInt(e.target.value) || 0;
+                                            setTotalSample(value);
+                                            if (value < menCount + womenCount) {
+                                                setMenCount(0);
+                                                setWomenCount(0);
+                                            }
+                                        }}
+                                        className="w-full"
+                                        type="number"
+                                        min="0"
+                                        placeholder="Ingrese el tamaño total de la muestra"
+                                    />
                                 </div>
                             </div>
-                            <div className="flex justify-center">
-                                <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center">
-                                    <i className="pi pi-image text-3xl text-gray-400"></i>
-                                    <span className="text-lg mt-2">2</span>
+
+                            {/* Segunda fila */}
+                            <div className="flex flex-col gap-2">
+                                <label className="font-medium">Distribución por género</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="menCount" className="text-sm text-gray-600">Hombres</label>
+                                        <InputText
+                                            id="menCount"
+                                            value={menCount.toString()}
+                                            onChange={(e) => handleMenCountChange(parseInt(e.target.value) || 0)}
+                                            className="w-full"
+                                            type="number"
+                                            min="0"
+                                            max={totalSample - womenCount}
+                                            placeholder="Cantidad"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label htmlFor="womenCount" className="text-sm text-gray-600">Mujeres</label>
+                                        <InputText
+                                            id="womenCount"
+                                            value={womenCount.toString()}
+                                            onChange={(e) => handleWomenCountChange(parseInt(e.target.value) || 0)}
+                                            className="w-full"
+                                            type="number"
+                                            min="0"
+                                            max={totalSample - menCount}
+                                            placeholder="Cantidad"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex justify-center">
-                                <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center">
-                                    <i className="pi pi-image text-3xl text-gray-400"></i>
-                                    <span className="text-lg mt-2">3</span>
+
+                            {/* Tercera fila */}
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="ageRange" className="font-medium">Rango de edad</label>
+                                <div className="flex gap-2 items-center">
+                                    <InputText
+                                        id="ageMin"
+                                        value={ageRange.min}
+                                        onChange={(e) => setAgeRange(prev => ({ ...prev, min: e.target.value }))}
+                                        placeholder="Mín"
+                                        className="w-full"
+                                        type="number"
+                                        min="0"
+                                    />
+                                    <span>-</span>
+                                    <InputText
+                                        id="ageMax"
+                                        value={ageRange.max}
+                                        onChange={(e) => setAgeRange(prev => ({ ...prev, max: e.target.value }))}
+                                        placeholder="Máx"
+                                        className="w-full"
+                                        type="number"
+                                        min="0"
+                                    />
                                 </div>
                             </div>
-                            <div className="flex justify-center">
-                                <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center">
-                                    <i className="pi pi-image text-3xl text-gray-400"></i>
-                                    <span className="text-lg mt-2">4</span>
+
+                            {/* Cuarta fila - Resumen */}
+                            <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
+                                <label className="font-medium">Resumen de distribución</label>
+                                <div className="flex gap-4 items-center">
+                                    <span className="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg flex items-center gap-2">
+                                        <i className="pi pi-user"></i>
+                                        Hombres: {menCount} ({totalSample > 0 ? ((menCount/totalSample) * 100).toFixed(1) : 0}%)
+                                    </span>
+                                    <span className="px-3 py-2 bg-pink-100 text-pink-800 rounded-lg flex items-center gap-2">
+                                        <i className="pi pi-user"></i>
+                                        Mujeres: {womenCount} ({totalSample > 0 ? ((womenCount/totalSample) * 100).toFixed(1) : 0}%)
+                                    </span>
+                                    <span className="px-3 py-2 bg-gray-100 text-gray-800 rounded-lg flex items-center gap-2">
+                                        <i className="pi pi-users"></i>
+                                        Restante: {totalSample - (menCount + womenCount)}
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                    </Card>
-                </div>
+
+                        {/* Cuadrícula de cuadros */}
+                        <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(80px, 100px))', gap: '0.75rem', justifyContent: 'center' }}>
+                                {/* Primera fila - 1-6 */}
+                                {[...Array(6)].map((_, index) => (
+                                    <div key={`box-${index + 1}`} style={{ aspectRatio: '1/1' }} className="border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center bg-white">
+                                        <i className="pi pi-image text-xl text-gray-400"></i>
+                                        <span className="text-sm mt-1">{index + 1}</span>
+                                    </div>
+                                ))}
+
+                                {/* Segunda fila - 7-12 */}
+                                {[...Array(6)].map((_, index) => (
+                                    <div key={`box-${index + 7}`} style={{ aspectRatio: '1/1' }} className="border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center bg-white">
+                                        <i className="pi pi-image text-xl text-gray-400"></i>
+                                        <span className="text-sm mt-1">{index + 7}</span>
+                                    </div>
+                                ))}
+
+                                {/* Tercera fila - 13-18 */}
+                                {[...Array(6)].map((_, index) => (
+                                    <div key={`box-${index + 13}`} style={{ aspectRatio: '1/1' }} className="border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md flex flex-col items-center justify-center bg-white">
+                                        <i className="pi pi-image text-xl text-gray-400"></i>
+                                        <span className="text-sm mt-1">{index + 13}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </Card>
             </div>
         );
     };
 
     return (
         <Card>
-            <div className="w-full max-w-[1400px] mx-auto">
+            <div className="w-full max-w-[1400px] mx-auto ">
                 <div className="relative w-full mb-4">
                     <h2 className="text-2xl font-bold">Cuestionario del Proyecto</h2>
                 </div>
