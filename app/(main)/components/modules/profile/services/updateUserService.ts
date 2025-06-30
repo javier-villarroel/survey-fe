@@ -16,7 +16,7 @@ export const updateUserService = async (userId: string, data: IUpdateUserRequest
             }
         };
 
-        const response = await apiWithAuth.put(`/users/${userId}`, data, config);
+        const response = await apiWithAuth.put(`/user/${userId}`, data, config);
         return response.data;
     } catch (error) {
         console.error('Error updating user:', error);

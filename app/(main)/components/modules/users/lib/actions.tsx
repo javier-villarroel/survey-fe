@@ -1,42 +1,73 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Button } from "primereact/button";
-import { Menu } from "primereact/menu";
+import { addUserRoleService, changeUserStatusService } from "../services/users.services";
+import { toast } from "sonner";
 
-const ActionDropdown = ({ row }: { row: any }) => {
-	const menuRef = useRef<any>(null);
+interface ActionDropdownProps {
+	row: {
+		id: number;
+		status: string;
+	};
+	onActionComplete?: () => void;
+}
 
-	const items = [
-		{
-			label: "Editar",
-			icon: "pi pi-pencil",
-			command: () => {
-				console.log("Editar", row);
-			},
-		},
-		{
-			label: "Eliminar",
-			icon: "pi pi-trash",
-			command: () => {
-				console.log("Eliminar", row);
-			},
-		},
-		{
-			label: "Asignar rol admin",
-			icon: "pi pi-user-plus",
-			command: () => {
-				console.log("Asignar rol admin", row);
-			},
-		},
-	];
+const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
+	const handleAssignRole = async () => {
+		try {
+			const response = await addUserRoleService(row.id);
+			if (response.success) {
+				toast.success(response.message);
+				if (onActionComplete) onActionComplete();
+			} else {
+				toast.error(response.error || 'Error al asignar el rol de administrador');
+			}
+		} catch (error) {
+			console.error('Error en handleAssignRole:', error);
+			toast.error('Error al asignar el rol de administrador');
+		}
+	};
+
+	const handleChangeStatus = async (newStatus: 'ACTIVE' | 'BLOQUED') => {
+		try {
+			const response = await changeUserStatusService(row.id, newStatus);
+			if (response.success) {
+				toast.success(response.message);
+				if (onActionComplete) onActionComplete();
+			} else {
+				toast.error(response.error || `Error al ${newStatus === 'ACTIVE' ? 'activar' : 'bloquear'} el usuario`);
+			}
+		} catch (error) {
+			console.error('Error en handleChangeStatus:', error);
+			toast.error(`Error al ${newStatus === 'ACTIVE' ? 'activar' : 'bloquear'} el usuario`);
+		}
+	};
 
 	return (
-		<div>
+		<div className="flex gap-2">
 			<Button
-				icon="pi pi-ellipsis-v"
-				className="p-button-text p-button-sm"
-				onClick={(e) => menuRef.current.toggle(e)}
+				type="button"
+				label="Asignar admin"
+				icon="pi pi-users"
+				severity="help"
+				onClick={handleAssignRole}
 			/>
-			<Menu model={items} popup ref={menuRef} />
+			{row.status === 'ACTIVE' ? (
+				<Button
+					type="button"
+					label="Suspender"
+					icon="pi pi-ban"
+					severity="danger"
+					onClick={() => handleChangeStatus('BLOQUED')}
+				/>
+			) : (
+				<Button
+					type="button"
+					label="Activar"
+					icon="pi pi-check"
+					severity="success"
+					onClick={() => handleChangeStatus('ACTIVE')}
+				/>
+			)}
 		</div>
 	);
 };

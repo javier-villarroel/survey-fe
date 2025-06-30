@@ -47,7 +47,7 @@ export const CreateUser = ({ onSuccess, user, onCancel }: CreateUserProps) => {
             let result;
             if (isEditing && user) {
                 result = await updateUser(user.id, {
-                    name: data.firstName,
+                    firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
                     phone: data.phone ? Number(data.phone) : undefined           
@@ -158,7 +158,6 @@ export const CreateUser = ({ onSuccess, user, onCancel }: CreateUserProps) => {
                                 name="phone"
                                 control={control}
                                 rules={{ 
-                                    required: "El teléfono es requerido",
                                     pattern: {
                                         value: /^\+[1-9]\d{1,14}$/,
                                         message: "Formato inválido. Ej: +584143654288"

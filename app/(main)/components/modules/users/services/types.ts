@@ -10,7 +10,7 @@ export interface IUser {
     name: string;
     roleProcess: any[];
   };
-  status: boolean;
+  status: "ACTIVE" | "BLOQUED";
   createdAt: string;
   updatedAt: string;
 }
@@ -50,7 +50,7 @@ export interface ICreateUserRequest {
 }
 
 export interface IUpdateUserRequest {
-  name?: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string | number;
