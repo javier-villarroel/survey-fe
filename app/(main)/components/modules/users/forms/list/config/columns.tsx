@@ -26,15 +26,7 @@ export const columns: TableColumn[] = [
         style: { minWidth: '12rem' }
     },
     {
-        field: "userName",
-        header: "Usuario",
-        sortable: true,
-        filter: true,
-        filterPlaceholder: "Filtrar por usuario",
-        style: { minWidth: '12rem' }
-    },
-    {
-        field: "name",
+        field: "firstName",
         header: "Nombre",
         sortable: true,
         filter: true,
