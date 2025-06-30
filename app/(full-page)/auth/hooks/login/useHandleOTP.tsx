@@ -1,4 +1,5 @@
 import { verifySignInOTPService } from '../../services/Auth/auth.services';
+import { OTP_EVENT_TYPE } from '../../lib/auth';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -26,7 +27,7 @@ export const useHandleOTP = (): UseHandleOTPReturn => {
             const response = await verifySignInOTPService({
                 code,
                 passToken,
-                event: 'LOGIN'
+                event: OTP_EVENT_TYPE.LOGIN
             });
 
             if ('error' in response) {
