@@ -5,11 +5,11 @@ import { UserStatus } from "../../../lib/enums";
 interface ActionsConfig {
     onEdit?: (user: IUser) => void;
     onStatusChange?: (user: IUser, newStatus: UserStatus) => void;
-    onAddAccess?: (user: IUser) => void;
+    onAccessChange?: (user: IUser) => void;
     onRemove?: (user: IUser) => void;
 }
 
-export const createActions = ({ onEdit, onStatusChange, onAddAccess, onRemove }: ActionsConfig): TableAction[] => {
+export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove }: ActionsConfig): TableAction[] => {
     return [
         {
             label: "Editar",
@@ -29,10 +29,12 @@ export const createActions = ({ onEdit, onStatusChange, onAddAccess, onRemove }:
             )
         },
         {
-            label: "Asignar Admin",
-            icon: "pi pi-user-plus",
-            className: "p-button-help",
-            onClick: (user: IUser) => onAddAccess?.(user)
+            label: "Acceso Admin",
+            icon: "pi pi-user",
+            getLabel: (user: IUser) => user.isAdmin ? "Revocar Admin" : "Asignar Admin",
+            getIcon: (user: IUser) => user.isAdmin ? "pi pi-user-minus" : "pi pi-user-plus",
+            getClassName: (user: IUser) => user.isAdmin ? "p-button-danger" : "p-button-help",
+            onClick: (user: IUser) => onAccessChange?.(user)
         },
         {
             label: "Eliminar",

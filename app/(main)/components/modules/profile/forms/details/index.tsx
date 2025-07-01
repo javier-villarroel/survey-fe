@@ -25,7 +25,7 @@ const ProfileDetail = () => {
 
     if (isLoadingProfile) {
         return (
-            <div className="flex justify-content-center align-items-center" style={{ height: '70vh' }}>
+            <div className="flex justify-content-center align-items-center " style={{ height: '70vh' }}>
                 <ProgressSpinner />
             </div>
         );

@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "primereact/button";
-import { addUserRoleService, changeUserStatusService } from "../services/users.services";
+import { addUserAccessService } from "../services/addUserAccessService";
+import { changeUserStatusService } from "../services/changeUserStatusService";
+import { UserRoles, UserStatus } from "../lib/enums";
 import { toast } from "sonner";
 
 interface ActionDropdownProps {
@@ -14,31 +16,35 @@ interface ActionDropdownProps {
 const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 	const handleAssignRole = async () => {
 		try {
-			const response = await addUserRoleService(row.id);
-			if (response.success) {
-				toast.success(response.message);
+			const result = await addUserAccessService(row.id, UserRoles.ADMIN);
+			if (result) {
+				toast.success("Rol de administrador asignado correctamente");
 				if (onActionComplete) onActionComplete();
-			} else {
-				toast.error(response.error || 'Error al asignar el rol de administrador');
 			}
 		} catch (error) {
 			console.error('Error en handleAssignRole:', error);
-			toast.error('Error al asignar el rol de administrador');
+			if (error instanceof Error) {
+				toast.error(error.message);
+			} else {
+				toast.error('Error al asignar el rol de administrador');
+			}
 		}
 	};
 
-	const handleChangeStatus = async (newStatus: 'ACTIVE' | 'BLOQUED') => {
+	const handleChangeStatus = async (newStatus: UserStatus) => {
 		try {
-			const response = await changeUserStatusService(row.id, newStatus);
-			if (response.success) {
-				toast.success(response.message);
+			const result = await changeUserStatusService(row.id, newStatus);
+			if (result) {
+				toast.success(`Usuario ${newStatus === UserStatus.ACTIVE ? 'activado' : 'bloqueado'} correctamente`);
 				if (onActionComplete) onActionComplete();
-			} else {
-				toast.error(response.error || `Error al ${newStatus === 'ACTIVE' ? 'activar' : 'bloquear'} el usuario`);
 			}
 		} catch (error) {
 			console.error('Error en handleChangeStatus:', error);
-			toast.error(`Error al ${newStatus === 'ACTIVE' ? 'activar' : 'bloquear'} el usuario`);
+			if (error instanceof Error) {
+				toast.error(error.message);
+			} else {
+				toast.error(`Error al ${newStatus === UserStatus.ACTIVE ? 'activar' : 'bloquear'} el usuario`);
+			}
 		}
 	};
 
@@ -51,13 +57,13 @@ const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 				severity="help"
 				onClick={handleAssignRole}
 			/>
-			{row.status === 'ACTIVE' ? (
+			{row.status === UserStatus.ACTIVE ? (
 				<Button
 					type="button"
 					label="Suspender"
 					icon="pi pi-ban"
 					severity="danger"
-					onClick={() => handleChangeStatus('BLOQUED')}
+					onClick={() => handleChangeStatus(UserStatus.BLOQUED)}
 				/>
 			) : (
 				<Button
@@ -65,7 +71,7 @@ const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 					label="Activar"
 					icon="pi pi-check"
 					severity="success"
-					onClick={() => handleChangeStatus('ACTIVE')}
+					onClick={() => handleChangeStatus(UserStatus.ACTIVE)}
 				/>
 			)}
 		</div>

@@ -14,6 +14,7 @@ export interface IUser {
   status: UserStatus;
   createdAt: string;
   updatedAt: string;
+  isAdmin: boolean;
 }
 
 export interface IPagination {

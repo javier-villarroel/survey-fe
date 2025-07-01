@@ -1,21 +1,39 @@
 import { useState, useRef } from "react";
 import { addUserAccessService } from "../services/addUserAccessService";
 import { Toast } from "primereact/toast";
+import { UserRoles } from '../lib/enums';
 
 export const useAddUserAccess = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [pendingAction, setPendingAction] = useState<{
+        userId: number;
+        isGranting: boolean;
+    } | null>(null);
     const toast = useRef<Toast>(null);
 
-    const addUserAccess = async (userId: number) => {
+    const handleConfirm = async () => {
+        if (!pendingAction) return null;
+        
         try {
             setIsLoading(true);
-            const result = await addUserAccessService(userId);
+            const result = await addUserAccessService(pendingAction.userId, pendingAction.isGranting ? UserRoles.ADMIN : null);
             
             toast.current?.show({
-                severity: "success",
-                summary: "Éxito",
-                detail: "Acceso de administrador asignado correctamente",
+                severity: pendingAction.isGranting ? "success" : "info",
+                summary: pendingAction.isGranting ? "Éxito" : "Completado",
+                detail: pendingAction.isGranting 
+                    ? "Acceso de administrador asignado correctamente"
+                    : "Acceso de administrador revocado correctamente",
                 life: 3000,
+                style: {
+                    background: pendingAction.isGranting ? '#15803d' : '#1e40af',
+                    color: '#ffffff'
+                },
+                contentStyle: {
+                    background: pendingAction.isGranting ? '#15803d' : '#1e40af',
+                    color: '#ffffff'
+                }
             });
 
             return result;
@@ -23,18 +41,44 @@ export const useAddUserAccess = () => {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: error instanceof Error ? error.message : "Error al asignar acceso de administrador",
+                detail: error instanceof Error 
+                    ? error.message 
+                    : `Error al ${pendingAction.isGranting ? 'asignar' : 'revocar'} acceso de administrador`,
                 life: 3000,
+                style: {
+                    background: '#991b1b',
+                    color: '#ffffff'
+                },
+                contentStyle: {
+                    background: '#991b1b',
+                    color: '#ffffff'
+                }
             });
             return null;
         } finally {
             setIsLoading(false);
+            setPendingAction(null);
+            setShowConfirmDialog(false);
         }
     };
 
+    const toggleUserAccess = (userId: number, isGranting: boolean) => {
+        setPendingAction({ userId, isGranting });
+        setShowConfirmDialog(true);
+    };
+
+    const handleReject = () => {
+        setPendingAction(null);
+        setShowConfirmDialog(false);
+    };
+
     return {
-        addUserAccess,
+        toggleUserAccess,
         isLoading,
         toast,
+        showConfirmDialog,
+        handleConfirm,
+        handleReject,
+        pendingAction
     };
 }; 

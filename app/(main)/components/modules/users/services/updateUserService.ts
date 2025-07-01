@@ -9,7 +9,7 @@ export const updateUserService = async (
   userData: IUpdateUserRequest
 ): Promise<IUser | null> => {
   try {
-    const { data } = await apiWithAuth.patch<IUserResponse>(`${USER_API_BASE}/${id}`, userData);
+    const { data } = await apiWithAuth.patch<any>(`${USER_API_BASE}/${id}`, userData);
     toast.success(data.info.message_to_show || "Usuario actualizado exitosamente");
     return data.result;
   } catch (error) {

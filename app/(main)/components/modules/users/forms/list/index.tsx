@@ -22,6 +22,7 @@ import { CreateUser } from "../create";
 import { UserDetails } from "../details";
 import { UserStatus } from "../../lib/enums";
 import { UserStatusConfirmDialog } from "../../components/UserStatusConfirmDialog";
+import { UserAccessConfirmDialog } from "../../components/UserAccessConfirmDialog";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -75,12 +76,20 @@ const ListUsers = () => {
 		changeUserStatus, 
 		isLoading: isChangingStatus, 
 		toast: statusToast,
-		showConfirmDialog,
-		handleConfirm,
-		handleReject,
-		pendingAction
+		showConfirmDialog: showStatusConfirmDialog,
+		handleConfirm: handleStatusConfirm,
+		handleReject: handleStatusReject,
+		pendingAction: pendingStatusAction
 	} = useChangeUserStatus();
-	const { addUserAccess, isLoading: isAddingAccess, toast: accessToast } = useAddUserAccess();
+	const { 
+		toggleUserAccess, 
+		isLoading: isTogglingAccess, 
+		toast: accessToast,
+		showConfirmDialog: showAccessConfirmDialog,
+		handleConfirm: handleAccessConfirm,
+		handleReject: handleAccessReject,
+		pendingAction: pendingAccessAction
+	} = useAddUserAccess();
 	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
 
 	const handleEdit = (user: IUser) => {
@@ -92,11 +101,8 @@ const ListUsers = () => {
 		changeUserStatus(user.id, newStatus);
 	};
 
-	const handleAddAccess = async (user: IUser) => {
-		const result = await addUserAccess(user.id);
-		if (result) {
-			refreshData();
-		}
+	const handleAccessChange = (user: IUser) => {
+		toggleUserAccess(user.id, !user.isAdmin);
 	};
 
 	const handleRemove = (user: IUser) => {
@@ -150,7 +156,7 @@ const ListUsers = () => {
 	const actions = createActions({
 		onEdit: handleEdit,
 		onStatusChange: handleStatusChange,
-		onAddAccess: handleAddAccess,
+		onAccessChange: handleAccessChange,
 		onRemove: handleRemove
 	});
 
@@ -179,15 +185,26 @@ const ListUsers = () => {
 	return (
 		<>
 		<UserStatusConfirmDialog
-			showConfirmDialog={showConfirmDialog}
+			showConfirmDialog={showStatusConfirmDialog}
 			handleConfirm={async () => {
-				const result = await handleConfirm();
+				const result = await handleStatusConfirm();
 				if (result) {
 					refreshData();
 				}
 			}}
-			handleReject={handleReject}
-			pendingAction={pendingAction}
+			handleReject={handleStatusReject}
+			pendingAction={pendingStatusAction}
+		/>
+		<UserAccessConfirmDialog
+			showConfirmDialog={showAccessConfirmDialog}
+			handleConfirm={async () => {
+				const result = await handleAccessConfirm();
+				if (result) {
+					refreshData();
+				}
+			}}
+			handleReject={handleAccessReject}
+			pendingAction={pendingAccessAction}
 		/>
 		<ConfirmDialog />
 		<Toast ref={statusToast} />
