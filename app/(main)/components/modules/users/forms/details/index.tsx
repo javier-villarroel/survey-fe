@@ -1,10 +1,10 @@
 "use client";
 
-import { useUpdateUser } from "../../hooks/useUpdateUser";
 import React from "react";
 import { IUser } from "../../services/types";
 import { UserForm } from "../components/UserForm";
 import { IFormCreateUser } from "../../lib/schemas";
+import { useUpdateUser } from "../../hooks/update/useUpdateUser";
 
 export interface UserDetailsProps {
     onSuccess: () => void;

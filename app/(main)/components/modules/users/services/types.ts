@@ -1,3 +1,5 @@
+import { UserStatus } from "../lib/enums";
+
 export interface IUser {
   id: number;
   firstName: string;
@@ -9,7 +11,7 @@ export interface IUser {
     name: string;
     roleProcess: any[];
   };
-  status: "ACTIVE" | "BLOQUED";
+  status: UserStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,6 +65,10 @@ export interface IUpdateUserRequest {
   roleId?: number;
   status?: boolean;
   password?: string;
+}
+
+export interface IChangeUserStatusRequest {
+  status: UserStatus;
 }
 
 // Tipos específicos para las respuestas de usuarios

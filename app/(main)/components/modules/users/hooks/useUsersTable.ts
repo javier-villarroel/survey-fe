@@ -1,7 +1,7 @@
 import { TablePaginationParams } from "@/app/(main)/components/common/components/table/types";
 import { DataTableStateEvent } from "primereact/datatable";
 import { IUsersListResponse } from "../services/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "./useUsers";
 import { useState } from "react";
 
@@ -22,6 +22,7 @@ export const useUsersTable = () => {
         filters: {}
     });
     const { getUsers } = useUsers();
+    const queryClient = useQueryClient();
 
     const { data, isLoading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
@@ -35,6 +36,10 @@ export const useUsersTable = () => {
         refetchOnMount: true, // Refetch al montar el componente
         refetchOnWindowFocus: true // Refetch cuando la ventana recupera el foco
     });
+
+    const refreshData = () => {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+    };
 
     const onTableChange = (event: DataTableStateEvent) => {
         const newFilters = event.filters || {};
@@ -75,6 +80,7 @@ export const useUsersTable = () => {
         loading: isLoading,
         error,
         onTableChange,
-        handleFilter
+        handleFilter,
+        refreshData
     };
 }; 

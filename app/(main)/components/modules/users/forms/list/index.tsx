@@ -3,6 +3,9 @@
 import { DynamicTable } from "@/app/(main)/components/common/components/table/DynamicTable";
 import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
+import { useChangeUserStatus } from "../../hooks/useChangeUserStatus";
+import { useAddUserAccess } from "../../hooks/useAddUserAccess";
+import { useRemoveUser } from "../../hooks/useRemoveUser";
 import { createActions } from "./config/actions";
 import { Paginator } from 'primereact/paginator';
 import { Dropdown } from 'primereact/dropdown';
@@ -11,10 +14,13 @@ import { IUser } from "../../services/types";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { columns } from "./config/columns";
+import { Toast } from "primereact/toast";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { CreateUser } from "../create";
 import { UserDetails } from "../details";
+import { UserStatus } from "../../lib/enums";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -63,11 +69,43 @@ const LoadingSkeleton = () => {
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-	const { data, loading, pagination, handleFilter } = useUsersTable();
+	const { data, loading, pagination, handleFilter, refreshData } = useUsersTable();
+	const { changeUserStatus, isLoading: isChangingStatus, toast: statusToast } = useChangeUserStatus();
+	const { addUserAccess, isLoading: isAddingAccess, toast: accessToast } = useAddUserAccess();
+	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
 
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
 		setShowModal(true);
+	};
+
+	const handleStatusChange = async (user: IUser, newStatus: UserStatus) => {
+		const result = await changeUserStatus(user.id, newStatus);
+		if (result) {
+			refreshData();
+		}
+	};
+
+	const handleAddAccess = async (user: IUser) => {
+		const result = await addUserAccess(user.id);
+		if (result) {
+			refreshData();
+		}
+	};
+
+	const handleRemove = (user: IUser) => {
+		confirmDialog({
+			message: '¿Está seguro que desea eliminar este usuario?',
+			header: 'Confirmar Eliminación',
+			icon: 'pi pi-exclamation-triangle',
+			acceptClassName: 'p-button-danger',
+			accept: async () => {
+				const result = await removeUser(user.id);
+				if (result) {
+					refreshData();
+				}
+			}
+		});
 	};
 
 	const handleSuccess = () => {
@@ -104,7 +142,10 @@ const ListUsers = () => {
 	};
 
 	const actions = createActions({
-		onEdit: handleEdit
+		onEdit: handleEdit,
+		onStatusChange: handleStatusChange,
+		onAddAccess: handleAddAccess,
+		onRemove: handleRemove
 	});
 
 	const headerContent = (
@@ -131,6 +172,10 @@ const ListUsers = () => {
 
 	return (
 		<>
+		<ConfirmDialog />
+		<Toast ref={statusToast} />
+		<Toast ref={accessToast} />
+		<Toast ref={removeToast} />
 		<Card>
 			<div className="relative w-full mb-4">
 				<h2 className="text-2xl font-bold">Gestión de usuarios</h2>

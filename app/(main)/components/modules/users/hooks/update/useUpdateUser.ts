@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { updateUserService } from '../services/updateUserService';
-import { IUser, IUpdateUserRequest } from '../services/types';
+
 import { useQueryClient } from '@tanstack/react-query';
+import { IUpdateUserRequest, IUser, updateUserService } from '../../services';
 
 export const useUpdateUser = () => {
     const [isLoading, setIsLoading] = useState(false);

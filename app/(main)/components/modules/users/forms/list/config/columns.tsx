@@ -1,17 +1,18 @@
 import { FilterMatchMode } from "primereact/api";
 import { TableColumn } from "@/app/(main)/components/common/components/table/types";
 import { IUser } from "../../../services/types";
+import { UserStatus } from "../../../lib/enums";
 
 const statusBodyTemplate = (user: IUser) => {
     return (
         <span
-            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                user.status
-                    ? "bg-green-50 text-green-700 ring-green-600/20"
-                    : "bg-red-50 text-red-700 ring-red-600/20"
+            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                user.status === UserStatus.ACTIVE
+                    ? "bg-green-700 text-white"
+                    : "bg-red-700 text-white"
             }`}
         >
-            {user.status ? "Activo" : "Inactivo"}
+            {user.status === UserStatus.ACTIVE ? "Activo" : "Inactivo"}
         </span>
     );
 };
