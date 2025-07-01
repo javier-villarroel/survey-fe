@@ -2,29 +2,37 @@ import { useState, useRef } from "react";
 import { changeUserStatusService } from "../services/changeUserStatusService";
 import { UserStatus } from "../lib/enums";
 import { Toast } from "primereact/toast";
+import { ConfirmDialog } from 'primereact/confirmdialog';
 
 export const useChangeUserStatus = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    userId: number;
+    status: UserStatus;
+  } | null>(null);
   const toast = useRef<Toast>(null);
 
-  const changeUserStatus = async (userId: number, status: UserStatus) => {
+  const handleConfirm = async () => {
+    if (!pendingAction) return;
+    
     try {
       setIsLoading(true);
-      const result = await changeUserStatusService(userId, status);
+      const result = await changeUserStatusService(pendingAction.userId, pendingAction.status);
       
       toast.current?.show({
-        severity: status === UserStatus.ACTIVE ? "success" : "warn",
-        summary: status === UserStatus.ACTIVE ? "Usuario Activado" : "Usuario Suspendido",
-        detail: status === UserStatus.ACTIVE 
+        severity: pendingAction.status === UserStatus.ACTIVE ? "success" : "warn",
+        summary: pendingAction.status === UserStatus.ACTIVE ? "Usuario Activado" : "Usuario Suspendido",
+        detail: pendingAction.status === UserStatus.ACTIVE 
           ? "El usuario ha sido activado exitosamente" 
           : "El usuario ha sido suspendido exitosamente",
         life: 3000,
         style: {
-          background: status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
+          background: pendingAction.status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
           color: '#ffffff'
         },
         contentStyle: {
-          background: status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
+          background: pendingAction.status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
           color: '#ffffff'
         }
       });
@@ -48,12 +56,28 @@ export const useChangeUserStatus = () => {
       return null;
     } finally {
       setIsLoading(false);
+      setPendingAction(null);
+      setShowConfirmDialog(false);
     }
+  };
+
+  const changeUserStatus = (userId: number, status: UserStatus) => {
+    setPendingAction({ userId, status });
+    setShowConfirmDialog(true);
+  };
+
+  const handleReject = () => {
+    setPendingAction(null);
+    setShowConfirmDialog(false);
   };
 
   return {
     changeUserStatus,
     isLoading,
     toast,
+    showConfirmDialog,
+    handleConfirm,
+    handleReject,
+    pendingAction
   };
 }; 

@@ -21,6 +21,7 @@ import { Card } from "primereact/card";
 import { CreateUser } from "../create";
 import { UserDetails } from "../details";
 import { UserStatus } from "../../lib/enums";
+import { UserStatusConfirmDialog } from "../../components/UserStatusConfirmDialog";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -70,7 +71,15 @@ const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 	const { data, loading, pagination, handleFilter, refreshData } = useUsersTable();
-	const { changeUserStatus, isLoading: isChangingStatus, toast: statusToast } = useChangeUserStatus();
+	const { 
+		changeUserStatus, 
+		isLoading: isChangingStatus, 
+		toast: statusToast,
+		showConfirmDialog,
+		handleConfirm,
+		handleReject,
+		pendingAction
+	} = useChangeUserStatus();
 	const { addUserAccess, isLoading: isAddingAccess, toast: accessToast } = useAddUserAccess();
 	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
 
@@ -79,11 +88,8 @@ const ListUsers = () => {
 		setShowModal(true);
 	};
 
-	const handleStatusChange = async (user: IUser, newStatus: UserStatus) => {
-		const result = await changeUserStatus(user.id, newStatus);
-		if (result) {
-			refreshData();
-		}
+	const handleStatusChange = (user: IUser, newStatus: UserStatus) => {
+		changeUserStatus(user.id, newStatus);
 	};
 
 	const handleAddAccess = async (user: IUser) => {
@@ -172,6 +178,17 @@ const ListUsers = () => {
 
 	return (
 		<>
+		<UserStatusConfirmDialog
+			showConfirmDialog={showConfirmDialog}
+			handleConfirm={async () => {
+				const result = await handleConfirm();
+				if (result) {
+					refreshData();
+				}
+			}}
+			handleReject={handleReject}
+			pendingAction={pendingAction}
+		/>
 		<ConfirmDialog />
 		<Toast ref={statusToast} />
 		<Toast ref={accessToast} />
