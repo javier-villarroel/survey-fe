@@ -13,7 +13,7 @@ export const addUserAccessService = async (userId: number): Promise<IUser | null
             roleId: UserRoles.ADMIN
         };
 
-        const { data } = await apiWithAuth.patch<IUserResponse>(`/user/${userId}/add_access`, requestBody);
+        const { data } = await apiWithAuth.post<IUserResponse>(`/user/${userId}/add_access`, requestBody);
         return data.result;
     } catch (error) {
         if (error instanceof AxiosError) {

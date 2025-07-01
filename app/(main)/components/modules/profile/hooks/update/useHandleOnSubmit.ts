@@ -31,28 +31,25 @@ export const useHandleOnSubmit = ({ form, refreshProfile }: UseHandleOnSubmitPro
 
         const formData = new FormData();
         
-        if (profileImage) {
+        // Si hay una imagen seleccionada, la agregamos al FormData
+        if (profileImage instanceof File) {
             formData.append('profileImage', profileImage);
         }
 
-        const payload: any = {
-            firstName: restData.firstName,
-            lastName: restData.lastName,
-            email: restData.email,
-            phone: restData.phone,
-            twoFactorAuth: restData.twoFactorAuth,
-            status: 'ACTIVE'
-        };
-
-        console.log('Payload:', payload);
-        
-
-        if (data.password) {
-            payload.password = data.password;
+        // Agregamos todos los campos al mismo nivel
+        formData.append('firstName', restData.firstName);
+        formData.append('lastName', restData.lastName);
+        formData.append('email', restData.email);
+        if (restData.phone) {
+            formData.append('phone', restData.phone);
         }
+        formData.append('twoFactorAuth', restData.twoFactorAuth.toString());
+        formData.append('status', 'ACTIVE');
 
-        // Agregar el payload como un campo JSON en el FormData
-        formData.append('data', JSON.stringify(payload));
+        // Si hay contraseña, la agregamos
+        if (data.password) {
+            formData.append('password', data.password);
+        }
 
         const result = await updateProfile(formData);
 
@@ -61,7 +58,9 @@ export const useHandleOnSubmit = ({ form, refreshProfile }: UseHandleOnSubmitPro
                 severity: 'success',
                 summary: 'Éxito',
                 detail: 'Perfil actualizado exitosamente',
-                life: 3000
+                life: 3000,
+                style: { background: '#15803d', color: '#ffffff' },
+                contentStyle: { background: '#15803d', color: '#ffffff' }
             });
             form.reset({
                 ...restData,

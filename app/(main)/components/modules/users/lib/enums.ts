@@ -4,5 +4,5 @@ export enum UserStatus {
 }
 
 export enum UserRoles {
-    ADMIN = 10
+    ADMIN = 1
 } 
