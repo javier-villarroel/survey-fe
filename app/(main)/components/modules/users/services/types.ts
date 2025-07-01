@@ -1,7 +1,6 @@
 export interface IUser {
   id: number;
-  userName: string;
-  name: string;
+  firstName: string;
   lastName: string;
   email: string;
   phone?: string;
@@ -42,23 +41,29 @@ export interface IApiResponse<T> {
   result: T;
 }
 
+export interface IUserResponse {
+  result: IUser;
+}
+
 export interface ICreateUserRequest {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phonePrefix: string;
+  phoneNumber: string;
+  phone?: string;
+  status?: string;
 }
 
 export interface IUpdateUserRequest {
   firstName?: string;
   lastName?: string;
   email?: string;
-  phone?: string | number;
+  phone?: string;
   roleId?: number;
   status?: boolean;
   password?: string;
 }
 
 // Tipos específicos para las respuestas de usuarios
-export type IUserResponse = IApiResponse<IUser>;
 export type IUsersListResponse = IApiResponse<IUser[]>; 

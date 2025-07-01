@@ -4,7 +4,14 @@ import { noAuthApi } from "@/app/api/axios";
 
 export const createUserService = async (userData: ICreateUserRequest): Promise<IUser | null> => {
   try {
-    const { data } = await noAuthApi.post<IUserResponse>("/user", userData);
+    const { phonePrefix, phoneNumber, ...rest } = userData;
+    const phone = phonePrefix && phoneNumber ? `${phonePrefix}${phoneNumber}` : undefined;
+
+    const { data } = await noAuthApi.post<IUserResponse>("/user", {
+      ...rest,
+      phone
+    });
+    
     return data.result;
   } catch (error) {
     if (error instanceof AxiosError) {

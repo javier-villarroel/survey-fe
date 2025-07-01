@@ -1,10 +1,12 @@
 "use client";
 
 import { DynamicTable } from "@/app/(main)/components/common/components/table/DynamicTable";
+import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
-import { confirmDialog } from 'primereact/confirmdialog';
 import { createActions } from "./config/actions";
-import { useUsers } from "../../hooks/useUsers";
+import { Paginator } from 'primereact/paginator';
+import { Dropdown } from 'primereact/dropdown';
+import { Skeleton } from 'primereact/skeleton';
 import { IUser } from "../../services/types";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
@@ -12,10 +14,7 @@ import { columns } from "./config/columns";
 import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { CreateUser } from "../create";
-import { Paginator } from 'primereact/paginator';
-import { Dropdown } from 'primereact/dropdown';
-import { DataTableStateEvent } from 'primereact/datatable';
-import { Skeleton } from 'primereact/skeleton';
+import { UserDetails } from "../details";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -64,35 +63,11 @@ const LoadingSkeleton = () => {
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-	const { deleteUser, toggleUserStatus } = useUsers();
 	const { data, loading, pagination, handleFilter } = useUsersTable();
 
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
 		setShowModal(true);
-	};
-
-	const handleDelete = async (userId: number) => {
-		confirmDialog({
-			message: '¿Está seguro que desea eliminar este usuario?',
-			header: 'Confirmar eliminación',
-			icon: 'pi pi-exclamation-triangle',
-			acceptLabel: 'Sí, eliminar',
-			rejectLabel: 'No, cancelar',
-			accept: () => deleteUser(userId)
-		});
-	};
-
-	const handleToggleStatus = async (user: IUser) => {
-		const action = user.status ? 'suspender' : 'activar';
-		confirmDialog({
-			message: `¿Está seguro que desea ${action} este usuario?`,
-			header: `Confirmar ${action}`,
-			icon: 'pi pi-exclamation-triangle',
-			acceptLabel: `Sí, ${action}`,
-			rejectLabel: 'No, cancelar',
-			accept: () => toggleUserStatus(user)
-		});
 	};
 
 	const handleSuccess = () => {
@@ -129,9 +104,7 @@ const ListUsers = () => {
 	};
 
 	const actions = createActions({
-		onEdit: handleEdit,
-		onDelete: handleDelete,
-		onToggleStatus: handleToggleStatus
+		onEdit: handleEdit
 	});
 
 	const headerContent = (
@@ -188,11 +161,18 @@ const ListUsers = () => {
 					contentClassName="border-round-bottom"
 				>
 					<div className="p-4">
-						<CreateUser 
-							onSuccess={handleSuccess} 
-							user={selectedUser} 
-							onCancel={handleCancel}
-						/>
+						{selectedUser ? (
+							<UserDetails 
+								user={selectedUser}
+								onSuccess={handleSuccess} 
+								onCancel={handleCancel}
+							/>
+						) : (
+							<CreateUser 
+								onSuccess={handleSuccess} 
+								onCancel={handleCancel}
+							/>
+						)}
 					</div>
 				</Dialog>
 

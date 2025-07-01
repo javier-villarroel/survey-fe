@@ -11,21 +11,14 @@ export const useUpdateUser = () => {
     const updateUser = useCallback(async (id: number, userData: IUpdateUserRequest): Promise<IUser | null> => {
         setIsLoading(true);
         setError(null);
-
-        try {
-            const result = await updateUserService(id, userData);
-            if (result) {
-                // Invalidar la caché de usuarios para forzar una recarga
-                await queryClient.invalidateQueries({ queryKey: ['users'] });
-            }
-            return result;
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Error al actualizar usuario";
-            setError(errorMessage);
-            return null;
-        } finally {
-            setIsLoading(false);
+        const result = await updateUserService(id, userData);
+        if (result) {
+            // Invalidar la caché de usuarios para forzar una recarga
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
         }
+        setIsLoading(false);
+        return result;
+        
     }, [queryClient]);
 
     return {

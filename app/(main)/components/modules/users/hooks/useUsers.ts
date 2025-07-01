@@ -1,6 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useApi } from "@/app/hooks/useApi";
-import { useQueryClient } from "@tanstack/react-query";
 import { IUser, ICreateUserRequest, IUpdateUserRequest, IUsersListResponse, IUserResponse } from "../services/types";
 import { TablePaginationParams } from "@/app/(main)/components/common/components/table/types";
 
@@ -11,7 +10,6 @@ interface Pagination {
 
 export const useUsers = () => {
     const api = useApi();
-    const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false);
 
     const getUsers = async (params: TablePaginationParams): Promise<IUsersListResponse> => {
@@ -86,41 +84,11 @@ export const useUsers = () => {
         }
     };
 
-    const deleteUser = useCallback(async (userId: number) => {
-        try {
-            setLoading(true);
-            await api.delete(`/user/${userId}`);
-            await queryClient.invalidateQueries({ queryKey: ["users"] });
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, [api, queryClient]);
-
-    const toggleUserStatus = useCallback(async (user: IUser) => {
-        try {
-            setLoading(true);
-            await api.patch(`/user/${user.id}`, {
-                status: !user.status
-            });
-            await queryClient.invalidateQueries({ queryKey: ["users"] });
-        } catch (error) {
-            console.error("Error toggling user status:", error);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, [api, queryClient]);
-
     return {
         getUsers,
         getUser,
         createUser,
         updateUser,
-        deleteUser,
-        toggleUserStatus,
         loading
     };
 }; 
