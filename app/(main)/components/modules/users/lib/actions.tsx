@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "primereact/button";
 import { addUserAccessService } from "../services/addUserAccessService";
-import { changeUserStatusService } from "../services/changeUserStatusService";
 import { UserRoles, UserStatus } from "../lib/enums";
 import { toast } from "sonner";
+import { useChangeUserStatus } from "../hooks/useChangeUserStatus";
 
 interface ActionDropdownProps {
 	row: {
@@ -14,6 +14,8 @@ interface ActionDropdownProps {
 }
 
 const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
+	const { changeUserStatus, toast: statusToast } = useChangeUserStatus();
+
 	const handleAssignRole = async () => {
 		try {
 			const result = await addUserAccessService(row.id, UserRoles.ADMIN);
@@ -32,20 +34,8 @@ const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 	};
 
 	const handleChangeStatus = async (newStatus: UserStatus) => {
-		try {
-			const result = await changeUserStatusService(row.id, newStatus);
-			if (result) {
-				toast.success(`Usuario ${newStatus === UserStatus.ACTIVE ? 'activado' : 'bloqueado'} correctamente`);
-				if (onActionComplete) onActionComplete();
-			}
-		} catch (error) {
-			console.error('Error en handleChangeStatus:', error);
-			if (error instanceof Error) {
-				toast.error(error.message);
-			} else {
-				toast.error(`Error al ${newStatus === UserStatus.ACTIVE ? 'activar' : 'bloquear'} el usuario`);
-			}
-		}
+		changeUserStatus(row.id, newStatus);
+		if (onActionComplete) onActionComplete();
 	};
 
 	return (
@@ -65,13 +55,22 @@ const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 					severity="danger"
 					onClick={() => handleChangeStatus(UserStatus.BLOQUED)}
 				/>
-			) : (
+			) : row.status === UserStatus.BLOQUED ? (
 				<Button
 					type="button"
 					label="Activar"
 					icon="pi pi-check"
 					severity="success"
 					onClick={() => handleChangeStatus(UserStatus.ACTIVE)}
+				/>
+			) : null}
+			{row.status !== UserStatus.DELETED && (
+				<Button
+					type="button"
+					label="Eliminar"
+					icon="pi pi-trash"
+					severity="danger"
+					onClick={() => handleChangeStatus(UserStatus.DELETED)}
 				/>
 			)}
 		</div>

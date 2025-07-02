@@ -20,10 +20,10 @@ export const menuModel: any[] = [
 			},
 		],
 	},
-	{
-		label: "",
-		items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
-	},
+	// {
+	// 	label: "",
+	// 	items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
+	// },
 	// {
 	// 	label: "",
 	// 	items: [{ label: "Proyectos", icon: "pi pi-briefcase", to: "/proyectos" }],
@@ -69,7 +69,7 @@ const AppMenu = () => {
                             className=" text-white text-sm font-bold px-6 py-2  shadow-sm cursor-pointer transition-colors"
                             onClick={() => router.push('/versiones')}
                         >
-                            Versión 0.1.1
+                            Versión 0.1.2
                         </span>
                     </div>
                 </div>

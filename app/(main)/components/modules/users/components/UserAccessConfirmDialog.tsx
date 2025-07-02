@@ -3,10 +3,10 @@ import { Button } from 'primereact/button';
 
 interface UserAccessConfirmDialogProps {
     showConfirmDialog: boolean;
-    handleConfirm: () => Promise<boolean>;
+    handleConfirm: () => Promise<boolean | void>;
     handleReject: () => void;
     pendingAction: {
-        userId: string;
+        userId: number;
         isAdmin: boolean;
     } | null;
 }

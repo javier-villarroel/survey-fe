@@ -4,6 +4,8 @@ import { UserStatus } from "../lib/enums";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from 'primereact/confirmdialog';
 
+type ToastSeverity = "success" | "info" | "warn" | "error";
+
 export const useChangeUserStatus = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -20,21 +22,47 @@ export const useChangeUserStatus = () => {
       setIsLoading(true);
       const result = await changeUserStatusService(pendingAction.userId, pendingAction.status);
       
+      let message = {
+        summary: "",
+        detail: "",
+        severity: "success" as ToastSeverity,
+        style: { background: '', color: '#ffffff' }
+      };
+
+      switch (pendingAction.status) {
+        case UserStatus.ACTIVE:
+          message = {
+            summary: "Usuario Activado",
+            detail: "El usuario ha sido activado exitosamente",
+            severity: "success",
+            style: { background: '#15803d', color: '#ffffff' }
+          };
+          break;
+        case UserStatus.BLOQUED:
+          message = {
+            summary: "Usuario Suspendido",
+            detail: "El usuario ha sido suspendido exitosamente",
+            severity: "warn",
+            style: { background: '#991b1b', color: '#ffffff' }
+          };
+          break;
+        case UserStatus.DELETED:
+          message = {
+            summary: "Usuario Eliminado",
+            detail: "El usuario ha sido eliminado exitosamente",
+            severity: "success",
+            style: { background: '#15803d', color: '#ffffff' }
+          };
+          break;
+      }
+
       toast.current?.show({
-        severity: pendingAction.status === UserStatus.ACTIVE ? "success" : "warn",
-        summary: pendingAction.status === UserStatus.ACTIVE ? "Usuario Activado" : "Usuario Suspendido",
-        detail: pendingAction.status === UserStatus.ACTIVE 
-          ? "El usuario ha sido activado exitosamente" 
-          : "El usuario ha sido suspendido exitosamente",
+        severity: message.severity,
+        summary: message.summary,
+        detail: message.detail,
         life: 3000,
-        style: {
-          background: pendingAction.status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
-          color: '#ffffff'
-        },
-        contentStyle: {
-          background: pendingAction.status === UserStatus.ACTIVE ? '#15803d' : '#991b1b',
-          color: '#ffffff'
-        }
+        style: message.style,
+        contentStyle: message.style
       });
 
       return result;

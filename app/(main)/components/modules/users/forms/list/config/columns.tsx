@@ -22,7 +22,7 @@ export const columns: TableColumn[] = [
         field: "id",
         header: "ID",
         sortable: true,
-        filter: true,
+        // filter: true,
         filterPlaceholder: "Filtrar por ID",
         style: { minWidth: '12rem' }
     },

@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { removeUserService } from "../services/removeUserService";
 import { Toast } from "primereact/toast";
+import { changeUserStatusService } from "../services/changeUserStatusService";
+import { UserStatus } from "../lib/enums";
 
 export const useRemoveUser = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -9,8 +11,7 @@ export const useRemoveUser = () => {
     const removeUser = async (userId: number) => {
         try {
             setIsLoading(true);
-            const result = await removeUserService(userId);
-            
+            const result = await changeUserStatusService(userId, UserStatus.DELETED);
             toast.current?.show({
                 severity: "success",
                 summary: "Usuario Eliminado",

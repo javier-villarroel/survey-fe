@@ -15,7 +15,7 @@ export enum AuditEvent {
     DELETE = 'DELETE',
     READ = 'READ',
     LOGIN = 'LOGIN',
-    RESET_PASSWORD = 'RESET_PASSWORD'
+    UPDATE_PASSWORD = 'UPDATE_PASSWORD'
 }
 
 export const ModuleTranslations: Record<AuditModule, string> = {
@@ -35,7 +35,7 @@ export const EventTranslations: Record<AuditEvent, string> = {
     [AuditEvent.DELETE]: 'Eliminar',
     [AuditEvent.READ]: 'Leer',
     [AuditEvent.LOGIN]: 'Inicio de sesión',
-    [AuditEvent.RESET_PASSWORD]: 'Cambio de clave'
+    [AuditEvent.UPDATE_PASSWORD]: 'Cambio de clave'
 };
 
 export const ModuleIcons: Record<AuditModule, string> = {
@@ -55,7 +55,7 @@ export const EventIcons: Record<AuditEvent, string> = {
     [AuditEvent.DELETE]: 'pi pi-trash',
     [AuditEvent.READ]: 'pi pi-eye',
     [AuditEvent.LOGIN]: 'pi pi-sign-in',
-    [AuditEvent.RESET_PASSWORD]: 'pi pi-sign-in'
+    [AuditEvent.UPDATE_PASSWORD]: 'pi pi-sign-in'
 };
 
 type TagSeverity = 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast';
@@ -66,7 +66,7 @@ export const EventColors: Record<AuditEvent, TagSeverity> = {
     [AuditEvent.DELETE]: 'danger',
     [AuditEvent.READ]: 'info',
     [AuditEvent.LOGIN]: 'secondary',
-    [AuditEvent.RESET_PASSWORD]: 'secondary'
+    [AuditEvent.UPDATE_PASSWORD]: 'secondary'
 };
 
 export const EventBackgroundColors: Record<AuditEvent, string> = {
@@ -75,7 +75,7 @@ export const EventBackgroundColors: Record<AuditEvent, string> = {
     [AuditEvent.DELETE]: '#EF4444', // Rojo
     [AuditEvent.READ]: '#3B82F6',   // Azul
     [AuditEvent.LOGIN]: '#6366F1',   // Indigo
-    [AuditEvent.RESET_PASSWORD]: '#6366F1'   // Indigo
+    [AuditEvent.UPDATE_PASSWORD]: '#6366F1'   // Indigo
 };
 
 export const ModuleColors: Record<AuditModule, string> = {
