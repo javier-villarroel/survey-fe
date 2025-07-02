@@ -1,75 +1,62 @@
 import { useState, useRef } from "react";
-import { addUserAccessService } from "../services/addUserAccessService";
 import { Toast } from "primereact/toast";
-import { UserRoles } from '../lib/enums';
+import { UsersService } from '../services/users.services';
+
+interface PendingAction {
+    userId: string;
+    isAdmin: boolean;
+}
 
 export const useAddUserAccess = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [pendingAction, setPendingAction] = useState<{
-        userId: number;
-        isGranting: boolean;
-    } | null>(null);
+    const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const toast = useRef<Toast>(null);
 
-    const handleConfirm = async () => {
-        if (!pendingAction) return null;
-        
-        try {
-            setIsLoading(true);
-            const result = await addUserAccessService(pendingAction.userId, pendingAction.isGranting ? UserRoles.ADMIN : null);
-            
-            toast.current?.show({
-                severity: pendingAction.isGranting ? "success" : "info",
-                summary: pendingAction.isGranting ? "Éxito" : "Completado",
-                detail: pendingAction.isGranting 
-                    ? "Acceso de administrador asignado correctamente"
-                    : "Acceso de administrador revocado correctamente",
-                life: 3000,
-                style: {
-                    background: pendingAction.isGranting ? '#15803d' : '#1e40af',
-                    color: '#ffffff'
-                },
-                contentStyle: {
-                    background: pendingAction.isGranting ? '#15803d' : '#1e40af',
-                    color: '#ffffff'
-                }
-            });
-
-            return result;
-        } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: error instanceof Error 
-                    ? error.message 
-                    : `Error al ${pendingAction.isGranting ? 'asignar' : 'revocar'} acceso de administrador`,
-                life: 3000,
-                style: {
-                    background: '#991b1b',
-                    color: '#ffffff'
-                },
-                contentStyle: {
-                    background: '#991b1b',
-                    color: '#ffffff'
-                }
-            });
-            return null;
-        } finally {
-            setIsLoading(false);
-            setPendingAction(null);
-            setShowConfirmDialog(false);
-        }
-    };
-
-    const toggleUserAccess = (userId: number, isGranting: boolean) => {
-        setPendingAction({ userId, isGranting });
+    const toggleUserAccess = async (userId: string, isAdmin: boolean) => {
+        setPendingAction({ userId, isAdmin });
         setShowConfirmDialog(true);
     };
 
+    const handleConfirm = async () => {
+        if (!pendingAction) return false;
+
+        try {
+            setIsLoading(true);
+            const payload = {
+                roleId: 1, // ID del rol de administrador
+                action: pendingAction.isAdmin ? 1 : 0 // 1 para asignar, 0 para remover
+            };
+
+            await UsersService.updateUserAccess(pendingAction.userId, payload);
+
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: `Se ha ${pendingAction.isAdmin ? 'asignado' : 'removido'} el rol de administrador correctamente`,
+                life: 3000
+            });
+
+            setShowConfirmDialog(false);
+            setPendingAction(null);
+            return true;
+        } catch (error) {
+            console.error('Error al actualizar el acceso:', error);
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo actualizar el acceso del usuario',
+                life: 3000
+            });
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleReject = () => {
-        setPendingAction(null);
         setShowConfirmDialog(false);
+        setPendingAction(null);
     };
 
     return {

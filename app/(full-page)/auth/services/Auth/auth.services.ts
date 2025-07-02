@@ -75,7 +75,7 @@ export const verifyOTPService = async (verifyData: IVerifyOTPRequest): Promise<S
 	
 	try {
 		console.log('verificando');
-		const { data } = await noAuthApi.post<BaseResponse<{ valid: boolean }>>(
+		const { data } = await noAuthApi.patch<BaseResponse<{ valid: boolean }>>(
 			"/otp/confirmation",
 			{ "event": "OTP_RESET_PASSWORD",...verifyData}
 		);
