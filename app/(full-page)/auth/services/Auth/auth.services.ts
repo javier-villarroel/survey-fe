@@ -54,7 +54,7 @@ export const signInServices = async (credentials: FormLogin): Promise<ServiceRes
 
 export const recoverPasswordService = async (email: IFormRecoverPassword): Promise<ServiceResponse<IResetPasswordResponse>> => {
 	try {
-		const { data } = await noAuthApi.patch<BaseResponse<IResetPasswordResponse>>(
+		const { data } = await noAuthApi.post<BaseResponse<IResetPasswordResponse>>(
 			"/auth/reset_password",
 			email
 		);
@@ -114,7 +114,7 @@ export const verifySignInOTPService = async (verifyData: IVerifySignInOTPRequest
 
 export const resetPasswordService = async (resetData: IResetPasswordRequest): Promise<ServiceResponse<{ success: boolean }>> => {
 	try {
-		const { data } = await noAuthApi.post<BaseResponse<{ success: boolean }>>(
+		const { data } = await noAuthApi.patch<BaseResponse<{ success: boolean }>>(
 			"/auth/update_password",
 			resetData
 		);
