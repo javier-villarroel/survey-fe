@@ -19,7 +19,6 @@ import { Tag } from 'primereact/tag';
 import { formatDistanceToNow, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Avatar } from 'primereact/avatar';
-import { Tooltip } from 'primereact/tooltip';
 
 interface AuditLogTimelineProps {
     items: AuditLogItem[];
@@ -74,7 +73,7 @@ const getInitials = (firstName?: string, lastName?: string, email?: string): str
     return '??';
 };
 
-const getStatusInfo = (status: string | undefined): StatusInfo => {
+const getStatusInfo = (status: string | undefined, event: AuditEvent): any => {
     if (!status) return { 
         label: 'Desconocido', 
         severity: 'info', 
@@ -82,29 +81,31 @@ const getStatusInfo = (status: string | undefined): StatusInfo => {
         color: '#6366F1' // Indigo para estado desconocido
     };
     
-    switch (status.toUpperCase()) {
-        case 'SUCCESS':
-            return { 
-                label: 'Exitoso', 
-                severity: 'success',
-                icon: 'pi pi-lock-open',
-                color: '#22C55E' // Verde
-            };
-        case 'FAILED':
-        case 'FALLIDO':
-            return { 
-                label: 'Fallido', 
-                severity: 'danger',
-                icon: 'pi pi-lock',
-                color: '#EF4444' // Rojo
-            };
-        default:
-            return { 
-                label: status, 
-                severity: 'info',
-                icon: 'pi pi-question-circle',
-                color: '#6366F1' // Indigo
-            };
+    if(event === 'LOGIN') {
+        switch (status.toUpperCase() ) {
+            case 'SUCCESS':
+                return { 
+                    label: 'Exitoso', 
+                    severity: 'success',
+                    icon: 'pi pi-lock-open',
+                    color: '#22C55E' // Verde
+                };
+            case 'FAILED':
+            case 'FALLIDO':
+                return { 
+                    label: 'Fallido', 
+                    severity: 'danger',
+                    icon: 'pi pi-lock',
+                    color: '#EF4444' // Rojo
+                };
+            default:
+                return { 
+                    label: status, 
+                    severity: 'info',
+                    icon: 'pi pi-question-circle',
+                    color: '#6366F1' // Indigo
+                };
+        }
     }
 };
 
@@ -203,20 +204,20 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
         
         // Determinar las iniciales basadas en el módulo y estado
         let initials;
-        if (moduleType === AuditModule.AUTH && item.status === 'SUCCESS') {
+        if (moduleType === AuditModule.AUTH && item.status === 'SUCCESS' ) {
             // Para AUTH exitoso, usar el email del newData
-            initials = getInitials(undefined, undefined, item.newData?.email);
+            initials = getInitials(undefined, undefined, item.user?.email);
         } else {
             // Para otros casos, usar firstName y lastName
-            initials = getInitials(item.newData?.firstName, item.newData?.lastName);
+            initials = getInitials(item.user?.firstName, item.user?.lastName);
         }
 
         // Obtener información del estado si es módulo AUTH
         const showStatus = moduleType === AuditModule.AUTH;
-        const status = showStatus ? getStatusInfo(item.status || item.newData?.status) : null;
+        const status = showStatus ? getStatusInfo(item.status || item.newData?.status, item.event) : null;
 
         // Obtener el ícono del módulo
-        const moduleIcon = getModuleIcon(moduleType, item.status || item.newData?.status);
+        const moduleIcon = item.event === 'LOGIN' ? getModuleIcon(moduleType, item.status || item.newData?.status) : '';
 
         // Determinar el color del ícono
         const iconColor = moduleType === AuditModule.AUTH && status 
@@ -267,13 +268,13 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                                 <div className="flex flex-column">
                                     <span className="font-semibold text-900 text-overflow-ellipsis overflow-hidden">
                                         {moduleType === AuditModule.AUTH && item.status === 'SUCCESS' 
-                                            ? item.newData?.email 
-                                            : `${item.newData?.firstName || ''} ${item.newData?.lastName || ''}`}
+                                            ? item.user?.email 
+                                            : `${item.user?.firstName || ''} ${item.user?.lastName || ''}`}
                                     </span>
                                     <span className="text-500 text-sm text-overflow-ellipsis overflow-hidden">
-                                        {moduleType === AuditModule.AUTH && item.status === 'SUCCESS' 
+                                        {moduleType === AuditModule.AUTH && item.status === 'SUCCESS' && item.event === 'LOGIN'
                                             ? 'Usuario autenticado'
-                                            : item.newData?.email}
+                                            : item.user?.email}
                                     </span>
                                 </div>
                             </div>

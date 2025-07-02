@@ -10,11 +10,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { resetPasswordService } from '../services/Auth/auth.services';
 import type { Password as PasswordType } from 'primereact/password';
 
-// Dynamically import Password component with suspense
-const Password = dynamic<React.ComponentProps<typeof PasswordType>>(() => import('primereact/password').then(mod => {
-    const { Password } = mod;
-    return Password;
-}), {
+// Dynamically import Password component
+const Password = dynamic(() => import('primereact/password').then(mod => mod.Password), {
     ssr: false,
     loading: () => <div className="animate-pulse bg-gray-200 h-12 w-full rounded"></div>
 });

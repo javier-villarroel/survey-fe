@@ -23,6 +23,7 @@ export interface AuditLogItem {
     userId: string;
     oldData?: any;
     newData?: any;
+    user?: any;
     createdAt?: string;
     status?: 'SUCCESS' | 'FAILED' | 'FALLIDO';
 }
