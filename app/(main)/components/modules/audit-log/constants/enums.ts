@@ -15,7 +15,6 @@ export enum AuditEvent {
     DELETE = 'DELETE',
     READ = 'READ',
     LOGIN = 'LOGIN'
-    
 }
 
 export const ModuleTranslations: Record<AuditModule, string> = {
