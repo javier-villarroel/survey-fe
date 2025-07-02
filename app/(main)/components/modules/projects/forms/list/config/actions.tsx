@@ -23,12 +23,6 @@ export const createActions = ({
         onClick: (project: Project) => onEdit(project)
     },
     {
-        label: "Eliminar",
-        icon: "pi pi-trash",
-        className: "text-red-500",
-        onClick: (project: Project) => onDelete(project.id)
-    },
-    {
         label: "Cambiar estado",
         icon: "pi pi-refresh",
         className: "text-yellow-500",
@@ -38,7 +32,7 @@ export const createActions = ({
         onClick: (project: Project) => onToggleStatus(project)
     },
     {
-        label: "Crear Cuestionario",
+        label: "Cuestionarios",
         icon: "pi pi-file-edit",
         className: "text-purple-500",
         onClick: (project: Project) => onCreateQuestionnaire(project)
@@ -54,5 +48,11 @@ export const createActions = ({
         icon: "pi pi-users",
         className: "text-indigo-500",
         onClick: (project: Project) => onRoleAssignment(project)
-    }
+    },
+    {
+        label: "Eliminar",
+        icon: "pi pi-trash",
+        className: "text-red-500",
+        onClick: (project: Project) => onDelete(project.id)
+    },
 ]; 

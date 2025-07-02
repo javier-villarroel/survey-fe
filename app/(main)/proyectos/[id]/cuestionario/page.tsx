@@ -1,138 +1,121 @@
 'use client';
 
 import { Card } from 'primereact/card';
-import { useParams } from 'next/navigation';
-import { Steps } from 'primereact/steps';
-import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Dropdown } from 'primereact/dropdown';
-import { RadioButton } from 'primereact/radiobutton';
-import { Checkbox } from 'primereact/checkbox';
-import { Dialog } from 'primereact/dialog';
-import { TabView, TabPanel } from 'primereact/tabview';
-import { StepOne } from './components/StepOne';
-import { StepTwo } from './components/StepTwo';
-import { StepThree } from './components/StepThree';
-import { StepFour } from './components/StepFour';
-import { StepOneData, StepTwoData, StepThreeData, StepFourData } from './lib/types';
+import { DynamicTable } from "@/app/(main)/components/common/components/table/DynamicTable";
+import { useState } from 'react';
+import { Questionnaire } from './types';
+import { columns } from './config/columns';
+import { mockQuestionnaires } from './data/mock';
+import { createActions } from './config/actions';
+import { confirmDialog } from 'primereact/confirmdialog';
 
-type FormComponent = {
-    id: string;
-    type: string;
-    label: string;
-    placeholder?: string;
-    options?: { value: string; label: string }[];
-    required?: boolean;
-};
-
-const ProjectQuestionnaire = () => {
+const QuestionnairesList = () => {
     const params = useParams();
+    const router = useRouter();
     const projectId = params.id as string;
-    const [activeIndex, setActiveIndex] = useState<number>(0);
-    
-    // Estados para cada paso
-    const [stepOneData, setStepOneData] = useState<StepOneData>({
-        formComponents: []
-    });
+    const [loading] = useState(false);
+    const [filters, setFilters] = useState({});
 
-    const [stepTwoData, setStepTwoData] = useState<StepTwoData>({
-        totalSample: 0,
-        menCount: 0,
-        womenCount: 0,
-        ageRange: { min: '', max: '' }
-    });
+    const handleTableChange = () => {
+        console.log('Table page changed');
+    };
 
-    const [stepThreeData, setStepThreeData] = useState<StepThreeData>({
-        selectedStimuli: [],
-        isRandomOrder: false
-    });
+    const handleFilter = (filters: any) => {
+        setFilters(filters);
+        console.log('Filters changed:', filters);
+    };
 
-    const [stepFourData, setStepFourData] = useState<StepFourData>({
-        estimatedTime: 30,
-        startDate: null,
-        endDate: null,
-        isActive: false,
-        isPaid: false
-    });
+    const handleCreateQuestionnaire = () => {
+        router.push(`/proyectos/${projectId}/cuestionario/crear`);
+    };
 
-    const steps = [
-        {
-            label: 'Componentes',
-            icon: 'pi pi-fw pi-list'
-        },
-        {
-            label: 'Preguntas',
-            icon: 'pi pi-fw pi-question-circle'
-        },
-        {
-            label: 'Estímulos',
-            icon: 'pi pi-fw pi-images'
-        },
-        {
-            label: 'Configuración',
-            icon: 'pi pi-fw pi-cog'
-        }
-    ];
+    const handleDetail = (questionnaire: Questionnaire) => {
+        router.push(`/proyectos/${projectId}/cuestionario/${questionnaire.id}`);
+    };
 
-    const handleFinishQuestionnaire = () => {
-        // Aquí puedes implementar la lógica para guardar todo el cuestionario
-        console.log('Cuestionario finalizado', {
-            stepOneData,
-            stepTwoData,
-            stepThreeData,
-            stepFourData
+    const handleEdit = (questionnaire: Questionnaire) => {
+        router.push(`/proyectos/${projectId}/cuestionario/${questionnaire.id}/editar`);
+    };
+
+    const handleDuplicate = (questionnaire: Questionnaire) => {
+        // Implementar lógica de duplicación
+        console.log('Duplicar cuestionario:', questionnaire);
+    };
+
+    const handleDelete = (questionnaireId: string) => {
+        confirmDialog({
+            message: '¿Está seguro que desea eliminar este cuestionario?',
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí, eliminar',
+            rejectLabel: 'No, cancelar',
+            accept: () => {
+                // Implementar lógica de eliminación
+                console.log('Eliminar cuestionario:', questionnaireId);
+            }
         });
     };
+
+    const handleShare = (questionnaire: Questionnaire) => {
+        // Implementar lógica de compartir link
+        console.log('Compartir link del cuestionario:', questionnaire);
+    };
+
+    const handleViewInvitations = (questionnaire: Questionnaire) => {
+        router.push(`/proyectos/${projectId}/cuestionario/${questionnaire.id}/invitaciones`);
+    };
+
+    const handleTest = (questionnaire: Questionnaire) => {
+        router.push(`/proyectos/${projectId}/cuestionario/${questionnaire.id}/test`);
+    };
+
+    const actions = createActions({
+        onDetail: handleDetail,
+        onEdit: handleEdit,
+        onDuplicate: handleDuplicate,
+        onDelete: handleDelete,
+        onShare: handleShare,
+        onViewInvitations: handleViewInvitations,
+        onTest: handleTest
+    });
 
     return (
         <Card>
             <div className="w-full max-w-[1400px] mx-auto">
                 <div className="relative w-full mb-4">
-                    <h2 className="text-2xl font-bold">Cuestionario del Proyecto</h2>
+                    <h2 className="text-2xl font-bold">Cuestionarios del Proyecto</h2>
+                    <div className="absolute right-0 top-0 -mt-1">
+                        <Button
+                            label="Crear cuestionario"
+                            icon="pi pi-plus"
+                            onClick={handleCreateQuestionnaire}
+                            style={{
+                                backgroundColor: '#000e28',
+                                borderColor: '#000e28'
+                            }}
+                        />
+                    </div>
                 </div>
                 
-                <div className="mb-6">
-                    <Steps
-                        model={steps}
-                        activeIndex={activeIndex}
-                        onSelect={(e) => setActiveIndex(e.index)}
-                        className="w-full"
-                        readOnly={false}
-                    />
-                </div>
-
                 <div className="mt-4">
-                    {activeIndex === 0 && (
-                        <StepOne
-                            data={stepOneData}
-                            onDataChange={setStepOneData}
-                        />
-                    )}
-                    {activeIndex === 1 && (
-                        <StepTwo
-                            data={stepTwoData}
-                            onDataChange={setStepTwoData}
-                        />
-                    )}
-                    {activeIndex === 2 && (
-                        <StepThree
-                            data={stepThreeData}
-                            onDataChange={setStepThreeData}
-                        />
-                    )}
-                    {activeIndex === 3 && (
-                        <StepFour
-                            data={stepFourData}
-                            onDataChange={setStepFourData}
-                            onFinish={handleFinishQuestionnaire}
-                        />
-                    )}
+                    <DynamicTable<Questionnaire>
+                        columns={columns}
+                        value={mockQuestionnaires}
+                        loading={loading}
+                        onPage={handleTableChange}
+                        onFilter={handleFilter}
+                        totalRecords={mockQuestionnaires.length}
+                        globalSearchFields={['title', 'status']}
+                        emptyMessage="No se encontraron cuestionarios"
+                        rowsPerPageOptions={[10, 25, 50]}
+                        actions={actions}
+                    />
                 </div>
             </div>
         </Card>
     );
 };
 
-export default ProjectQuestionnaire; 
+export default QuestionnairesList; 
