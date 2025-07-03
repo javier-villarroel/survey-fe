@@ -5,12 +5,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "./useUsers";
 import { useState, useEffect } from "react";
 
-interface TableParams extends TablePaginationParams {
-    filters?: Record<string, any>;
-    search?: string;
+interface TableParams {
+    page: number;
+    limit: number;
 }
 
-const initialPagination: TablePaginationParams = {
+const initialPagination: TableParams = {
     page: 1,
     limit: 10
 };
@@ -24,11 +24,7 @@ const getCookie = (name: string) => {
 };
 
 export const useUsersTable = () => {
-    const [queryParams, setQueryParams] = useState<TableParams>({ 
-        ...initialPagination,
-        search: "",
-        filters: {}
-    });
+    const [queryParams, setQueryParams] = useState<TableParams>(initialPagination);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const { getUsers } = useUsers();
     const queryClient = useQueryClient();
@@ -44,13 +40,11 @@ export const useUsersTable = () => {
         queryKey: ["users", queryParams],
         queryFn: () => getUsers({
             page: queryParams.page,
-            limit: queryParams.limit,
-            search: queryParams.search,
-            filters: queryParams.filters
+            limit: queryParams.limit
         }),
-        staleTime: 0, // Siempre considerar los datos como obsoletos
-        refetchOnMount: true, // Refetch al montar el componente
-        refetchOnWindowFocus: true, // Refetch cuando la ventana recupera el foco
+        staleTime: 0,
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
         select: (data) => {
             if (!data || !currentUserEmail) return data;
             
@@ -71,31 +65,22 @@ export const useUsersTable = () => {
     };
 
     const onTableChange = (event: DataTableStateEvent) => {
-        const newFilters = event.filters || {};
-        
-        setQueryParams(prev => ({
-            ...prev,
+        setQueryParams({
             page: (event.page ?? 0) + 1,
-            limit: event.rows ?? prev.limit,
-            filters: newFilters,
-            search: event.globalFilter as string || ""
-        }));
+            limit: event.rows ?? initialPagination.limit
+        });
     };
 
-    const handleFilter = (params: TablePaginationParams) => {
-        setQueryParams(prev => ({
-            ...prev,
+    const handleFilter = (params: TableParams) => {
+        setQueryParams({
             page: params.page,
-            limit: params.limit,
-            search: params.search,
-            filters: params.filters
-        }));
+            limit: params.limit
+        });
     };
 
-    // Transformamos la paginación para que coincida con lo que espera PrimeReact
     const transformedPagination = data?.pagination ? {
-        currentPage: data.pagination.page - 1, // PrimeReact espera páginas basadas en 0
-        totalPages: Math.ceil(data.pagination.count / data.pagination.perPage), // Calculamos el total de páginas basado en el total de registros
+        currentPage: data.pagination.page - 1,
+        totalPages: Math.ceil(data.pagination.count / data.pagination.perPage),
         totalDocs: data.pagination.count,
         rowsPerPage: data.pagination.perPage,
         first: (data.pagination.page - 1) * data.pagination.perPage,
