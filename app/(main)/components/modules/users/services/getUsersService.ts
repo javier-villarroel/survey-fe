@@ -20,11 +20,8 @@ export const getUsersService = async (pagination: Pagination, filters?: Record<s
         const queries: QueryFilter[] = [];
         
         if (filters) {
-            if (filters.userName) {
-                queries.push({ field: 'userName', text: filters.userName });
-            }
-            if (filters.name) {
-                queries.push({ field: 'name', text: filters.name });
+            if (filters.firstName) {
+                queries.push({ field: 'firstName', text: filters.firstName });
             }
             if (filters.lastName) {
                 queries.push({ field: 'lastName', text: filters.lastName });
