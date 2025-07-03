@@ -98,11 +98,12 @@ const ListUsers = () => {
 	};
 
 	const handleStatusChange = (user: IUser, newStatus: UserStatus) => {
-		changeUserStatus(user.id, newStatus);
+		const userId = typeof user.id === 'number' ? user.id : parseInt(user.id);
+		changeUserStatus(userId, newStatus);
 	};
 
 	const handleAccessChange = (user: IUser) => {
-		toggleUserAccess(user.id, !user.isAdmin);
+		toggleUserAccess(user);
 	};
 
 	const handleRemove = (user: IUser) => {
@@ -112,7 +113,8 @@ const ListUsers = () => {
 			icon: 'pi pi-exclamation-triangle',
 			acceptClassName: 'p-button-danger',
 			accept: async () => {
-				const result = await removeUser(user.id);
+				const userId = typeof user.id === 'number' ? user.id : parseInt(user.id);
+				const result = await removeUser(userId);
 				if (result) {
 					refreshData();
 				}

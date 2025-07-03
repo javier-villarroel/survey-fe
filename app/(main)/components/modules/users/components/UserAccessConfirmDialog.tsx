@@ -1,14 +1,17 @@
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
+import { IUser } from '../services/types';
+
+interface PendingAction {
+    user: IUser;
+    action: "ASSIGN" | "UNASSIGN";
+}
 
 interface UserAccessConfirmDialogProps {
     showConfirmDialog: boolean;
     handleConfirm: () => Promise<boolean | void>;
     handleReject: () => void;
-    pendingAction: {
-        userId: number;
-        isAdmin: boolean;
-    } | null;
+    pendingAction: PendingAction | null;
 }
 
 export const UserAccessConfirmDialog = ({
@@ -19,13 +22,13 @@ export const UserAccessConfirmDialog = ({
 }: UserAccessConfirmDialogProps) => {
     if (!pendingAction) return null;
 
-    const { isAdmin } = pendingAction;
+    const isAssigning = pendingAction.action === "UNASSIGN";
 
     return (
         <Dialog
             visible={showConfirmDialog}
             style={{ width: '450px' }}
-            header={`${isAdmin ? 'Asignar' : 'Remover'} Acceso de Administrador`}
+            header={`${isAssigning ? 'Asignar' : 'Revocar'} Acceso de Administrador`}
             modal
             footer={
                 <div>
@@ -40,7 +43,7 @@ export const UserAccessConfirmDialog = ({
                         icon="pi pi-check"
                         onClick={handleConfirm}
                         autoFocus
-                        className={isAdmin ? 'p-button-success' : 'p-button-danger'}
+                        className={isAssigning ? 'p-button-success' : 'p-button-danger'}
                     />
                 </div>
             }
@@ -48,11 +51,11 @@ export const UserAccessConfirmDialog = ({
         >
             <div className="flex align-items-center justify-content-center">
                 <i 
-                    className={`pi ${isAdmin ? 'pi-user-plus' : 'pi-user-minus'} mr-3`} 
+                    className={`pi ${isAssigning ? 'pi-user-plus' : 'pi-user-minus'} mr-3`} 
                     style={{ fontSize: '2rem' }}
                 />
                 <span>
-                    ¿Está seguro que desea {isAdmin ? 'asignar' : 'remover'} el acceso de administrador a este usuario?
+                    ¿Está seguro que desea {isAssigning ? 'asignar' : 'revocar'} el acceso de administrador a este usuario?
                 </span>
             </div>
         </Dialog>

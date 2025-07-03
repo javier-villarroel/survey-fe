@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 import { UsersService } from '../services/users.services';
+import { IUser } from '../services/types';
+import { UserRoles } from "../lib/enums";
 
 interface PendingAction {
-    userId: string;
-    isAdmin: boolean;
+    user: IUser;
+    action: "ASSIGN" | "UNASSIGN";
 }
 
 export const useAddUserAccess = () => {
@@ -13,8 +15,11 @@ export const useAddUserAccess = () => {
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const toast = useRef<Toast>(null);
 
-    const toggleUserAccess = async (userId: string, isAdmin: boolean) => {
-        setPendingAction({ userId, isAdmin });
+    const toggleUserAccess = async (user: IUser) => {
+        setPendingAction({ 
+            user,
+            action: user.action || "UNASSIGN" 
+        });
         setShowConfirmDialog(true);
     };
 
@@ -24,16 +29,21 @@ export const useAddUserAccess = () => {
         try {
             setIsLoading(true);
             const payload = {
-                roleId: 1, // ID del rol de administrador
-                action: pendingAction.isAdmin ? 1 : 0 // 1 para asignar, 0 para remover
+                roleId: UserRoles.ADMIN, // ID del rol de administrador
+                action: pendingAction.action === "ASSIGN" ? 0 : 1 // 1 para asignar, 0 para revocar
             };
+            console.log('pendingAction:', pendingAction);
+            
+            const userId = typeof pendingAction.user.id === 'number' 
+                ? pendingAction.user.id.toString() 
+                : pendingAction.user.id;
 
-            await UsersService.updateUserAccess(pendingAction.userId, payload);
+            await UsersService.updateUserAccess(userId, payload);
 
             toast.current?.show({
                 severity: 'success',
                 summary: 'Éxito',
-                detail: `Se ha ${pendingAction.isAdmin ? 'asignado' : 'removido'} el rol de administrador correctamente`,
+                detail: `Se ha ${pendingAction.action === "ASSIGN" ? 'revocado' : 'asignado'} el rol de administrador correctamente`,
                 life: 3000
             });
 

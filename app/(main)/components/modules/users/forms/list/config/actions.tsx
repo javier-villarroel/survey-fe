@@ -31,9 +31,9 @@ export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove
         {
             label: "Acceso Admin",
             icon: "pi pi-user",
-            getLabel: (user: IUser) => user.isAdmin ? "Revocar Admin" : "Asignar Admin",
-            getIcon: (user: IUser) => user.isAdmin ? "pi pi-user-minus" : "pi pi-user-plus",
-            getClassName: (user: IUser) => user.isAdmin ? "p-button-danger" : "p-button-help",
+            getLabel: (user: IUser) => user.action === "ASSIGN" ? "Revocar Admin" : "Asignar Admin",
+            getIcon: (user: IUser) => user.action === "ASSIGN" ? "pi pi-user-minus" : "pi pi-user-plus",
+            getClassName: (user: IUser) => user.action === "ASSIGN" ? "p-button-danger" : "p-button-help",
             onClick: (user: IUser) => onAccessChange?.(user)
         },
         {

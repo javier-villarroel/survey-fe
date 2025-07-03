@@ -1,7 +1,7 @@
 import { UserStatus } from "../lib/enums";
 
 export interface IUser {
-  id: number;
+  id: string | number;
   firstName: string;
   lastName: string;
   email: string;
@@ -15,6 +15,7 @@ export interface IUser {
   createdAt: string;
   updatedAt: string;
   isAdmin: boolean;
+  action?: "ASSIGN" | "UNASSIGN";
 }
 
 export interface IPagination {

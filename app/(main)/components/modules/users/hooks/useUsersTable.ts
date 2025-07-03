@@ -3,7 +3,7 @@ import { DataTableStateEvent } from "primereact/datatable";
 import { IUsersListResponse } from "../services/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUsers } from "./useUsers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface TableParams extends TablePaginationParams {
     filters?: Record<string, any>;
@@ -15,14 +15,30 @@ const initialPagination: TablePaginationParams = {
     limit: 10
 };
 
+const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+};
+
 export const useUsersTable = () => {
     const [queryParams, setQueryParams] = useState<TableParams>({ 
         ...initialPagination,
         search: "",
         filters: {}
     });
+    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const { getUsers } = useUsers();
     const queryClient = useQueryClient();
+
+    useEffect(() => {
+        const email = getCookie('email');
+        if (email) {
+            setCurrentUserEmail(decodeURIComponent(email));
+        }
+    }, []);
 
     const { data, isLoading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
@@ -34,7 +50,20 @@ export const useUsersTable = () => {
         }),
         staleTime: 0, // Siempre considerar los datos como obsoletos
         refetchOnMount: true, // Refetch al montar el componente
-        refetchOnWindowFocus: true // Refetch cuando la ventana recupera el foco
+        refetchOnWindowFocus: true, // Refetch cuando la ventana recupera el foco
+        select: (data) => {
+            if (!data || !currentUserEmail) return data;
+            
+            const filteredUsers = data.result.filter(user => user.email !== currentUserEmail);
+            return {
+                ...data,
+                result: filteredUsers,
+                pagination: {
+                    ...data.pagination,
+                    count: filteredUsers.length
+                }
+            };
+        }
     });
 
     const refreshData = () => {
