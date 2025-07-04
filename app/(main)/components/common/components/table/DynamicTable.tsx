@@ -207,7 +207,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 rowsPerPageOptions={rowsPerPageOptions}
                 style={{ ...defaultStyle, ...style }}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                currentPageReportTemplate={`Página {currentPage} de ${totalPages} (Total: {totalRecords} registros)`}
+                currentPageReportTemplate={`Página {currentPage} de ${totalPages || Math.ceil(totalRecords / rowsPerPageOptions[0])} (Total: {totalRecords} registros)`}
                 paginatorLeft={<div className="px-3">Total: {totalRecords} registros</div>}
             >
                 {columns.map((col) => (

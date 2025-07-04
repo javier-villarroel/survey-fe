@@ -83,11 +83,14 @@ export const useUsersTable = () => {
                 ordering: JSON.stringify({ createdAt: "desc" })
             };
 
-            return getUsers({
+            const response = await getUsers({
                 page: queryParams.page,
                 limit: queryParams.limit,
                 filters: queryParams.filters
             });
+
+            console.log('Backend Response:', response);
+            return response;
         },
         staleTime: 0,
         refetchOnMount: true,
@@ -96,7 +99,7 @@ export const useUsersTable = () => {
             if (!data || !currentUserEmail) return data;
             
             const filteredUsers = data.result.filter(user => user.email !== currentUserEmail);
-            return {
+            const transformedData = {
                 ...data,
                 result: filteredUsers,
                 pagination: {
@@ -104,6 +107,8 @@ export const useUsersTable = () => {
                     count: filteredUsers.length
                 }
             };
+            console.log('Transformed Data:', transformedData);
+            return transformedData;
         }
     });
 
@@ -129,13 +134,15 @@ export const useUsersTable = () => {
 
     const transformedPagination = data?.pagination ? {
         currentPage: data.pagination.page - 1,
-        totalPages: Math.ceil(data.pagination.count / data.pagination.perPage),
-        totalDocs: data.pagination.count,
+        totalPages: data.pagination.totalPages || Math.ceil(data.pagination.totalDocs / data.pagination.perPage),
+        totalDocs: data.pagination.totalDocs,
         rowsPerPage: data.pagination.perPage,
         first: (data.pagination.page - 1) * data.pagination.perPage,
         hasNextPage: data.pagination.hasNextPage,
         hasPrevPage: data.pagination.hasPrevPage
     } : undefined;
+
+    console.log('Final Pagination:', transformedPagination);
 
     return {
         data: data?.result || [],

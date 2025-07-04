@@ -92,6 +92,8 @@ const ListUsers = () => {
 	} = useAddUserAccess();
 	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
 
+	console.log('ListUsers Pagination:', pagination);
+
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
 		setShowModal(true);
@@ -263,6 +265,7 @@ const ListUsers = () => {
 						value={data}
 						loading={loading}
 						totalRecords={pagination?.totalDocs || 0}
+						totalPages={pagination?.totalPages}
 						actions={actions}
 						globalSearchFields={[ "firstName", "lastName", "email", "role.name"]}
 						emptyMessage="No se encontraron usuarios"
