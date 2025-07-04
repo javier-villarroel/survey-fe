@@ -36,7 +36,7 @@ export const menuModel: any[] = [
 				icon: "pi pi-fw pi-cog",
 				items: [
 					{
-						label: "Bitacora",
+						label: "Bitácora",
 						icon: "pi pi-fw pi-calendar",		
 						to: "/bitacora" 		
 					},
@@ -69,7 +69,7 @@ const AppMenu = () => {
                             className=" text-white text-sm font-bold px-6 py-2  shadow-sm cursor-pointer transition-colors"
                             onClick={() => router.push('/versiones')}
                         >
-                            Versión 0.1.2
+                            Versión 0.1.4
                         </span>
                     </div>
                 </div>
