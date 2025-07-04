@@ -17,6 +17,7 @@ export interface TableColumn {
     sortable?: boolean;
     filter?: boolean;
     filterPlaceholder?: string;
+    filterMatchMode?: FilterMatchMode;
     body?: (rowData: any) => React.ReactNode;
     style?: React.CSSProperties;
     filterMatchModeOptions?: {

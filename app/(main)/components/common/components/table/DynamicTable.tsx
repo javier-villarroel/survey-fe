@@ -48,6 +48,7 @@ export function DynamicTable<T extends Record<string, any>>({
     onPage,
     onFilter,
     totalRecords,
+    totalPages = 1,
     title,
     createButton,
     actions,
@@ -59,38 +60,42 @@ export function DynamicTable<T extends Record<string, any>>({
     className,
     style,
     showPaginator = true
-}: DynamicTableProps<T> & { showPaginator?: boolean }) {
-    const [filters, setFilters] = React.useState<DataTableFilterMeta>(
-        defaultFilters || {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            ...columns.reduce((acc, column) => {
-                if (column.filter) {
-                    acc[column.field] = {
-                        operator: FilterOperator.AND,
-                        constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]
-                    };
-                }
-                return acc;
-            }, {} as DataTableFilterMeta)
-        }
-    );
+}: DynamicTableProps<T> & { showPaginator?: boolean; totalPages?: number }) {
+    const [filters, setFilters] = React.useState<DataTableFilterMeta>(() => {
+        const initialFilters: DataTableFilterMeta = {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        };
+
+        columns.forEach(column => {
+            if (column.filter) {
+                initialFilters[column.field] = {
+                    operator: FilterOperator.AND,
+                    constraints: [{ value: null, matchMode: column.filterMatchMode || FilterMatchMode.CONTAINS }]
+                };
+            }
+        });
+
+        return initialFilters;
+    });
 
     const [globalFilterValue, setGlobalFilterValue] = React.useState("");
 
     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setGlobalFilterValue(value);
-        setFilters((prevFilters) => ({
-            ...prevFilters,
-            global: { value, matchMode: FilterMatchMode.CONTAINS },
-        }));
+
+        const newFilters = {
+            ...filters,
+            global: { value, matchMode: FilterMatchMode.CONTAINS }
+        };
+        
+        setFilters(newFilters);
         
         if (onFilter) {
             onFilter({
-                page: 0,
+                page: 1,
                 limit: rowsPerPageOptions[0],
-                search: value,
-                filters
+                filters: newFilters
             });
         }
     };
@@ -101,26 +106,42 @@ export function DynamicTable<T extends Record<string, any>>({
         }
     };
 
-    const handleFilter = (event: any) => {
-        const newFilters = { ...event.filters };
+    const handleFilter = (event: DataTableStateEvent) => {
+        console.log('Filter event:', event);
+        const newFilters = event.filters as DataTableFilterMeta;
         setFilters(newFilters);
         
         if (onFilter) {
-            const searchValues = Object.values(newFilters)
-                .map((filter: any) => {
-                    if (filter.constraints) {
-                        return filter.constraints.map((constraint: any) => constraint.value).filter(Boolean);
-                    }
-                    return filter.value;
-                })
-                .flat()
-                .filter(Boolean);
-
             onFilter({
                 page: 1,
                 limit: rowsPerPageOptions[0],
-                search: searchValues.join(" "),
                 filters: newFilters
+            });
+        }
+    };
+
+    const clearAllFilters = () => {
+        const clearedFilters: DataTableFilterMeta = {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        };
+
+        columns.forEach(column => {
+            if (column.filter) {
+                clearedFilters[column.field] = {
+                    operator: FilterOperator.AND,
+                    constraints: [{ value: null, matchMode: column.filterMatchMode || FilterMatchMode.CONTAINS }]
+                };
+            }
+        });
+
+        setFilters(clearedFilters);
+        setGlobalFilterValue("");
+        
+        if (onFilter) {
+            onFilter({
+                page: 1,
+                limit: rowsPerPageOptions[0],
+                filters: clearedFilters
             });
         }
     };
@@ -166,20 +187,28 @@ export function DynamicTable<T extends Record<string, any>>({
 
     return (
         <div className="card">
+            <div className="mb-3 flex justify-end">
+                <Button
+                    label="Limpiar filtros"
+                    icon="pi pi-filter-slash"
+                    className="p-button-outlined p-button-danger"
+                    onClick={clearAllFilters}
+                />
+            </div>
             <DataTable
                 value={value}
                 lazy
                 dataKey="id"
                 paginator={showPaginator}
                 first={0}
-                rows={10}
+                rows={rowsPerPageOptions[0]}
                 totalRecords={totalRecords}
                 loading={loading}
                 onPage={handlePage}
                 onFilter={handleFilter}
                 filters={filters}
+                filterDisplay="menu"
                 header={header}
-                filterDisplay="row"
                 globalFilterFields={globalSearchFields}
                 emptyMessage={emptyMessage}
                 className={`p-datatable-sm ${className || ''}`}
@@ -189,7 +218,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 rowsPerPageOptions={rowsPerPageOptions}
                 style={{ ...defaultStyle, ...style }}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                currentPageReportTemplate="Página {currentPage} de {totalPages} (Total: {totalRecords} registros)"
+                currentPageReportTemplate={`Página {currentPage} de ${totalPages} (Total: {totalRecords} registros)`}
                 paginatorLeft={<div className="px-3">Total: {totalRecords} registros</div>}
             >
                 {columns.map((col) => (
@@ -199,26 +228,23 @@ export function DynamicTable<T extends Record<string, any>>({
                         header={col.header}
                         sortable={col.sortable}
                         filter={col.filter}
-                        filterField={col.field}
-                        filterPlaceholder={col.filterPlaceholder || `Filtrar por ${col.header.toLowerCase()}`}
-                        showFilterMenu={false}
-                        filterMatchModeOptions={
-                            col.filterMatchModeOptions || DEFAULT_FILTER_OPTIONS
-                        }
+                        filterPlaceholder={col.filterPlaceholder}
+                        filterMatchMode={col.filterMatchMode || FilterMatchMode.CONTAINS}
+                        filterMatchModeOptions={col.filterMatchModeOptions || DEFAULT_FILTER_OPTIONS}
+                        style={col.style}
                         body={col.body}
-                        style={col.style || { minWidth: '15rem' }}
+                        showFilterMenu={true}
                         showFilterOperator={false}
                         showAddButton={false}
-                        showFilterMatchModes={false}
-                        showClearButton={false}
+                        showApplyButton={true}
+                        showClearButton={true}
                     />
                 ))}
                 {actions && actions.length > 0 && (
                     <Column
-                        header="Acciones"
                         body={actionsBodyTemplate}
-                        style={{ minWidth: '10rem' }}
-                        headerStyle={{ textAlign: 'center' }}
+                        style={{ width: '5rem' }}
+                        header="Acciones"
                     />
                 )}
             </DataTable>

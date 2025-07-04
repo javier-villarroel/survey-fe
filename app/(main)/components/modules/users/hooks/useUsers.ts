@@ -17,25 +17,38 @@ interface QueryFilter {
 export const useUsers = () => {
     const api = useApi();
     const [loading, setLoading] = useState(false);
+    const [filters, setFilters] = useState<Record<string, any>>({});
 
     const convertFiltersToQueries = (filters: Record<string, any>): QueryFilter[] => {
         const queries: QueryFilter[] = [];
 
-        Object.entries(filters).forEach(([field, filter]) => {
-            // Solo procesar si hay un valor de filtro
-            if (filter && filter.value !== undefined && filter.value !== '') {
-                // Manejar campos anidados (como role.name)
-                const actualField = field.includes('.') ? field.split('.').pop()! : field;
-                
-                // Si el modo de filtro es EQUALS, usamos el valor exacto
-                // Si es CONTAINS o cualquier otro, lo tratamos como búsqueda parcial
-                const filterValue = filter.matchMode === FilterMatchMode.EQUALS 
-                    ? filter.value
-                    : filter.value;
+        if (!filters) return queries;
 
+        // Procesar cada campo de filtro
+        Object.entries(filters).forEach(([field, filterData]) => {
+            // Ignorar campos vacíos o nulos
+            if (!filterData) return;
+
+            let value: string | null = null;
+
+            // Manejar diferentes estructuras de filtro
+            if (typeof filterData === 'string') {
+                // Si es un string directo
+                value = filterData;
+            } else if (filterData.value) {
+                // Si tiene una propiedad value directa
+                value = filterData.value;
+            } else if (filterData.constraints?.[0]?.value) {
+                // Si usa la estructura de constraints de PrimeReact
+                value = filterData.constraints[0].value;
+            }
+
+            // Solo agregar si hay un valor
+            if (value) {
+                const actualField = field.includes('.') ? field.split('.').pop()! : field;
                 queries.push({
                     field: actualField,
-                    text: filterValue
+                    text: value
                 });
             }
         });
@@ -43,16 +56,31 @@ export const useUsers = () => {
         return queries;
     };
 
+    const handleFilterChange = (field: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [field]: { value }
+        }));
+    };
+
     const getUsers = async (params: TablePaginationParams): Promise<IUsersListResponse> => {
         try {
             setLoading(true);
+
             const pagination: Pagination = {
                 page: params.page,
                 limit: params.limit
             };
-            console.log('params.filters:', params.filters);
-            
-            const queries = params.filters ? convertFiltersToQueries(params.filters) : [];
+
+            // Combinar filtros del estado con los recibidos
+            const allFilters = {
+                ...filters,
+                ...(params.filters || {})
+            };
+
+            const queries = convertFiltersToQueries(allFilters);
+            console.log('Filtros aplicados:', allFilters);
+            console.log('Queries generadas:', queries);
 
             const response = await api.get("/user/table", {
                 params: {
@@ -63,6 +91,7 @@ export const useUsers = () => {
             });
             return response.data;
         } catch (error) {
+            console.error('Error en getUsers:', error);
             throw error;
         } finally {
             setLoading(false);
@@ -110,6 +139,8 @@ export const useUsers = () => {
         getUser,
         createUser,
         updateUser,
-        loading
+        loading,
+        handleFilterChange,
+        filters
     };
 }; 

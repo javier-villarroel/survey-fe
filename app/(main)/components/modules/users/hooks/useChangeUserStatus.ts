@@ -38,7 +38,7 @@ export const useChangeUserStatus = () => {
             style: { background: '#15803d', color: '#ffffff' }
           };
           break;
-        case UserStatus.BLOQUED:
+        case UserStatus.SUSPENDED:
           message = {
             summary: "Usuario Suspendido",
             detail: "El usuario ha sido suspendido exitosamente",
@@ -51,7 +51,7 @@ export const useChangeUserStatus = () => {
             summary: "Usuario Eliminado",
             detail: "El usuario ha sido eliminado exitosamente",
             severity: "success",
-            style: { background: '#15803d', color: '#ffffff' }
+            style: { background: '#1b4e2f', color: '#ffffff' }
           };
           break;
       }

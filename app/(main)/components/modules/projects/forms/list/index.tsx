@@ -22,7 +22,6 @@ const ListProjects = () => {
     const handleEdit = (project: Project) => {
         setSelectedProject(project);
         // Por ahora solo seleccionamos el proyecto, la edición se implementará después
-        console.log('Editar proyecto:', project);
     };
 
     const handleDelete = async (projectId: string) => {

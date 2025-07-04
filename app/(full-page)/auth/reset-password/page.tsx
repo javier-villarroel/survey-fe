@@ -36,6 +36,7 @@ const ResetPasswordForm = () => {
                 <li>Al menos una letra minúscula</li>
                 <li>Al menos una letra mayúscula</li>
                 <li>Al menos un número</li>
+                <li>Al menos un carácter especial (!@#$%^&*)</li>
                 <li>Mínimo 8 caracteres</li>
             </ul>
         </div>
@@ -65,12 +66,12 @@ const ResetPasswordForm = () => {
         }
 
         // Validar requisitos de contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
         if (!passwordRegex.test(password)) {
             toast.current?.show({ 
                 severity: 'error', 
                 summary: 'Error', 
-                detail: 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y tener mínimo 8 caracteres',
+                detail: 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número, un carácter especial y tener mínimo 8 caracteres',
                 style: { background: '#dc3545', color: '#fff' },
                 contentStyle: { background: '#dc3545', color: '#fff' }
             });

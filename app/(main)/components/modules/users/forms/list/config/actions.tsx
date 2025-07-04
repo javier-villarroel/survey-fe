@@ -25,7 +25,7 @@ export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove
             getClassName: (user: IUser) => user.status === UserStatus.ACTIVE ? "p-button-danger" : "p-button-success",
             onClick: (user: IUser) => onStatusChange?.(
                 user, 
-                user.status === UserStatus.ACTIVE ? UserStatus.BLOQUED : UserStatus.ACTIVE
+                user.status === UserStatus.ACTIVE ? UserStatus.SUSPENDED : UserStatus.ACTIVE
             )
         },
         {

@@ -53,9 +53,9 @@ const ActionDropdown = ({ row, onActionComplete }: ActionDropdownProps) => {
 					label="Suspender"
 					icon="pi pi-ban"
 					severity="danger"
-					onClick={() => handleChangeStatus(UserStatus.BLOQUED)}
+					onClick={() => handleChangeStatus(UserStatus.SUSPENDED)}
 				/>
-			) : row.status === UserStatus.BLOQUED ? (
+			) : row.status === UserStatus.SUSPENDED ? (
 				<Button
 					type="button"
 					label="Activar"

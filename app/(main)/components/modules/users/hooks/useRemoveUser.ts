@@ -18,11 +18,11 @@ export const useRemoveUser = () => {
                 detail: "El usuario ha sido eliminado exitosamente",
                 life: 3000,
                 style: {
-                    background: '#991b1b',
+                    background: '#1b4e2f',
                     color: '#ffffff'
                 },
                 contentStyle: {
-                    background: '#991b1b',
+                    background: '#1b4e2f',
                     color: '#ffffff'
                 }
             });

@@ -50,7 +50,6 @@ const formatDate = (dateString: string | undefined) => {
             exact: format(date, "dd/MM/yyyy hh:mm a", { locale: es })
         };
     } catch (error) {
-        console.error('Error formatting date:', error);
         return { relative: 'Error en fecha', exact: 'Error en fecha' };
     }
 };
@@ -59,6 +58,10 @@ const getInitials = (firstName?: string, lastName?: string, email?: string): str
     // Si tenemos nombre y apellido, usamos esos
     if (firstName && lastName) {
         return `${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}`;
+    }
+
+    if (firstName) {
+        return `${firstName[0].toUpperCase()}${firstName[1].toUpperCase()}`;
     }
     
     // Si tenemos email, usamos las dos primeras letras antes del @
@@ -209,7 +212,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
             initials = getInitials(undefined, undefined, item.user?.email);
         } else {
             // Para otros casos, usar firstName y lastName
-            initials = getInitials(item.user?.firstName, item.user?.lastName);
+            initials = getInitials(item.user?.name, item.user?.lastName);
         }
 
         // Obtener información del estado si es módulo AUTH
