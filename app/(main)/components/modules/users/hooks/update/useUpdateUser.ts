@@ -8,7 +8,7 @@ export const useUpdateUser = () => {
     const [error, setError] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
-    const updateUser = useCallback(async (id: number, userData: IUpdateUserRequest): Promise<IUser | null> => {
+    const updateUser = useCallback(async (id: any, userData: IUpdateUserRequest): Promise<IUser | null> => {
         setIsLoading(true);
         setError(null);
         const result = await updateUserService(id, userData);

@@ -107,7 +107,6 @@ export function DynamicTable<T extends Record<string, any>>({
     };
 
     const handleFilter = (event: DataTableStateEvent) => {
-        console.log('Filter event:', event);
         const newFilters = event.filters as DataTableFilterMeta;
         setFilters(newFilters);
         
@@ -186,14 +185,17 @@ export function DynamicTable<T extends Record<string, any>>({
     const header = title || createButton ? renderHeader() : undefined;
 
     return (
-        <div className="card">
-            <div className="mb-3 flex justify-end">
-                <Button
-                    label="Limpiar filtros"
-                    icon="pi pi-filter-slash"
-                    className="p-button-outlined p-button-danger"
-                    onClick={clearAllFilters}
-                />
+            <div className="card">
+                <div className="mb-3 flex justify-end w-full">
+                <div className="flex w-full">
+                    <div className="flex-1" />
+                    <Button
+                        label="Limpiar filtros"
+                        icon="pi pi-filter-slash"
+                        className="p-button-outlined p-button-danger"
+                        onClick={clearAllFilters}
+                    />
+                </div>
             </div>
             <DataTable
                 value={value}

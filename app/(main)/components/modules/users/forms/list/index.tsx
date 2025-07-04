@@ -264,7 +264,7 @@ const ListUsers = () => {
 						loading={loading}
 						totalRecords={pagination?.totalDocs || 0}
 						actions={actions}
-						globalSearchFields={["userName", "name", "lastName", "email", "role.name"]}
+						globalSearchFields={[ "firstName", "lastName", "email", "role.name"]}
 						emptyMessage="No se encontraron usuarios"
 						className="text-center"
 						onPage={handleTablePage}
