@@ -258,7 +258,7 @@ const ListUsers = () => {
 				</Dialog>
 
 				<div className="overflow-x-auto">
-					<DynamicTable<IUser>
+					<DynamicTable<IUser> 
 						columns={columns}
 						value={data}
 						loading={loading}

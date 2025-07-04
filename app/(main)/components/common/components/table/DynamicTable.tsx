@@ -10,13 +10,6 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DynamicTableProps, TableColumn, TableAction, TablePaginationParams } from "./types";
 import { classNames } from "primereact/utils";
 
-const DEFAULT_FILTER_OPTIONS = [
-    { label: 'Contiene', value: FilterMatchMode.CONTAINS },
-    { label: 'Es igual a', value: FilterMatchMode.EQUALS },
-    { label: 'Comienza con', value: FilterMatchMode.STARTS_WITH },
-    { label: 'Termina con', value: FilterMatchMode.ENDS_WITH },
-];
-
 const ActionsCell = <T extends object>({ rowData, actions }: { rowData: T; actions: TableAction[] }) => {
     const menuRef = useRef<Menu>(null);
     
@@ -68,10 +61,7 @@ export function DynamicTable<T extends Record<string, any>>({
 
         columns.forEach(column => {
             if (column.filter) {
-                initialFilters[column.field] = {
-                    operator: FilterOperator.AND,
-                    constraints: [{ value: null, matchMode: column.filterMatchMode || FilterMatchMode.CONTAINS }]
-                };
+                initialFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
             }
         });
 
@@ -126,10 +116,7 @@ export function DynamicTable<T extends Record<string, any>>({
 
         columns.forEach(column => {
             if (column.filter) {
-                clearedFilters[column.field] = {
-                    operator: FilterOperator.AND,
-                    constraints: [{ value: null, matchMode: column.filterMatchMode || FilterMatchMode.CONTAINS }]
-                };
+                clearedFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
             }
         });
 
@@ -209,7 +196,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 onPage={handlePage}
                 onFilter={handleFilter}
                 filters={filters}
-                filterDisplay="menu"
+                filterDisplay="row"
                 header={header}
                 globalFilterFields={globalSearchFields}
                 emptyMessage={emptyMessage}
@@ -228,18 +215,17 @@ export function DynamicTable<T extends Record<string, any>>({
                         key={col.field}
                         field={col.field}
                         header={col.header}
-                        sortable={col.sortable}
+                        sortable={false}
                         filter={col.filter}
-                        filterPlaceholder={col.filterPlaceholder}
-                        filterMatchMode={col.filterMatchMode || FilterMatchMode.CONTAINS}
-                        filterMatchModeOptions={col.filterMatchModeOptions || DEFAULT_FILTER_OPTIONS}
+                        filterPlaceholder={col.filterPlaceholder || "Buscar..."}
+                        filterMatchMode={FilterMatchMode.CONTAINS}
                         style={col.style}
                         body={col.body}
-                        showFilterMenu={true}
+                        showFilterMenu={false}
                         showFilterOperator={false}
                         showAddButton={false}
-                        showApplyButton={true}
-                        showClearButton={true}
+                        showApplyButton={false}
+                        showClearButton={false}
                     />
                 ))}
                 {actions && actions.length > 0 && (
