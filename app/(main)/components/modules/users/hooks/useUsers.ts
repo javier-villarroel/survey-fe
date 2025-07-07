@@ -86,7 +86,7 @@ export const useUsers = () => {
                 params: {
                     pagination: JSON.stringify(pagination),
                     ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
-                    ordering: JSON.stringify({ createdAt: "desc" })
+                    ordering: JSON.stringify({ createdAt: "asc" })
                 }
             });
             return response.data;

@@ -172,8 +172,8 @@ export function DynamicTable<T extends Record<string, any>>({
     const header = title || createButton ? renderHeader() : undefined;
 
     return (
-            <div className="card">
-                <div className="mb-3 flex justify-end w-full">
+        <div className="card">
+            <div className="mb-3 flex justify-end w-full">
                 <div className="flex w-full">
                     <div className="flex-1" />
                     <Button
@@ -207,7 +207,7 @@ export function DynamicTable<T extends Record<string, any>>({
                 rowsPerPageOptions={rowsPerPageOptions}
                 style={{ ...defaultStyle, ...style }}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                currentPageReportTemplate={`Página {currentPage} de ${totalPages || Math.ceil(totalRecords / rowsPerPageOptions[0])} (Total: {totalRecords} registros)`}
+                currentPageReportTemplate={`Mostrando {first} a {last} de {totalRecords} registros`}
                 paginatorLeft={<div className="px-3">Total: {totalRecords} registros</div>}
             >
                 {columns.map((col) => (

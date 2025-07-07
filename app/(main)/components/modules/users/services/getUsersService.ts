@@ -41,7 +41,7 @@ export const getUsersService = async (pagination: Pagination, filters?: Record<s
         const params = {
             pagination: JSON.stringify(pagination),
             ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
-            ordering: JSON.stringify({ createdAt: "desc" })
+            ordering: JSON.stringify({ createdAt: "asc" })
         };
 
         // Convertir los parámetros a string de consulta

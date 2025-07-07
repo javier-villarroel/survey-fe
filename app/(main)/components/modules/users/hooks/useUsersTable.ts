@@ -6,7 +6,7 @@ import { useUsers } from "./useUsers";
 import { useState, useEffect } from "react";
 import { FilterMatchMode } from "primereact/api";
 
-interface TableParams {
+export interface TableParams {
     page: number;
     limit: number;
     filters?: Record<string, any>;
@@ -19,7 +19,7 @@ interface QueryFilter {
 
 const initialPagination: TableParams = {
     page: 1,
-    limit: 10,
+    limit: 5,
     filters: {}
 };
 
@@ -48,13 +48,8 @@ export const useUsersTable = () => {
         const queries: QueryFilter[] = [];
 
         Object.entries(filters).forEach(([field, filter]) => {
-            // Solo procesar si hay un valor de filtro
             if (filter && filter.value !== undefined && filter.value !== '') {
-                // Manejar campos anidados (como role.name)
                 const actualField = field.includes('.') ? field.split('.').pop()! : field;
-                
-                // Si el modo de filtro es EQUALS, usamos el valor exacto
-                // Si es CONTAINS o cualquier otro, lo tratamos como búsqueda parcial
                 const filterValue = filter.matchMode === FilterMatchMode.EQUALS 
                     ? filter.value
                     : filter.value;
@@ -80,7 +75,7 @@ export const useUsersTable = () => {
                     limit: queryParams.limit
                 }),
                 ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
-                ordering: JSON.stringify({ createdAt: "desc" })
+                ordering: JSON.stringify({ createdAt: "asc" })
             };
 
             const response = await getUsers({
@@ -89,7 +84,6 @@ export const useUsersTable = () => {
                 filters: queryParams.filters
             });
 
-            console.log('Backend Response:', response);
             return response;
         },
         staleTime: 0,
@@ -99,16 +93,19 @@ export const useUsersTable = () => {
             if (!data || !currentUserEmail) return data;
             
             const filteredUsers = data.result.filter(user => user.email !== currentUserEmail);
-            const transformedData = {
+            return {
                 ...data,
                 result: filteredUsers,
                 pagination: {
                     ...data.pagination,
-                    count: filteredUsers.length
+                    totalDocs: data.pagination.count,
+                    totalPages: data.pagination.totalPages,
+                    perPage: data.pagination.limit,
+                    page: data.pagination.page,
+                    hasNextPage: data.pagination.hasNextPage,
+                    hasPrevPage: data.pagination.hasPrevPage
                 }
             };
-            console.log('Transformed Data:', transformedData);
-            return transformedData;
         }
     });
 
@@ -116,40 +113,35 @@ export const useUsersTable = () => {
         queryClient.invalidateQueries({ queryKey: ["users"] });
     };
 
-    const onTableChange = (event: DataTableStateEvent) => {
-        setQueryParams({
-            page: (event.page ?? 0) + 1,
-            limit: event.rows ?? initialPagination.limit,
-            filters: event.filters || {}
-        });
-    };
-
     const handleFilter = (params: TableParams) => {
-        setQueryParams({
-            page: params.page,
-            limit: params.limit,
-            filters: params.filters
-        });
+        setQueryParams(params);
     };
 
     const transformedPagination = data?.pagination ? {
-        currentPage: data.pagination.page - 1,
-        totalPages: data.pagination.totalPages || Math.ceil(data.pagination.totalDocs / data.pagination.perPage),
-        totalDocs: data.pagination.totalDocs,
-        rowsPerPage: data.pagination.perPage,
-        first: (data.pagination.page - 1) * data.pagination.perPage,
+        currentPage: data.pagination.page,
+        totalPages: data.pagination.totalPages,
+        totalDocs: data.pagination.count,
+        rowsPerPage: data.pagination.limit,
+        first: (data.pagination.page - 1) * data.pagination.limit,
         hasNextPage: data.pagination.hasNextPage,
-        hasPrevPage: data.pagination.hasPrevPage
-    } : undefined;
-
-    console.log('Final Pagination:', transformedPagination);
+        hasPrevPage: data.pagination.hasPrevPage,
+        page: data.pagination.page
+    } : {
+        currentPage: 1,
+        totalPages: 1,
+        totalDocs: 0,
+        rowsPerPage: initialPagination.limit,
+        first: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        page: 1
+    };
 
     return {
         data: data?.result || [],
         pagination: transformedPagination,
         loading: isLoading,
         error,
-        onTableChange,
         handleFilter,
         refreshData
     };

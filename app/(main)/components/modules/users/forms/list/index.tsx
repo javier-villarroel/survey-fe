@@ -23,6 +23,7 @@ import { UserDetails } from "../details";
 import { UserStatus } from "../../lib/enums";
 import { UserStatusConfirmDialog } from "../../components/UserStatusConfirmDialog";
 import { UserAccessConfirmDialog } from "../../components/UserAccessConfirmDialog";
+import { TableParams } from "../../hooks/useUsersTable";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -71,6 +72,7 @@ const LoadingSkeleton = () => {
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+	const [queryParams, setQueryParams] = useState<TableParams>({ page: 1, limit: 5, filters: {} });
 	const { data, loading, pagination, handleFilter, refreshData } = useUsersTable();
 	const { 
 		changeUserStatus, 
@@ -91,8 +93,6 @@ const ListUsers = () => {
 		pendingAction: pendingAccessAction
 	} = useAddUserAccess();
 	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
-
-	console.log('ListUsers Pagination:', pagination);
 
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
@@ -135,25 +135,34 @@ const ListUsers = () => {
 	};
 
 	const onPageChange = (event: { first: number; rows: number; page: number }) => {
-		handleFilter({
+		const newParams = {
 			page: event.page + 1,
-			limit: event.rows
-		});
+			limit: event.rows,
+			filters: queryParams.filters
+		};
+		setQueryParams(newParams);
+		handleFilter(newParams);
 	};
 
 	const handlePageSizeChange = (e: { value: number }) => {
-		handleFilter({
+		const newParams = {
 			page: 1,
-			limit: e.value
-		});
+			limit: e.value,
+			filters: queryParams.filters
+		};
+		setQueryParams(newParams);
+		handleFilter(newParams);
 	};
 
 	const handleTablePage = (event: DataTableStateEvent) => {
 		if (event.page !== undefined && event.rows !== undefined) {
-			handleFilter({
+			const newParams = {
 				page: event.page + 1,
-				limit: event.rows
-			});
+				limit: event.rows,
+				filters: event.filters || {}
+			};
+			setQueryParams(newParams);
+			handleFilter(newParams);
 		}
 	};
 
@@ -188,33 +197,6 @@ const ListUsers = () => {
 
 	return (
 		<>
-		<UserStatusConfirmDialog
-			showConfirmDialog={showStatusConfirmDialog}
-			handleConfirm={async () => {
-				const result = await handleStatusConfirm();
-				if (result) {
-					refreshData();
-				}
-			}}
-			handleReject={handleStatusReject}
-			pendingAction={pendingStatusAction}
-		/>
-		<UserAccessConfirmDialog
-			showConfirmDialog={showAccessConfirmDialog}
-			handleConfirm={async () => {
-				const result = await handleAccessConfirm();
-				if (result) {
-					refreshData();
-				}
-			}}
-			handleReject={handleAccessReject}
-			pendingAction={pendingAccessAction}
-		/>
-		<ConfirmDialog />
-		<Toast ref={statusToast} />
-		<Toast ref={accessToast} />
-		<Toast ref={removeToast} />
-		<Card>
 			<div className="relative w-full mb-4">
 				<h2 className="text-2xl font-bold">Gestión de usuarios</h2>
 				<div className="absolute right-0 top-0 -mt-1">
@@ -230,65 +212,33 @@ const ListUsers = () => {
 				</div>
 			</div>
 			<Card className="w-full shadow-2">
-				<Dialog
-					header={headerContent}
-					visible={showModal}
-					style={{ width: "90vw", maxWidth: 600 }}
-					modal
-					onHide={handleCancel}
-					draggable={false}
-					resizable={false}
-					className="p-fluid"
-					closeOnEscape
-					dismissableMask
-					contentClassName="border-round-bottom"
-				>
-					<div className="p-4">
-						{selectedUser ? (
-							<UserDetails 
-								user={selectedUser}
-								onSuccess={handleSuccess} 
-								onCancel={handleCancel}
-							/>
-						) : (
-							<CreateUser 
-								onSuccess={handleSuccess} 
-								onCancel={handleCancel}
-							/>
-						)}
-					</div>
-				</Dialog>
-
-				<div className="overflow-x-auto">
-					<DynamicTable<IUser> 
-						columns={columns}
+				<div className="flex flex-column gap-4">
+					<DynamicTable<IUser>
 						value={data}
-						loading={loading}
-						totalRecords={pagination?.totalDocs || 0}
-						totalPages={pagination?.totalPages}
+						columns={columns}
 						actions={actions}
-						globalSearchFields={[ "firstName", "lastName", "email", "role.name"]}
-						emptyMessage="No se encontraron usuarios"
-						className="text-center"
+						loading={loading}
 						onPage={handleTablePage}
 						onFilter={handleFilter}
-						rowsPerPageOptions={[5, 10, 20]}
+						totalRecords={pagination?.totalDocs ?? 0}
+						totalPages={pagination?.totalPages ?? 1}
 						showPaginator={false}
+						rowsPerPageOptions={pageSizeOptions.map(option => option.value)}
 					/>
-					<div className="flex align-items-center justify-content-center gap-4 mt-4">
+					<div className="flex align-items-center justify-content-center gap-4">
 						<div className="flex align-items-center gap-2">
 							<span className="text-sm">Mostrar:</span>
 							<Dropdown
-								value={pagination?.rowsPerPage || 10}
+								value={pagination?.rowsPerPage ?? 5}
 								options={pageSizeOptions}
 								onChange={handlePageSizeChange}
 								className="w-auto"
 							/>
 						</div>
 						<Paginator
-							first={((pagination?.currentPage || 0)) * (pagination?.rowsPerPage || 10)}
-							rows={pagination?.rowsPerPage || 10}
-							totalRecords={pagination?.totalDocs || 0}
+							first={(pagination?.currentPage ? pagination.currentPage - 1 : 0) * (pagination?.rowsPerPage ?? 5)}
+							rows={pagination?.rowsPerPage ?? 5}
+							totalRecords={pagination?.totalDocs ?? 0}
 							onPageChange={onPageChange}
 							template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
 							className="border-round-xl"
@@ -296,7 +246,54 @@ const ListUsers = () => {
 					</div>
 				</div>
 			</Card>
-			</Card>
+
+			<Dialog
+				visible={showModal}
+				onHide={handleCancel}
+				header={headerContent}
+				modal
+				className="p-fluid w-full md:w-8 lg:w-6"
+				contentClassName="p-0"
+			>
+				{selectedUser ? (
+					<UserDetails
+						user={selectedUser}
+						onSuccess={handleSuccess}
+						onCancel={handleCancel}
+					/>
+				) : (
+					<CreateUser onSuccess={handleSuccess} onCancel={handleCancel} />
+				)}
+			</Dialog>
+
+			<UserStatusConfirmDialog
+				showConfirmDialog={showStatusConfirmDialog}
+				handleConfirm={async () => {
+					const result = await handleStatusConfirm();
+					if (result) {
+						refreshData();
+					}
+				}}
+				handleReject={handleStatusReject}
+				pendingAction={pendingStatusAction}
+			/>
+
+			<UserAccessConfirmDialog
+				showConfirmDialog={showAccessConfirmDialog}
+				handleConfirm={async () => {
+					const result = await handleAccessConfirm();
+					if (result) {
+						refreshData();
+					}
+				}}
+				handleReject={handleAccessReject}
+				pendingAction={pendingAccessAction}
+			/>
+
+			<ConfirmDialog />
+			<Toast ref={removeToast} />
+			<Toast ref={statusToast} />
+			<Toast ref={accessToast} />
 		</>
 	);
 };
