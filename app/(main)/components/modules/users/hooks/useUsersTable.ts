@@ -52,10 +52,8 @@ export const useUsersTable = () => {
         select: (data) => {
             if (!data || !currentUserEmail) return data;
             
-            const filteredUsers = data.result.filter(user => user.email !== currentUserEmail);
             return {
                 ...data,
-                result: filteredUsers,
                 pagination: {
                     ...data.pagination,
                     totalDocs: data.pagination.count,
@@ -103,6 +101,7 @@ export const useUsersTable = () => {
         loading: isLoading,
         error,
         handleFilter,
-        refreshData
+        refreshData,
+        currentUserEmail
     };
 }; 

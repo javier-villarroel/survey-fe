@@ -74,7 +74,7 @@ const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 	const [queryParams, setQueryParams] = useState<TableParams>({ page: 1, limit: 5, filters: {} });
-	const { data, loading, pagination, handleFilter, refreshData } = useUsersTable();
+	const { data, loading, pagination, handleFilter, refreshData, currentUserEmail } = useUsersTable();
 	const { 
 		changeUserStatus, 
 		toast: statusToast,
@@ -169,7 +169,8 @@ const ListUsers = () => {
 		onEdit: handleEdit,
 		onStatusChange: handleStatusChange,
 		onAccessChange: handleAccessChange,
-		onRemove: handleRemove
+		onRemove: handleRemove,
+		currentUserEmail
 	});
 
 	const headerContent = (

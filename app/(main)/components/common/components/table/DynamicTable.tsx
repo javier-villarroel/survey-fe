@@ -17,7 +17,8 @@ const ActionsCell = <T extends object>({ rowData, actions }: { rowData: T; actio
         label: action.getLabel ? action.getLabel(rowData) : action.label,
         icon: action.getIcon ? action.getIcon(rowData) : action.icon,
         className: action.getClassName ? action.getClassName(rowData) : action.className,
-        command: () => action.onClick(rowData)
+        command: () => action.onClick(rowData),
+        disabled: action.disabled ? action.disabled(rowData) : false
     }));
 
     return (

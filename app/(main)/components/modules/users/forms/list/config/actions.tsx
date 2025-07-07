@@ -7,15 +7,23 @@ interface ActionsConfig {
     onStatusChange?: (user: IUser, newStatus: UserStatus) => void;
     onAccessChange?: (user: IUser) => void;
     onRemove?: (user: IUser) => void;
+    currentUserEmail?: string | null;
 }
 
-export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove }: ActionsConfig): TableAction[] => {
+export const createActions = ({ 
+    onEdit, 
+    onStatusChange, 
+    onAccessChange, 
+    onRemove,
+    currentUserEmail 
+}: ActionsConfig): TableAction[] => {
     return [
         {
             label: "Editar",
             icon: "pi pi-pencil",
             className: "p-button-warning",
-            onClick: (user: IUser) => onEdit?.(user)
+            onClick: (user: IUser) => onEdit?.(user),
+            disabled: (user: IUser) => user.email === currentUserEmail
         },
         {
             label: "Cambiar estado",
@@ -26,7 +34,8 @@ export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove
             onClick: (user: IUser) => onStatusChange?.(
                 user, 
                 user.status === UserStatus.ACTIVE ? UserStatus.SUSPENDED : UserStatus.ACTIVE
-            )
+            ),
+            disabled: (user: IUser) => user.email === currentUserEmail
         },
         {
             label: "Acceso Admin",
@@ -34,13 +43,15 @@ export const createActions = ({ onEdit, onStatusChange, onAccessChange, onRemove
             getLabel: (user: IUser) => user.action === "ASSIGN" ? "Revocar Admin" : "Asignar Admin",
             getIcon: (user: IUser) => user.action === "ASSIGN" ? "pi pi-user-minus" : "pi pi-user-plus",
             getClassName: (user: IUser) => user.action === "ASSIGN" ? "p-button-danger" : "p-button-help",
-            onClick: (user: IUser) => onAccessChange?.(user)
+            onClick: (user: IUser) => onAccessChange?.(user),
+            disabled: (user: IUser) => user.email === currentUserEmail
         },
         {
             label: "Eliminar",
             icon: "pi pi-trash",
             className: "p-button-danger",
-            onClick: (user: IUser) => onRemove?.(user)
+            onClick: (user: IUser) => onRemove?.(user),
+            disabled: (user: IUser) => user.email === currentUserEmail
         }
     ];
 }; 

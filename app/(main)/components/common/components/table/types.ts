@@ -9,6 +9,7 @@ export interface TableAction {
     getLabel?: (rowData: any) => string;
     getIcon?: (rowData: any) => string;
     getClassName?: (rowData: any) => string;
+    disabled?: (rowData: any) => boolean;
 }
 
 export interface TableColumn {
