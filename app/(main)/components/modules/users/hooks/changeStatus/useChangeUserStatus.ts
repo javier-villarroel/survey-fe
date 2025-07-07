@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
-import { changeUserStatusService } from "../services/changeUserStatusService";
-import { UserStatus } from "../lib/enums";
+
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import { changeUserStatusService } from "../../services/changeUserStatusService";
+import { UserStatus } from "../../lib/enums";
 
 type ToastSeverity = "success" | "info" | "warn" | "error";
 

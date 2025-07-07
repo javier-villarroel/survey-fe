@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
 import { Toast } from "primereact/toast";
-import { UsersService } from '../services/users.services';
-import { IUser } from '../services/types';
-import { UserRoles } from "../lib/enums";
+import { IUser } from "../../services";
+import { UserRoles } from "../../lib/enums";
+import { UsersService } from "../../services/changeUserAddAccess";
+
 
 interface PendingAction {
     user: IUser;

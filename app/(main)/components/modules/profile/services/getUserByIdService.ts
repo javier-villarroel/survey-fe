@@ -6,7 +6,7 @@ import { USER_API_BASE } from "./constants";
 
 export const getUserByIdService = async (id: number | string): Promise<IUser | null> => {
   try {
-    const { data } = await apiWithAuth.get<IUserResponse>(`user/${id}/view?include={"groups":{"include":{"role":true}}}`);
+    const { data } = await apiWithAuth.get<IUserResponse>(`${USER_API_BASE}/${id}/view?include={"groups":{"include":{"role":true}}}`);
     return data.result;
   } catch (error) {
     if (error instanceof AxiosError) {

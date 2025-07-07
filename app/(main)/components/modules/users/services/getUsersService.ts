@@ -1,62 +1,71 @@
 import { AxiosError } from "axios";
-import { toast } from "sonner";
-import apiWithAuth from "@/app/api/axios";
 import { IUsersListResponse } from "./types";
+import apiWithAuth from "@/app/api/axios";
 import { USER_API_BASE } from "./constants";
-
-interface QueryFilter {
-    field: string;
-    text: string;
-}
 
 interface Pagination {
     page: number;
     limit: number;
 }
 
-export const getUsersService = async (pagination: Pagination, filters?: Record<string, any>) => {
-    try {
-        // Construir los queries basados en los filtros
-        const queries: QueryFilter[] = [];
-        
-        if (filters) {
-            if (filters.firstName) {
-                queries.push({ field: 'firstName', text: filters.firstName });
-            }
-            if (filters.lastName) {
-                queries.push({ field: 'lastName', text: filters.lastName });
-            }
-            if (filters.email) {
-                queries.push({ field: 'email', text: filters.email });
-            }
-            if (filters.role) {
-                queries.push({ field: 'role', text: filters.role });
-            }
-            if (filters.status !== undefined) {
-                queries.push({ field: 'status', text: filters.status.toString() });
-            }
+interface QueryFilter {
+    field: string;
+    text: string;
+}
+
+interface GetUsersParams {
+    page: number;
+    limit: number;
+    filters?: Record<string, any>;
+}
+
+const convertFiltersToQueries = (filters: Record<string, any>): QueryFilter[] => {
+    const queries: QueryFilter[] = [];
+
+    if (!filters) return queries;
+
+    Object.entries(filters).forEach(([field, filterData]) => {
+        if (!filterData) return;
+
+        let value: string | null = null;
+
+        if (typeof filterData === 'string') {
+            value = filterData;
+        } else if (filterData.value) {
+            value = filterData.value;
+        } else if (filterData.constraints?.[0]?.value) {
+            value = filterData.constraints[0].value;
         }
 
-        // Construir los parámetros de la URL
-        const params = {
-            pagination: JSON.stringify(pagination),
-            ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
-            ordering: JSON.stringify({ createdAt: "asc" })
-        };
+        if (value) {
+            const actualField = field.includes('.') ? field.split('.').pop()! : field;
+            queries.push({
+                field: actualField,
+                text: value
+            });
+        }
+    });
 
-        // Convertir los parámetros a string de consulta
-        const queryString = new URLSearchParams();
-        Object.entries(params).forEach(([key, value]) => {
-            queryString.append(key, value);
+    return queries;
+};
+
+export const getUsersService = async ({ page, limit, filters }: GetUsersParams): Promise<IUsersListResponse> => {
+    try {
+        const pagination: Pagination = { page, limit };
+        const queries = convertFiltersToQueries(filters || {});
+
+        const { data } = await apiWithAuth.get<IUsersListResponse>(`${USER_API_BASE}/table`, {
+            params: {
+                pagination: JSON.stringify(pagination),
+                ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
+                ordering: JSON.stringify({ createdAt: "desc" })
+            }
         });
 
-        const { data } = await apiWithAuth.get<IUsersListResponse>(
-            `${USER_API_BASE}/table?${queryString}`
-        );
         return data;
     } catch (error) {
         if (error instanceof AxiosError) {
-            toast.error(error.response?.data?.info?.message_to_show || "Error al obtener usuarios");
+            throw new Error(error.response?.data?.info?.message_to_show || "Error al obtener los usuarios");
         }
         throw error;
     }

@@ -1,20 +1,12 @@
-import { TablePaginationParams } from "@/app/(main)/components/common/components/table/types";
-import { DataTableStateEvent } from "primereact/datatable";
 import { IUsersListResponse } from "../services/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useUsers } from "./useUsers";
 import { useState, useEffect } from "react";
-import { FilterMatchMode } from "primereact/api";
+import { getUsersService } from "../services/getUsersService";
 
 export interface TableParams {
     page: number;
     limit: number;
     filters?: Record<string, any>;
-}
-
-interface QueryFilter {
-    field: string;
-    text: string;
 }
 
 const initialPagination: TableParams = {
@@ -34,7 +26,6 @@ const getCookie = (name: string) => {
 export const useUsersTable = () => {
     const [queryParams, setQueryParams] = useState<TableParams>(initialPagination);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
-    const { getUsers } = useUsers();
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -44,41 +35,10 @@ export const useUsersTable = () => {
         }
     }, []);
 
-    const convertFiltersToQueries = (filters: Record<string, any>): QueryFilter[] => {
-        const queries: QueryFilter[] = [];
-
-        Object.entries(filters).forEach(([field, filter]) => {
-            if (filter && filter.value !== undefined && filter.value !== '') {
-                const actualField = field.includes('.') ? field.split('.').pop()! : field;
-                const filterValue = filter.matchMode === FilterMatchMode.EQUALS 
-                    ? filter.value
-                    : filter.value;
-
-                queries.push({
-                    field: actualField,
-                    text: filterValue
-                });
-            }
-        });
-
-        return queries;
-    };
-
     const { data, isLoading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
         queryFn: async () => {
-            const queries = queryParams.filters ? convertFiltersToQueries(queryParams.filters) : [];
-            
-            const params = {
-                pagination: JSON.stringify({
-                    page: queryParams.page,
-                    limit: queryParams.limit
-                }),
-                ...(queries.length > 0 && { queries: JSON.stringify(queries) }),
-                ordering: JSON.stringify({ createdAt: "asc" })
-            };
-
-            const response = await getUsers({
+            const response = await getUsersService({
                 page: queryParams.page,
                 limit: queryParams.limit,
                 filters: queryParams.filters

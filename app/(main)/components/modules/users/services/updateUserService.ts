@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import apiWithAuth from "@/app/api/axios";
-import { IUser, IUpdateUserRequest, IUserResponse } from "./types";
+import { IUser, IUpdateUserRequest } from "./types";
 import { USER_API_BASE } from "./constants";
 
 export const updateUserService = async (

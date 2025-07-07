@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
-import { removeUserService } from "../services/removeUserService";
 import { Toast } from "primereact/toast";
-import { changeUserStatusService } from "../services/changeUserStatusService";
-import { UserStatus } from "../lib/enums";
+import { UserStatus } from "../../lib/enums";
+import { changeUserStatusService } from "../../services/changeUserStatusService";
+
 
 export const useRemoveUser = () => {
     const [isLoading, setIsLoading] = useState(false);

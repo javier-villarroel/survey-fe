@@ -16,7 +16,7 @@ export const updateUserService = async (userId: string, data: IUpdateUserRequest
             }
         };
 
-        const response = await apiWithAuth.patch(`/user/${userId}`, data, config);
+        const response = await apiWithAuth.patch(`${USER_API_BASE}/${userId}`, data, config);
         return response.data;
     } catch (error) {
         console.error('Error updating user:', error);

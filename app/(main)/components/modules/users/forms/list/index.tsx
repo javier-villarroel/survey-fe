@@ -3,9 +3,7 @@
 import { DynamicTable } from "@/app/(main)/components/common/components/table/DynamicTable";
 import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
-import { useChangeUserStatus } from "../../hooks/useChangeUserStatus";
-import { useAddUserAccess } from "../../hooks/useAddUserAccess";
-import { useRemoveUser } from "../../hooks/useRemoveUser";
+
 import { createActions } from "./config/actions";
 import { Paginator } from 'primereact/paginator';
 import { Dropdown } from 'primereact/dropdown';
@@ -24,6 +22,9 @@ import { UserStatus } from "../../lib/enums";
 import { UserStatusConfirmDialog } from "../../components/UserStatusConfirmDialog";
 import { UserAccessConfirmDialog } from "../../components/UserAccessConfirmDialog";
 import { TableParams } from "../../hooks/useUsersTable";
+import { useChangeUserStatus } from "../../hooks/changeStatus/useChangeUserStatus";
+import { useAddUserAccess } from "../../hooks/changeStatus/useAddUserAccess";
+import { useRemoveUser } from "../../hooks/changeStatus/useRemoveUser";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -76,7 +77,6 @@ const ListUsers = () => {
 	const { data, loading, pagination, handleFilter, refreshData } = useUsersTable();
 	const { 
 		changeUserStatus, 
-		isLoading: isChangingStatus, 
 		toast: statusToast,
 		showConfirmDialog: showStatusConfirmDialog,
 		handleConfirm: handleStatusConfirm,
@@ -85,14 +85,13 @@ const ListUsers = () => {
 	} = useChangeUserStatus();
 	const { 
 		toggleUserAccess, 
-		isLoading: isTogglingAccess, 
 		toast: accessToast,
 		showConfirmDialog: showAccessConfirmDialog,
 		handleConfirm: handleAccessConfirm,
 		handleReject: handleAccessReject,
 		pendingAction: pendingAccessAction
 	} = useAddUserAccess();
-	const { removeUser, isLoading: isRemoving, toast: removeToast } = useRemoveUser();
+	const { removeUser, toast: removeToast } = useRemoveUser();
 
 	const handleEdit = (user: IUser) => {
 		setSelectedUser(user);
