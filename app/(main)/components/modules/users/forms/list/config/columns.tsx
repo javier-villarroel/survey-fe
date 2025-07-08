@@ -74,53 +74,38 @@ export const columns: TableColumn[] = [
         field: "id",
         header: "ID",
         sortable: true,
-        filterPlaceholder: "Filtrar por ID",
         style: { minWidth: '12rem' }
     },
     {
         field: "firstName",
         header: "Nombre",
         sortable: true,
-        filter: true,
-        filterPlaceholder: "Filtrar por nombre",
         style: { minWidth: '12rem' }
     },
     {
         field: "lastName",
         header: "Apellido",
         sortable: true,
-        filter: true,
-        filterPlaceholder: "Filtrar por apellido",
         style: { minWidth: '12rem' }
     },
     {
         field: "email",
         header: "Email",
         sortable: true,
-        filter: true,
-        filterPlaceholder: "Filtrar por email",
         style: { minWidth: '14rem' }
     },
     {
         field: "role.name",
         header: "Rol",
         sortable: true,
-        filter: true,
         body: roleBodyTemplate,
-        filterMatchMode: FilterMatchMode.EQUALS,
-        filterMatchModeOptions: [{ label: 'Es igual a', value: FilterMatchMode.EQUALS }],
-        filterOptions: roleOptions,
         style: { minWidth: '10rem' }
     },
     {
         field: "status",
         header: "Estado",
         sortable: true,
-        filter: true,
         body: statusBodyTemplate,
-        filterMatchMode: FilterMatchMode.EQUALS,
-        filterMatchModeOptions: [{ label: 'Es igual a', value: FilterMatchMode.EQUALS }],
-        filterOptions: statusOptions,
         style: { minWidth: '8rem' }
     }
 ];

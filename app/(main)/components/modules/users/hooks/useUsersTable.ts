@@ -42,6 +42,26 @@ const validateAndFormatEmail = (email: string | null): string | null => {
     }
 };
 
+const formatFilters = (filters: Record<string, any>) => {
+    const formattedFilters: Record<string, any> = {};
+    
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value && value !== '') {
+            if (key === 'role.name') {
+                if (value === 'NO_ROLE') {
+                    formattedFilters['role'] = null;
+                } else {
+                    formattedFilters['role.name'] = value;
+                }
+            } else {
+                formattedFilters[key] = value;
+            }
+        }
+    });
+
+    return formattedFilters;
+};
+
 export const useUsersTable = () => {
     const [queryParams, setQueryParams] = useState<TableParams>(initialPagination);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
@@ -79,10 +99,11 @@ export const useUsersTable = () => {
     const { data, isLoading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
         queryFn: async () => {
+            const formattedFilters = formatFilters(queryParams.filters || {});
             const response = await getUsersService({
                 page: queryParams.page,
                 limit: queryParams.limit,
-                filters: queryParams.filters
+                filters: formattedFilters
             });
 
             return response;

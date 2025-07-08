@@ -111,8 +111,8 @@ const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
         return labels[key] || key;
     };
 
-    const getStatusSeverity = (status: string) => {
-        const severities: Record<string, string> = {
+    const getStatusSeverity = (status: string): 'success' | 'warning' | 'danger' | 'info' => {
+        const severities: Record<string, 'success' | 'warning' | 'danger' | 'info'> = {
             'Activo': 'success',
             'Suspendido': 'warning',
             'Eliminado': 'danger',
@@ -184,23 +184,35 @@ const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
             <h5>Cambios Realizados</h5>
             <div className="grid">
                 {changes.map((change, index) => (
-                    <div key={index} className="col-12 md:col-6">
+                    <div key={index} className="col-12">
                         <Card className="mb-3">
                             <div className="flex flex-column gap-3">
                                 <div className="text-lg font-medium">{change.field}</div>
-                                <div className="flex align-items-center gap-3">
-                                    <div className="flex flex-column gap-2">
-                                        <span className="text-sm text-500">Valor anterior</span>
-                                        <div className="flex align-items-center gap-2">
-                                            {renderOldValue(change)}
+                                <div className="grid">
+                                    <div className="col-12 md:col-5">
+                                        <Card className="shadow-none border-1 border-200">
+                                            <div className="flex flex-column gap-2">
+                                                <span className="text-sm text-500">Valor anterior</span>
+                                                <div className="flex align-items-center gap-2">
+                                                    {renderOldValue(change)}
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </div>
+                                    <div className="col-12 md:col-2 flex align-items-center justify-content-center">
+                                        <div className="surface-card border-round-xl p-4 shadow-2" style={{ transform: 'scale(1.5)' }}>
+                                            <i className="pi pi-arrow-right text-xl text-primary"></i>
                                         </div>
                                     </div>
-                                    <i className="pi pi-arrow-right text-500"></i>
-                                    <div className="flex flex-column gap-2">
-                                        <span className="text-sm text-500">Nuevo valor</span>
-                                        <div className="flex align-items-center gap-2">
-                                            {renderValue(change)}
-                                        </div>
+                                    <div className="col-12 md:col-5">
+                                        <Card className="shadow-none border-1 border-200">
+                                            <div className="flex flex-column gap-2">
+                                                <span className="text-sm text-500">Nuevo valor</span>
+                                                <div className="flex align-items-center gap-2">
+                                                    {renderValue(change)}
+                                                </div>
+                                            </div>
+                                        </Card>
                                     </div>
                                 </div>
                             </div>

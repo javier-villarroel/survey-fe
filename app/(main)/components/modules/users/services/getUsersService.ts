@@ -27,51 +27,45 @@ const convertFiltersToQueries = (filters: Record<string, any>): QueryFilter[] =>
     if (!filters) return queries;
 
     Object.entries(filters).forEach(([field, value]) => {
-        // Si el valor es un objeto de filtro de PrimeReact
-        if (value && typeof value === 'object' && 'value' in value) {
-            const filterValue = value.value;
-            
-            // No agregamos el filtro si:
-            // - El valor es null/undefined/vacío
-            // - El valor es un objeto (evita "[object Object]")
-            if (filterValue === null || 
-                filterValue === undefined || 
-                filterValue === '' ||
-                (typeof filterValue === 'object' && filterValue !== null)) {
-                return;
-            }
-
-            // Mapear los campos del frontend a los campos del backend
-            let backendField = field;
-            let backendValue = filterValue;
-            let operator: string | undefined;
-
-            switch (field) {
-                case 'role.name':
-                    if (filterValue === 'NO_ROLE') {
-                        backendField = 'roleId';
-                        backendValue = UserRoles.ADMIN.toString();
-                        operator = 'ne'; // not equals
-                    } else if (filterValue === UserRoles.ADMIN) {
-                        backendField = 'roleId';
-                        backendValue = UserRoles.ADMIN.toString();
-                        operator = 'eq'; // equals
-                    }
-                    break;
-                case 'status':
-                    backendField = 'status';
-                    operator = 'eq';
-                    break;
-                default:
-                    backendField = field;
-            }
-
-            queries.push({
-                field: backendField,
-                text: backendValue.toString(),
-                ...(operator && { operator })
-            });
+        // No agregamos el filtro si el valor es null/undefined/vacío
+        if (value === null || value === undefined || value === '') {
+            return;
         }
+
+        // Mapear los campos del frontend a los campos del backend
+        let backendField = field;
+        let backendValue = value;
+        let operator = 'contains';
+
+        switch (field) {
+            case 'role.name':
+                backendField = 'roleId';
+                if (value === 'NO_ROLE') {
+                    backendValue = UserRoles.ADMIN.toString();
+                    operator = 'ne'; // not equals
+                } else {
+                    backendValue = UserRoles.ADMIN.toString();
+                    operator = 'eq'; // equals
+                }
+                break;
+            case 'status':
+                backendField = 'status';
+                operator = 'eq';
+                break;
+            case 'firstName':
+            case 'lastName':
+            case 'email':
+                operator = 'contains';
+                break;
+            default:
+                backendField = field;
+        }
+
+        queries.push({
+            field: backendField,
+            text: backendValue.toString(),
+            operator
+        });
     });
 
     return queries;

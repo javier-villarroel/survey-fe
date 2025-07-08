@@ -8,16 +8,16 @@ interface PendingAction {
 }
 
 interface UserAccessConfirmDialogProps {
-    showConfirmDialog: boolean;
-    handleConfirm: () => Promise<boolean | void>;
-    handleReject: () => void;
+    show: boolean;
+    onConfirm: () => Promise<boolean | void>;
+    onReject: () => void;
     pendingAction: PendingAction | null;
 }
 
 export const UserAccessConfirmDialog = ({
-    showConfirmDialog,
-    handleConfirm,
-    handleReject,
+    show,
+    onConfirm,
+    onReject,
     pendingAction
 }: UserAccessConfirmDialogProps) => {
     if (!pendingAction) return null;
@@ -26,7 +26,7 @@ export const UserAccessConfirmDialog = ({
 
     return (
         <Dialog
-            visible={showConfirmDialog}
+            visible={show}
             style={{ width: '450px' }}
             header={`${isAssigning ? 'Asignar' : 'Revocar'} Acceso de Administrador`}
             modal
@@ -35,19 +35,19 @@ export const UserAccessConfirmDialog = ({
                     <Button
                         label="Cancelar"
                         icon="pi pi-times"
-                        onClick={handleReject}
+                        onClick={onReject}
                         className="p-button-text"
                     />
                     <Button
                         label="Confirmar"
                         icon="pi pi-check"
-                        onClick={handleConfirm}
+                        onClick={onConfirm}
                         autoFocus
                         className={isAssigning ? 'p-button-success' : 'p-button-danger'}
                     />
                 </div>
             }
-            onHide={handleReject}
+            onHide={onReject}
         >
             <div className="flex align-items-center justify-content-center">
                 <i 

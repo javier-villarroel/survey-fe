@@ -43,7 +43,7 @@ export function DynamicTable<T extends Record<string, any>>({
     onPage,
     onFilter,
     totalRecords,
-    totalPages = 1,
+    totalPages,
     title,
     createButton,
     actions,
@@ -54,18 +54,21 @@ export function DynamicTable<T extends Record<string, any>>({
     emptyMessage = "No se encontraron registros",
     className,
     style,
+    showFilters = true,
     showPaginator = true
-}: DynamicTableProps<T> & { showPaginator?: boolean; totalPages?: number }) {
+}: DynamicTableProps<T>) {
     const [filters, setFilters] = React.useState<DataTableFilterMeta>(() => {
         const initialFilters: DataTableFilterMeta = {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS }
         };
 
-        columns.forEach(column => {
-            if (column.filter) {
-                initialFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
-            }
-        });
+        if (showFilters) {
+            columns.forEach(column => {
+                if (column.filter) {
+                    initialFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
+                }
+            });
+        }
 
         return initialFilters;
     });
@@ -116,11 +119,13 @@ export function DynamicTable<T extends Record<string, any>>({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS }
         };
 
-        columns.forEach(column => {
-            if (column.filter) {
-                clearedFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
-            }
-        });
+        if (showFilters) {
+            columns.forEach(column => {
+                if (column.filter) {
+                    clearedFilters[column.field] = { value: null, matchMode: FilterMatchMode.CONTAINS };
+                }
+            });
+        }
 
         setFilters(clearedFilters);
         setGlobalFilterValue("");
@@ -163,6 +168,8 @@ export function DynamicTable<T extends Record<string, any>>({
     };
 
     const renderFilterElement = (col: TableColumn) => {
+        if (!showFilters) return null;
+
         if (col.filterOptions) {
             return (
                 <Dropdown
@@ -233,67 +240,62 @@ export function DynamicTable<T extends Record<string, any>>({
     return (
         <div className="card">
             <style>{customStyles}</style>
-            <div className="mb-3 flex justify-end w-full">
-                <div className="flex w-full">
-                    <div className="flex-1" />
-                    <Button
-                        label="Limpiar filtros"
-                        icon="pi pi-filter-slash"
-                        className="p-button-outlined p-button-danger"
-                        onClick={clearAllFilters}
-                    />
+            {showFilters && (
+                <div className="mb-3 flex justify-end w-full">
+                    <div className="flex w-full">
+                        <div className="flex-1" />
+                        <Button
+                            label="Limpiar filtros"
+                            icon="pi pi-filter-slash"
+                            className="p-button-outlined p-button-danger"
+                            onClick={clearAllFilters}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
             <DataTable
                 value={value}
                 lazy
                 dataKey="id"
                 paginator={showPaginator}
-                first={0}
                 rows={rowsPerPageOptions[0]}
-                loading={loading}
+                totalRecords={totalRecords}
                 onPage={handlePage}
                 onFilter={handleFilter}
                 filters={filters}
-                filterDisplay="row"
+                loading={loading}
                 header={header}
                 emptyMessage={emptyMessage}
-                className={`p-datatable-sm ${className || ''}`}
-                stripedRows
-                showGridlines
-                responsiveLayout="scroll"
-                rowsPerPageOptions={rowsPerPageOptions}
+                className={classNames("p-datatable-sm", className)}
                 style={{ ...defaultStyle, ...style }}
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                showGridlines
+                stripedRows
+                filterDisplay={showFilters ? "row" : "menu"}
+                rowsPerPageOptions={rowsPerPageOptions}
             >
-                {columns.map((col) => (
+                {columns.map((col, i) => (
                     <Column
                         key={col.field}
                         field={col.field}
                         header={col.header}
-                        sortable={false}
-                        filter={col.filter}
-                        filterPlaceholder={col.filterPlaceholder || "Buscar..."}
-                        filterElement={col.filter ? () => renderFilterElement(col) : undefined}
+                        sortable={col.sortable}
+                        filter={showFilters && col.filter}
+                        filterElement={showFilters && col.filter ? () => renderFilterElement(col) : undefined}
                         body={col.body}
                         style={col.style}
                         className={col.className}
+                        filterMatchMode={col.filterMatchMode}
+                        filterMatchModeOptions={col.filterMatchModeOptions}
                     />
                 ))}
                 {actions && actions.length > 0 && (
                     <Column
                         body={actionsBodyTemplate}
-                        style={{ width: '5rem' }}
-                        header="Acciones"
+                        style={{ width: '4rem' }}
+                        className="text-center"
                     />
                 )}
             </DataTable>
-            <style jsx global>{`
-                .p-datatable .p-datatable-emptymessage td {
-                    text-align: center !important;
-                    padding: 2rem !important;
-                }
-            `}</style>
         </div>
     );
 } 

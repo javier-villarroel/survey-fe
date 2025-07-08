@@ -18,6 +18,8 @@ export interface TableColumn {
     sortable?: boolean;
     filter?: boolean;
     filterPlaceholder?: string;
+    filterMatchMode?: FilterMatchMode;
+    filterMatchModeOptions?: { label: string; value: FilterMatchMode }[];
     filterOptions?: { label: string; value: any }[];
     body?: (rowData: any) => React.ReactNode;
     style?: React.CSSProperties;
@@ -32,12 +34,14 @@ export interface TablePaginationParams {
 }
 
 export interface TablePaginationInfo {
-    total: number;
+    currentPage: number;
+    totalPages: number;
+    totalDocs: number;
+    rowsPerPage: number;
+    first: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
     page: number;
-    limit: number;
-    hasNextPage?: boolean;
-    hasPrevPage?: boolean;
-    totalPages?: number;
 }
 
 export interface DynamicTableProps<T> {
@@ -45,8 +49,9 @@ export interface DynamicTableProps<T> {
     value: T[];
     loading: boolean;
     onPage: (event: DataTableStateEvent) => void;
-    onFilter: (params: TablePaginationParams) => void;
-    totalRecords: number;
+    onFilter?: (params: TablePaginationParams) => void;
+    totalRecords?: number;
+    totalPages?: number;
     title?: string;
     createButton?: {
         label: string;
@@ -63,4 +68,6 @@ export interface DynamicTableProps<T> {
     emptyMessage?: string;
     className?: string;
     style?: React.CSSProperties;
+    showFilters?: boolean;
+    showPaginator?: boolean;
 } 

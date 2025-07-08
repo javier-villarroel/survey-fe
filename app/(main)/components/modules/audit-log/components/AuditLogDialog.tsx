@@ -203,15 +203,22 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                                 <div className="p-3 surface-ground">
                                     <div className="grid">
                                         {change.type !== 'added' && (
-                                            <div className="col-12 md:col-6">
+                                            <div className="col-12 md:col-5">
                                                 <div className="p-3 surface-card border-round">
                                                     <div className="text-500 mb-2">Valor anterior</div>
                                                     <div>{formatValue(change.oldValue)}</div>
                                                 </div>
                                             </div>
                                         )}
+                                        {change.type === 'modified' && (
+                                            <div className="col-12 md:col-2 flex align-items-center justify-content-center">
+                                                <div className="flex align-items-center justify-content-center w-3rem h-3rem border-circle bg-primary">
+                                                    <i className="pi pi-arrow-right text-xl text-white"></i>
+                                                </div>
+                                            </div>
+                                        )}
                                         {change.type !== 'removed' && (
-                                            <div className="col-12 md:col-6">
+                                            <div className="col-12 md:col-5">
                                                 <div className="p-3 surface-card border-round">
                                                     <div className="text-500 mb-2">Valor nuevo</div>
                                                     <div>{formatValue(change.newValue)}</div>

@@ -2,9 +2,9 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { UserStatus } from '../lib/enums';
 
 interface UserStatusConfirmDialogProps {
-    showConfirmDialog: boolean;
-    handleConfirm: () => Promise<void>;
-    handleReject: () => void;
+    show: boolean;
+    onConfirm: () => Promise<void>;
+    onReject: () => void;
     pendingAction: {
         userId: number;
         status: UserStatus;
@@ -12,20 +12,20 @@ interface UserStatusConfirmDialogProps {
 }
 
 export const UserStatusConfirmDialog = ({
-    showConfirmDialog,
-    handleConfirm,
-    handleReject,
+    show,
+    onConfirm,
+    onReject,
     pendingAction
 }: UserStatusConfirmDialogProps) => {
     return (
         <ConfirmDialog
-            visible={showConfirmDialog}
-            onHide={handleReject}
+            visible={show}
+            onHide={onReject}
             message={`¿Estás seguro que deseas ${pendingAction?.status === UserStatus.ACTIVE ? 'activar' : 'suspender'} este usuario?`}
             header="Confirmación"
             icon="pi pi-exclamation-triangle"
-            accept={handleConfirm}
-            reject={handleReject}
+            accept={onConfirm}
+            reject={onReject}
             acceptLabel="Sí"
             rejectLabel="No"
             acceptIcon="pi pi-check"

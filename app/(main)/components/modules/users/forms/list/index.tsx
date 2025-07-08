@@ -3,6 +3,7 @@
 import { DynamicTable } from "@/app/(main)/components/common/components/table/DynamicTable";
 import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
+import { UserFilters } from "../../components/UserFilters";
 
 import { createActions } from "./config/actions";
 import { Paginator } from 'primereact/paginator';
@@ -160,16 +161,6 @@ const ListUsers = () => {
 		handleFilter(newParams);
 	};
 
-	const handlePageSizeChange = (e: { value: number }) => {
-		const newParams = {
-			page: 1,
-			limit: e.value,
-			filters: queryParams.filters
-		};
-		setQueryParams(newParams);
-		handleFilter(newParams);
-	};
-
 	const handleTablePage = (event: DataTableStateEvent) => {
 		if (event.page !== undefined && event.rows !== undefined) {
 			const newParams = {
@@ -190,6 +181,26 @@ const ListUsers = () => {
 				...queryParams.filters,
 				[field]: value
 			}
+		};
+		setQueryParams(newParams);
+		handleFilter(newParams);
+	};
+
+	const handleClearFilters = () => {
+		const newParams = {
+			...queryParams,
+			page: 1,
+			filters: {}
+		};
+		setQueryParams(newParams);
+		handleFilter(newParams);
+	};
+
+	const handlePageSizeChange = (e: { value: number }) => {
+		const newParams = {
+			...queryParams,
+			page: 1,
+			limit: e.value
 		};
 		setQueryParams(newParams);
 		handleFilter(newParams);
@@ -242,13 +253,18 @@ const ListUsers = () => {
 			</div>
 			<Card className="w-full shadow-2">
 				<div className="flex flex-column gap-4">
+					<UserFilters 
+						filters={queryParams.filters}
+						onFilterChange={handleFilterChange}
+						onClearFilters={handleClearFilters}
+					/>
 					<DynamicTable<IUser>
 						value={data}
 						loading={loading}
 						columns={columns}
 						actions={actions}
+						showFilters={false}
 						onPage={handleTablePage}
-						onFilter={handleFilter}
 						totalRecords={pagination?.totalDocs}
 						totalPages={pagination?.totalPages}
 						emptyMessage="No se encontraron usuarios"
@@ -269,8 +285,8 @@ const ListUsers = () => {
 							first={(pagination?.currentPage ? pagination.currentPage - 1 : 0) * (pagination?.rowsPerPage ?? 5)}
 							rows={pagination?.rowsPerPage}
 							totalRecords={pagination?.totalDocs}
-							rowsPerPageOptions={[5, 10, 20]}
 							onPageChange={onPageChange}
+							template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
 						/>
 					</div>
 				</div>
@@ -299,33 +315,23 @@ const ListUsers = () => {
 			</Dialog>
 
 			<UserStatusConfirmDialog
-				showConfirmDialog={showStatusConfirmDialog}
-				handleConfirm={async () => {
-					const result = await handleStatusConfirm();
-					if (result) {
-						refreshData();
-					}
-				}}
-				handleReject={handleStatusReject}
+				show={showStatusConfirmDialog}
+				onConfirm={handleStatusConfirm}
+				onReject={handleStatusReject}
 				pendingAction={pendingStatusAction}
 			/>
 
 			<UserAccessConfirmDialog
-				showConfirmDialog={showAccessConfirmDialog}
-				handleConfirm={async () => {
-					const result = await handleAccessConfirm();
-					if (result) {
-						refreshData();
-					}
-				}}
-				handleReject={handleAccessReject}
+				show={showAccessConfirmDialog}
+				onConfirm={handleAccessConfirm}
+				onReject={handleAccessReject}
 				pendingAction={pendingAccessAction}
 			/>
 
 			<ConfirmDialog />
-			<Toast ref={removeToast} />
 			<Toast ref={statusToast} />
 			<Toast ref={accessToast} />
+			<Toast ref={removeToast} />
 		</>
 	);
 };
