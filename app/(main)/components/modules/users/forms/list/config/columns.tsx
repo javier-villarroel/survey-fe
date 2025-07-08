@@ -4,15 +4,25 @@ import { IUser } from "../../../services/types";
 import { UserStatus } from "../../../lib/enums";
 
 const statusBodyTemplate = (user: IUser) => {
+    let label = "Inactivo";
+    let bgClass = "bg-red-700 text-white";
+
+    if (user.status === UserStatus.ACTIVE) {
+        label = "Activo";
+        bgClass = "bg-green-700 text-white";
+    } else if (user.status === UserStatus.BLOQUED) {
+        label = "Bloqueado";
+        bgClass = "bg-yellow-600 text-white";
+    } else if (user.status === UserStatus.SUSPENDED) {
+        label = "Suspendido";
+        bgClass = "bg-gray-500 text-white";
+    }
+
     return (
         <span
-            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                user.status === UserStatus.ACTIVE
-                    ? "bg-green-700 text-white"
-                    : "bg-red-700 text-white"
-            }`}
+            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${bgClass}`}
         >
-            {user.status === UserStatus.ACTIVE ? "Activo" : "Inactivo"}
+            {label}
         </span>
     );
 };
@@ -69,4 +79,4 @@ export const columns: TableColumn[] = [
         body: statusBodyTemplate,
         style: { minWidth: '8rem' }
     }
-]; 
+];
