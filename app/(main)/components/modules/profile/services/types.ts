@@ -13,7 +13,11 @@ export interface IUser {
   status: boolean;
   createdAt: string;
   updatedAt: string;
-  profileImage?: string;
+  resources?: {
+    id: number;
+    type: string;
+    url: string;
+  }[];
 }
 
 export interface IPagination {

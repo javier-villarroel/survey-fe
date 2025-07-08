@@ -2,7 +2,7 @@
 import { useHandleOnSubmit } from '../../hooks/update/useHandleOnSubmit';
 import { useFetchProfile } from '../../hooks/useFetchProfile';
 import { useProfileImage } from '../../hooks/useProfileImage';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import { Skeleton } from 'primereact/skeleton';
 import { useProfileInfo } from '../../hooks/useProfileInfo';
 import type { ProfileFormData } from '../../lib/schemas';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,27 +15,76 @@ import { Toast } from 'primereact/toast';
 
 const ProfileDetail = () => {
     const form = useForm<ProfileFormData>({});
+    const { user, isLoading: isLoadingProfile } = useFetchProfile();
     const { previewImage, fileInputRef, handleImageClick, handleImageChange } = useProfileImage({ 
-        setValue: form.setValue 
+        setValue: form.setValue,
+        user
     });
     const { refreshProfile } = useProfileInfo(form);
-    const { isLoading: isLoadingProfile } = useFetchProfile();
     const { isUpdating, onSubmit, toast } = useHandleOnSubmit({ form, refreshProfile });
     const { control, handleSubmit, formState: { errors } } = form;
-
-    if (isLoadingProfile) {
-        return (
-            <div className="flex justify-content-center align-items-center " style={{ height: '70vh' }}>
-                <ProgressSpinner />
-            </div>
-        );
-    }
 
     const getFormErrorMessage = (name: keyof ProfileFormData) => {
         return errors[name] ? (
             <small className="p-error">{errors[name]?.message}</small>
         ) : null;
     };
+
+    if (isLoadingProfile) {
+        return (
+            <>
+                <h5>Perfil de usuario</h5>
+                <div className="grid">
+                    <div className="col-12 lg:col-4">
+                        <div className="card">
+                            <h5>Imagen de perfil</h5>
+                            <div className="flex flex-column align-items-center gap-4">
+                                <Skeleton shape="circle" size="12rem" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 lg:col-8">
+                        <div className="card">
+                            <h5>Información personal</h5>
+                            <div className="grid formgrid">
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton height="3rem" />
+                                </div>
+                                <div className="field col-12 md:col-6">
+                                    <Skeleton height="2rem" className="mb-2" />
+                                    <Skeleton width="8rem" height="2rem" />
+                                </div>
+                                <div className="col-12">
+                                    <Skeleton width="10rem" height="3rem" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>

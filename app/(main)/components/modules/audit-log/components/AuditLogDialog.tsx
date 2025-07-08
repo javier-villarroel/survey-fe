@@ -254,6 +254,28 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                     </div>
                 </div>
 
+                 {/* Información del usuario que realizó la acción */}
+                <div className="mt-4">
+                    <div className="flex align-items-center gap-2 mb-3">
+                        <i className="pi pi-user text-xl text-primary"></i>
+                        <h3 className="text-xl font-semibold m-0">Usuario que realizó la acción</h3>
+                    </div>
+                    <div className="grid">
+                        <div className="col-12 md:col-6">
+                            <div className="p-3 surface-ground border-round">
+                                <div className="text-500 mb-2">Nombre</div>
+                                <div className="text-900">{selectedItem.user.name}</div>
+                            </div>
+                        </div>
+                        <div className="col-12 md:col-6">
+                            <div className="p-3 surface-ground border-round">
+                                <div className="text-500 mb-2">Correo electrónico</div>
+                                <div className="text-900">{selectedItem.user.email}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Usuario afectado */}
                 {selectedItem.newData && (
                     <div className="mt-4">
@@ -278,27 +300,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                     </div>
                 )}
 
-                {/* Información del usuario que realizó la acción */}
-                <div className="mt-4">
-                    <div className="flex align-items-center gap-2 mb-3">
-                        <i className="pi pi-user text-xl text-primary"></i>
-                        <h3 className="text-xl font-semibold m-0">Usuario que realizó la acción</h3>
-                    </div>
-                    <div className="grid">
-                        <div className="col-12 md:col-6">
-                            <div className="p-3 surface-ground border-round">
-                                <div className="text-500 mb-2">Nombre</div>
-                                <div className="text-900">{selectedItem.user.name}</div>
-                            </div>
-                        </div>
-                        <div className="col-12 md:col-6">
-                            <div className="p-3 surface-ground border-round">
-                                <div className="text-500 mb-2">Correo electrónico</div>
-                                <div className="text-900">{selectedItem.user.email}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+               
 
                 {/* Detalles del evento */}
                 <div className="mt-4">

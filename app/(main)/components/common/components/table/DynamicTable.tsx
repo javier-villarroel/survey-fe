@@ -218,10 +218,21 @@ export function DynamicTable<T extends Record<string, any>>({
         '--p-datatable-row-height': '5rem'
     } as React.CSSProperties;
 
+    const customStyles = `
+        .p-column-filter-menu-button,
+        .p-column-filter-operator,
+        .p-column-filter-constraints,
+        .p-column-filter-add-rule,
+        .p-column-filter-buttonbar {
+            display: none !important;
+        }
+    `;
+
     const header = title || createButton ? renderHeader() : undefined;
 
     return (
         <div className="card">
+            <style>{customStyles}</style>
             <div className="mb-3 flex justify-end w-full">
                 <div className="flex w-full">
                     <div className="flex-1" />
@@ -240,14 +251,12 @@ export function DynamicTable<T extends Record<string, any>>({
                 paginator={showPaginator}
                 first={0}
                 rows={rowsPerPageOptions[0]}
-                totalRecords={totalRecords}
                 loading={loading}
                 onPage={handlePage}
                 onFilter={handleFilter}
                 filters={filters}
                 filterDisplay="row"
                 header={header}
-                globalFilterFields={globalSearchFields}
                 emptyMessage={emptyMessage}
                 className={`p-datatable-sm ${className || ''}`}
                 stripedRows
@@ -256,8 +265,6 @@ export function DynamicTable<T extends Record<string, any>>({
                 rowsPerPageOptions={rowsPerPageOptions}
                 style={{ ...defaultStyle, ...style }}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                currentPageReportTemplate={`Mostrando {first} a {last} de {totalRecords} registros`}
-                paginatorLeft={<div className="px-3">Total: {totalRecords} registros</div>}
             >
                 {columns.map((col) => (
                     <Column
