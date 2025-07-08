@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { classNames } from "primereact/utils";
 import React, {
 	forwardRef,
 	useContext,
@@ -38,13 +37,13 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
 	};
 
 	const userItems = [
-		// {
-		// 	label: "Ver perfil",
-		// 	icon: "pi pi-user",
-		// 	command: () => {
-		// 		router.push("/perfil");
-		// 	},
-		// },
+		{
+			label: "Ver perfil",
+			icon: "pi pi-user",
+			command: () => {
+				router.push("/perfil");
+			},
+		},
 		{
 			label: "Cerrar sesión",
 			icon: "pi pi-power-off",

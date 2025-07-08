@@ -1,7 +1,21 @@
 import { FilterMatchMode } from "primereact/api";
 import { TableColumn } from "@/app/(main)/components/common/components/table/types";
 import { IUser } from "../../../services/types";
-import { UserStatus } from "../../../lib/enums";
+import { UserStatus, UserRoles } from "../../../lib/enums";
+import { Dropdown } from "primereact/dropdown";
+
+const roleOptions = [
+    { label: 'Todos', value: '' },
+    { label: 'Administrador', value: UserRoles.ADMIN },
+    { label: 'Sin rol', value: 'NO_ROLE' }
+];
+
+const statusOptions = [
+    { label: 'Todos', value: '' },
+    { label: 'Activo', value: UserStatus.ACTIVE },
+    { label: 'Suspendido', value: UserStatus.SUSPENDED },
+    { label: 'Bloqueado', value: UserStatus.BLOQUED }
+];
 
 const statusBodyTemplate = (user: IUser) => {
     let label = "Inactivo";
@@ -27,12 +41,39 @@ const statusBodyTemplate = (user: IUser) => {
     );
 };
 
+const roleBodyTemplate = (user: IUser) => {
+    return user.role?.name || 'Sin rol';
+};
+
+const roleFilterTemplate = (options: any) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={roleOptions}
+            onChange={(e) => options.filterCallback(e.value)}
+            placeholder="Seleccionar rol"
+            className="p-column-filter w-full"
+        />
+    );
+};
+
+const statusFilterTemplate = (options: any) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={statusOptions}
+            onChange={(e) => options.filterCallback(e.value)}
+            placeholder="Seleccionar estado"
+            className="p-column-filter w-full"
+        />
+    );
+};
+
 export const columns: TableColumn[] = [
     {
         field: "id",
         header: "ID",
         sortable: true,
-        // filter: true,
         filterPlaceholder: "Filtrar por ID",
         style: { minWidth: '12rem' }
     },
@@ -65,18 +106,21 @@ export const columns: TableColumn[] = [
         header: "Rol",
         sortable: true,
         filter: true,
-        filterPlaceholder: "Filtrar por rol",
-        filterMatchModeOptions: [
-            { label: 'Es igual a', value: FilterMatchMode.EQUALS },
-            { label: 'Contiene', value: FilterMatchMode.CONTAINS },
-        ],
+        body: roleBodyTemplate,
+        filterMatchMode: FilterMatchMode.EQUALS,
+        filterMatchModeOptions: [{ label: 'Es igual a', value: FilterMatchMode.EQUALS }],
+        filterOptions: roleOptions,
         style: { minWidth: '10rem' }
     },
     {
         field: "status",
         header: "Estado",
         sortable: true,
+        filter: true,
         body: statusBodyTemplate,
+        filterMatchMode: FilterMatchMode.EQUALS,
+        filterMatchModeOptions: [{ label: 'Es igual a', value: FilterMatchMode.EQUALS }],
+        filterOptions: statusOptions,
         style: { minWidth: '8rem' }
     }
 ];

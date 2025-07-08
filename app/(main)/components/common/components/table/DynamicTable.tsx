@@ -9,6 +9,7 @@ import { Menu } from "primereact/menu";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DynamicTableProps, TableColumn, TableAction, TablePaginationParams } from "./types";
 import { classNames } from "primereact/utils";
+import { Dropdown } from "primereact/dropdown";
 
 const ActionsCell = <T extends object>({ rowData, actions }: { rowData: T; actions: TableAction[] }) => {
     const menuRef = useRef<Menu>(null);
@@ -172,6 +173,33 @@ export function DynamicTable<T extends Record<string, any>>({
 
     const header = title || createButton ? renderHeader() : undefined;
 
+    const renderFilterElement = (col: TableColumn) => {
+        if (col.filterOptions) {
+            return (
+                <Dropdown
+                    value={(filters[col.field] as any)?.value}
+                    options={col.filterOptions}
+                    onChange={(e) => {
+                        const newFilters = { ...filters };
+                        newFilters[col.field] = { value: e.value, matchMode: col.filterMatchMode || FilterMatchMode.EQUALS };
+                        setFilters(newFilters);
+                        
+                        if (onFilter) {
+                            onFilter({
+                                page: 1,
+                                limit: rowsPerPageOptions[0],
+                                filters: newFilters
+                            });
+                        }
+                    }}
+                    placeholder={col.filterPlaceholder || "Seleccionar..."}
+                    className="p-column-filter w-full"
+                />
+            );
+        }
+        return undefined;
+    };
+
     return (
         <div className="card">
             <div className="mb-3 flex justify-end w-full">
@@ -219,7 +247,9 @@ export function DynamicTable<T extends Record<string, any>>({
                         sortable={false}
                         filter={col.filter}
                         filterPlaceholder={col.filterPlaceholder || "Buscar..."}
-                        filterMatchMode={FilterMatchMode.CONTAINS}
+                        filterMatchMode={col.filterMatchMode || FilterMatchMode.CONTAINS}
+                        filterMatchModeOptions={col.filterMatchModeOptions}
+                        filterElement={col.filterOptions ? () => renderFilterElement(col) : undefined}
                         style={col.style}
                         body={col.body}
                         showFilterMenu={false}

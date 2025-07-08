@@ -25,6 +25,9 @@ export interface TableColumn {
         label: string;
         value: FilterMatchMode;
     }[];
+    filterElement?: (options: any) => React.ReactNode;
+    showFilterMenu?: boolean;
+    filterOptions?: { label: string; value: any }[];
 }
 
 export interface TablePaginationParams {

@@ -2,6 +2,7 @@ import { AxiosError } from "axios";
 import { IUsersListResponse } from "./types";
 import apiWithAuth from "@/app/api/axios";
 import { USER_API_BASE } from "./constants";
+import { UserRoles } from "../lib/enums";
 
 interface Pagination {
     page: number;
@@ -11,6 +12,7 @@ interface Pagination {
 interface QueryFilter {
     field: string;
     text: string;
+    operator?: string;
 }
 
 interface GetUsersParams {
@@ -24,24 +26,50 @@ const convertFiltersToQueries = (filters: Record<string, any>): QueryFilter[] =>
 
     if (!filters) return queries;
 
-    Object.entries(filters).forEach(([field, filterData]) => {
-        if (!filterData) return;
+    Object.entries(filters).forEach(([field, value]) => {
+        // Si el valor es un objeto de filtro de PrimeReact
+        if (value && typeof value === 'object' && 'value' in value) {
+            const filterValue = value.value;
+            
+            // No agregamos el filtro si:
+            // - El valor es null/undefined/vacío
+            // - El valor es un objeto (evita "[object Object]")
+            if (filterValue === null || 
+                filterValue === undefined || 
+                filterValue === '' ||
+                (typeof filterValue === 'object' && filterValue !== null)) {
+                return;
+            }
 
-        let value: string | null = null;
+            // Mapear los campos del frontend a los campos del backend
+            let backendField = field;
+            let backendValue = filterValue;
+            let operator: string | undefined;
 
-        if (typeof filterData === 'string') {
-            value = filterData;
-        } else if (filterData.value) {
-            value = filterData.value;
-        } else if (filterData.constraints?.[0]?.value) {
-            value = filterData.constraints[0].value;
-        }
+            switch (field) {
+                case 'role.name':
+                    if (filterValue === 'NO_ROLE') {
+                        backendField = 'roleId';
+                        backendValue = UserRoles.ADMIN.toString();
+                        operator = 'ne'; // not equals
+                    } else if (filterValue === UserRoles.ADMIN) {
+                        backendField = 'roleId';
+                        backendValue = UserRoles.ADMIN.toString();
+                        operator = 'eq'; // equals
+                    }
+                    break;
+                case 'status':
+                    backendField = 'status';
+                    operator = 'eq';
+                    break;
+                default:
+                    backendField = field;
+            }
 
-        if (value) {
-            const actualField = field.includes('.') ? field.split('.').pop()! : field;
             queries.push({
-                field: actualField,
-                text: value
+                field: backendField,
+                text: backendValue.toString(),
+                ...(operator && { operator })
             });
         }
     });

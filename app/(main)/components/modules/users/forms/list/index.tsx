@@ -18,7 +18,7 @@ import React, { useState } from "react";
 import { Card } from "primereact/card";
 import { CreateUser } from "../create";
 import { UserDetails } from "../details";
-import { UserStatus } from "../../lib/enums";
+import { UserStatus, UserRoles } from "../../lib/enums";
 import { UserStatusConfirmDialog } from "../../components/UserStatusConfirmDialog";
 import { UserAccessConfirmDialog } from "../../components/UserAccessConfirmDialog";
 import { TableParams } from "../../hooks/useUsersTable";
@@ -30,6 +30,19 @@ const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
 	{ label: '10 por página', value: 10 },
 	{ label: '20 por página', value: 20 }
+];
+
+const roleOptions = [
+	{ label: 'Todos', value: '' },
+	{ label: 'Administrador', value: UserRoles.ADMIN },
+	{ label: 'Sin rol', value: 'NO_ROLE' }
+];
+
+const statusOptions = [
+	{ label: 'Todos', value: '' },
+	{ label: 'Activo', value: UserStatus.ACTIVE },
+	{ label: 'Suspendido', value: UserStatus.SUSPENDED },
+	{ label: 'Bloqueado', value: UserStatus.BLOQUED }
 ];
 
 const LoadingSkeleton = () => {
@@ -73,7 +86,11 @@ const LoadingSkeleton = () => {
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-	const [queryParams, setQueryParams] = useState<TableParams>({ page: 1, limit: 5, filters: {} });
+	const [queryParams, setQueryParams] = useState<TableParams>({ 
+		page: 1, 
+		limit: 5, 
+		filters: {} 
+	});
 	const { data, loading, pagination, handleFilter, refreshData, currentUserEmail } = useUsersTable();
 	const { 
 		changeUserStatus, 
@@ -165,6 +182,19 @@ const ListUsers = () => {
 		}
 	};
 
+	const handleFilterChange = (field: string, value: any) => {
+		const newParams = {
+			...queryParams,
+			page: 1, // Reset to first page when filter changes
+			filters: {
+				...queryParams.filters,
+				[field]: value
+			}
+		};
+		setQueryParams(newParams);
+		handleFilter(newParams);
+	};
+
 	const actions = createActions({
 		onEdit: handleEdit,
 		onStatusChange: handleStatusChange,
@@ -214,15 +244,16 @@ const ListUsers = () => {
 				<div className="flex flex-column gap-4">
 					<DynamicTable<IUser>
 						value={data}
+						loading={loading}
 						columns={columns}
 						actions={actions}
-						loading={loading}
 						onPage={handleTablePage}
 						onFilter={handleFilter}
-						totalRecords={pagination?.totalDocs ?? 0}
-						totalPages={pagination?.totalPages ?? 1}
+						totalRecords={pagination?.totalDocs}
+						totalPages={pagination?.totalPages}
+						emptyMessage="No se encontraron usuarios"
 						showPaginator={false}
-						rowsPerPageOptions={pageSizeOptions.map(option => option.value)}
+						rowsPerPageOptions={[5, 10, 20]}
 					/>
 					<div className="flex align-items-center justify-content-center gap-4">
 						<div className="flex align-items-center gap-2">
@@ -236,11 +267,10 @@ const ListUsers = () => {
 						</div>
 						<Paginator
 							first={(pagination?.currentPage ? pagination.currentPage - 1 : 0) * (pagination?.rowsPerPage ?? 5)}
-							rows={pagination?.rowsPerPage ?? 5}
-							totalRecords={pagination?.totalDocs ?? 0}
+							rows={pagination?.rowsPerPage}
+							totalRecords={pagination?.totalDocs}
+							rowsPerPageOptions={[5, 10, 20]}
 							onPageChange={onPageChange}
-							template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-							className="border-round-xl"
 						/>
 					</div>
 				</div>
@@ -251,9 +281,8 @@ const ListUsers = () => {
 				onHide={handleCancel}
 				header={headerContent}
 				modal
-				className="p-fluid w-full sm:w-10 md:w-8 lg:w-5"
+				className="p-fluid w-full md:w-8 lg:w-6"
 				contentClassName="p-0"
-				style={{ maxWidth: '600px' }}
 			>
 				{selectedUser ? (
 					<UserDetails
@@ -262,7 +291,10 @@ const ListUsers = () => {
 						onCancel={handleCancel}
 					/>
 				) : (
-					<CreateUser onSuccess={handleSuccess} onCancel={handleCancel} />
+					<CreateUser
+						onSuccess={handleSuccess}
+						onCancel={handleCancel}
+					/>
 				)}
 			</Dialog>
 
