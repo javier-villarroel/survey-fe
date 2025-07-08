@@ -15,12 +15,31 @@ const initialPagination: TableParams = {
     filters: {}
 };
 
-const getCookie = (name: string) => {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift();
-    return null;
+const getCookie = (name: string): string | null => {
+    try {
+        if (typeof document === 'undefined') return null;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            const cookieValue = parts.pop()?.split(';').shift();
+            return cookieValue ? decodeURIComponent(cookieValue) : null;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting cookie:', error);
+        return null;
+    }
+};
+
+const validateAndFormatEmail = (email: string | null): string | null => {
+    if (!email) return null;
+    try {
+        const trimmedEmail = email.toLowerCase().trim();
+        return trimmedEmail.includes('@') ? trimmedEmail : null;
+    } catch (error) {
+        console.error('Error formatting email:', error);
+        return null;
+    }
 };
 
 export const useUsersTable = () => {
@@ -28,11 +47,33 @@ export const useUsersTable = () => {
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
-    useEffect(() => {
+    // Función para actualizar el email
+    const updateCurrentUserEmail = () => {
         const email = getCookie('email');
-        if (email) {
-            setCurrentUserEmail(decodeURIComponent(email));
+        const validEmail = validateAndFormatEmail(email);
+        if (validEmail !== currentUserEmail) {
+            setCurrentUserEmail(validEmail);
         }
+    };
+
+    // Actualizar al montar y cuando el componente reciba foco
+    useEffect(() => {
+        updateCurrentUserEmail();
+
+        // Actualizar cuando la ventana recibe foco
+        const handleFocus = () => {
+            updateCurrentUserEmail();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        
+        // Actualizar periódicamente
+        const interval = setInterval(updateCurrentUserEmail, 30000);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            clearInterval(interval);
+        };
     }, []);
 
     const { data, isLoading, error } = useQuery<IUsersListResponse>({

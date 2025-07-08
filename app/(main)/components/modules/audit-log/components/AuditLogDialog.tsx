@@ -3,9 +3,8 @@
 import React from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Tag } from 'primereact/tag';
-import { Divider } from 'primereact/divider';
 import { AuditLogItem } from '../types';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow, format, isValid } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
     AuditModule, 
@@ -21,37 +20,170 @@ interface AuditLogDialogProps {
     selectedItem: AuditLogItem | null;
 }
 
-const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return { relative: 'Fecha no disponible', exact: 'Fecha no disponible' };
+const getFieldLabel = (key: string): string => {
+    const labels: { [key: string]: string } = {
+        firstName: 'Nombre',
+        lastName: 'Apellido',
+        email: 'Correo electrónico',
+        phone: 'Teléfono',
+        status: 'Estado',
+        role: 'Rol',
+        action: 'Acción',
+        twoFactorAuth: 'Autenticación de dos factores',
+        groups: 'Grupos',
+        name: 'Nombre',
+        description: 'Descripción',
+        startDate: 'Fecha de inicio',
+        endDate: 'Fecha de fin',
+        createdAt: 'Fecha de creación',
+        updatedAt: 'Fecha de actualización',
+        principal: 'Principal',
+        color: 'Color',
+        level: 'Nivel'
+    };
+    return labels[key] || key;
+};
+
+const formatDate = (dateString: string | undefined | null): string => {
+    if (!dateString) return 'No definido';
     
     try {
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return { relative: 'Fecha inválida', exact: 'Fecha inválida' };
+        if (!isValid(date)) return 'Fecha inválida';
         
-        return {
-            relative: formatDistanceToNow(date, { 
-                addSuffix: true,
-                locale: es 
-            }),
-            exact: format(date, "dd/MM/yyyy hh:mm a", { locale: es })
-        };
+        return format(date, 'dd/MM/yyyy', { locale: es });
     } catch (error) {
-        console.error('Error formatting date:', error);
-        return { relative: 'Error en fecha', exact: 'Error en fecha' };
+        console.error('Error al formatear fecha:', error);
+        return 'Fecha inválida';
     }
 };
 
-const getStatusTranslation = (status: string | undefined) => {
-    if (!status) return 'Desconocido';
-    switch (status.toUpperCase()) {
-        case 'SUCCESS':
-            return 'Exitoso';
-        case 'FAILED':
-        case 'FALLIDO':
-            return 'Fallido';
-        default:
-            return status;
+const formatDateWithTime = (dateString: string | undefined | null): string => {
+    if (!dateString) return 'No definido';
+    
+    try {
+        const date = new Date(dateString);
+        if (!isValid(date)) return 'Fecha inválida';
+        
+        return format(date, "dd/MM/yyyy hh:mm a", { locale: es });
+    } catch (error) {
+        console.error('Error al formatear fecha y hora:', error);
+        return 'Fecha inválida';
     }
+};
+
+const getTimeAgo = (dateString: string | undefined | null): string => {
+    if (!dateString) return 'Fecha no disponible';
+    
+    try {
+        const date = new Date(dateString);
+        if (!isValid(date)) return 'Fecha inválida';
+        
+        return formatDistanceToNow(date, { addSuffix: true, locale: es });
+    } catch (error) {
+        console.error('Error al calcular tiempo transcurrido:', error);
+        return 'Fecha inválida';
+    }
+};
+
+const formatValue = (value: any): string | React.ReactNode => {
+    if (value === null || value === undefined) return 'No definido';
+    if (typeof value === 'boolean') return value ? 'Sí' : 'No';
+    
+    // Manejo especial para grupos
+    if (Array.isArray(value) && value.length > 0 && value[0]?.role) {
+        return value.map((group, index) => (
+            <div key={index} className="p-2 surface-100 border-round mb-2">
+                <div className="flex align-items-center gap-2">
+                    <i className="pi pi-users text-primary"></i>
+                    <span>{group.role?.name || 'Sin nombre'}</span>
+                    {group.principal && (
+                        <Tag severity="info" value="Principal" />
+                    )}
+                </div>
+            </div>
+        ));
+    }
+
+    // Manejo especial para roles individuales
+    if (typeof value === 'object' && value !== null && 'role' in value) {
+        return (
+            <div className="p-2 surface-100 border-round">
+                <div className="flex align-items-center gap-2">
+                    <i className="pi pi-user text-primary"></i>
+                    <span>{value.role?.name || 'Sin nombre'}</span>
+                    {value.principal && (
+                        <Tag severity="info" value="Principal" />
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // Manejo especial para objetos role
+    if (typeof value === 'object' && value !== null && 'name' in value) {
+        return (
+            <div className="p-2 surface-100 border-round">
+                <div className="flex align-items-center gap-2">
+                    <i className="pi pi-user text-primary"></i>
+                    <span>{value.name || 'Sin nombre'}</span>
+                    {value.color && (
+                        <div 
+                            className="border-round" 
+                            style={{ 
+                                width: '1rem', 
+                                height: '1rem', 
+                                backgroundColor: value.color 
+                            }}
+                        />
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    if (value === 'ACTIVE') return 'Activo';
+    if (value === 'INACTIVE') return 'Inactivo';
+    if (value === 'SUSPENDED') return 'Suspendido';
+    if (value === 'ASSIGN') return 'Asignado';
+    if (value === 'UNASSIGN') return 'Desasignado';
+    
+    // Manejo de fechas
+    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) {
+        return formatDate(value);
+    }
+
+    return String(value);
+};
+
+const getChangedFields = (oldData: any, newData: any) => {
+    const changes: { key: string; oldValue: any; newValue: any; type: 'added' | 'removed' | 'modified' }[] = [];
+    const allKeys = new Set([...Object.keys(oldData || {}), ...Object.keys(newData || {})]);
+
+    allKeys.forEach(key => {
+        // Ignorar campos específicos
+        if (['id', 'createdAt', 'updatedAt'].includes(key)) return;
+
+        const oldValue = oldData?.[key];
+        const newValue = newData?.[key];
+
+        if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+            let type: 'added' | 'removed' | 'modified';
+            
+            if (!oldData?.hasOwnProperty(key)) type = 'added';
+            else if (!newData?.hasOwnProperty(key)) type = 'removed';
+            else type = 'modified';
+
+            changes.push({
+                key,
+                oldValue,
+                newValue,
+                type
+            });
+        }
+    });
+
+    return changes;
 };
 
 export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
@@ -61,60 +193,115 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
 }) => {
     if (!selectedItem) return null;
 
-    const { relative: timeAgo, exact: exactTime } = formatDate(selectedItem.createdAt);
+    const timeAgo = getTimeAgo(selectedItem.createdAt);
+    const exactTime = formatDateWithTime(selectedItem.createdAt);
     const moduleType = selectedItem.module as AuditModule;
     const event = selectedItem.event as AuditEvent;
-
-    const renderAuthContent = () => {
-        if (!selectedItem.newData) return null;
-
-        const message = selectedItem.newData.message || selectedItem.description;
-        const status = selectedItem.status || selectedItem.newData.status;
-        const isSuccess = status === 'SUCCESS';
-        const severity = isSuccess ? 'success' : 'danger';
-        const statusText = getStatusTranslation(status);
-
-        return (
-            <div className="mt-4">
-                <h3 className="text-xl font-semibold mb-3">Detalles de la autenticación</h3>
-                <div className="p-4 surface-ground border-round">
-                    <div className="flex flex-column gap-3">
-                        <div className="flex align-items-center gap-2">
-                            <i className={`pi ${isSuccess ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'} text-xl`}></i>
-                            <Tag value={statusText} severity={severity} />
-                        </div>
-                        <div className="text-lg">{message}</div>
-                        {selectedItem.oldData?.email && (
-                            <div className="flex align-items-center gap-2 text-600">
-                                <i className="pi pi-user text-lg"></i>
-                                <span>{selectedItem.oldData.email}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
-    };
 
     const renderDataComparison = () => {
         if (!selectedItem.oldData && !selectedItem.newData) return null;
 
+        const changes = getChangedFields(selectedItem.oldData, selectedItem.newData);
+
         return (
             <div className="mt-4">
-                <h3 className="text-xl font-semibold mb-3">Cambios realizados</h3>
+                <div className="flex align-items-center gap-2 mb-3">
+                    <i className="pi pi-sync text-xl text-primary"></i>
+                    <h3 className="text-xl font-semibold m-0">Cambios realizados</h3>
+                </div>
                 <div className="grid">
-                    <div className="col-6">
-                        <h4 className="text-lg mb-2">Datos anteriores</h4>
-                        <pre className="p-3 surface-ground border-round">
-                            {JSON.stringify(selectedItem.oldData, null, 2)}
-                        </pre>
-                    </div>
-                    <div className="col-6">
-                        <h4 className="text-lg mb-2">Datos nuevos</h4>
-                        <pre className="p-3 surface-ground border-round">
-                            {JSON.stringify(selectedItem.newData, null, 2)}
-                        </pre>
-                    </div>
+                    {changes.map((change, index) => (
+                        <div key={index} className="col-12 mb-3">
+                            <div className="border-round shadow-2 overflow-hidden">
+                                {/* Encabezado del campo */}
+                                <div className={`p-3 ${
+                                    change.type === 'added' 
+                                        ? 'bg-green-600' 
+                                        : change.type === 'removed' 
+                                            ? 'bg-red-600' 
+                                            : 'bg-primary'
+                                }`}>
+                                    <div className="flex align-items-center justify-content-between">
+                                        <div className="text-lg font-medium text-white flex align-items-center gap-2">
+                                            <i className={`pi ${
+                                                change.type === 'added' 
+                                                    ? 'pi-plus-circle' 
+                                                    : change.type === 'removed' 
+                                                        ? 'pi-minus-circle' 
+                                                        : 'pi-sync'
+                                            }`}></i>
+                                            {getFieldLabel(change.key)}
+                                        </div>
+                                        <Tag 
+                                            value={
+                                                change.type === 'added' 
+                                                    ? 'Agregado' 
+                                                    : change.type === 'removed' 
+                                                        ? 'Eliminado' 
+                                                        : 'Modificado'
+                                            } 
+                                            severity={
+                                                change.type === 'added' 
+                                                    ? 'success' 
+                                                    : change.type === 'removed' 
+                                                        ? 'danger' 
+                                                        : 'info'
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                                
+                                {/* Contenido de la comparación */}
+                                <div className="p-3 surface-ground">
+                                    <div className="flex align-items-stretch gap-3">
+                                        {/* Valor anterior */}
+                                        {(change.type === 'modified' || change.type === 'removed') && (
+                                            <div className="flex-1 bg-white border-round-lg p-0 shadow-1">
+                                                <div className="bg-red-50 p-2 border-round-top flex align-items-center gap-2">
+                                                    <i className="pi pi-history text-red-600"></i>
+                                                    <span className="font-medium text-red-600">Valor anterior</span>
+                                                </div>
+                                                <div className="p-3 border-round-bottom">
+                                                    {formatValue(change.oldValue)}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Flecha central - solo para modificaciones */}
+                                        {change.type === 'modified' && (
+                                            <div className="flex align-items-center">
+                                                <div className="p-2 border-round bg-primary-50">
+                                                    <i className="pi pi-arrow-right text-primary text-xl"></i>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Valor nuevo */}
+                                        {(change.type === 'modified' || change.type === 'added') && (
+                                            <div className="flex-1 bg-white border-round-lg p-0 shadow-1">
+                                                <div className="bg-green-50 p-2 border-round-top flex align-items-center gap-2">
+                                                    <i className="pi pi-check-circle text-green-600"></i>
+                                                    <span className="font-medium text-green-600">Nuevo valor</span>
+                                                </div>
+                                                <div className="p-3 border-round-bottom">
+                                                    {formatValue(change.newValue)}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {changes.length === 0 && (
+                        <div className="col-12">
+                            <div className="p-4 surface-ground border-round text-center">
+                                <i className="pi pi-info-circle text-xl text-blue-500 mb-3"></i>
+                                <div className="text-lg">No se encontraron cambios en los datos</div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -132,20 +319,6 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
             <div className="grid">
                 <div className="col-12">
                     <div className="flex flex-column gap-3">
-                        {selectedItem.newData?.firstName && (
-                            <div className="flex align-items-center gap-2">
-                                <i className="pi pi-user text-xl"></i>
-                                <span className="font-bold">Usuario:</span>
-                                <span>{selectedItem.newData?.firstName} {selectedItem.newData?.lastName}</span>
-                            </div>
-                        )}
-                        {selectedItem.newData?.email && (
-                            <div className="flex align-items-center gap-2">
-                                <i className="pi pi-envelope text-xl"></i>
-                                <span className="font-bold">Correo:</span>
-                                <span>{selectedItem.newData?.email}</span>
-                            </div>
-                        )}
                         <div className="flex align-items-center gap-2">
                             <i className="pi pi-clock text-xl"></i>
                             <span className="font-bold">Fecha:</span>
@@ -170,7 +343,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                     </div>
                 </div>
                 <div className="col-12">
-                    {moduleType === AuditModule.AUTH ? renderAuthContent() : renderDataComparison()}
+                    {renderDataComparison()}
                 </div>
             </div>
         </Dialog>

@@ -170,7 +170,6 @@ const ListUsers = () => {
 		onStatusChange: handleStatusChange,
 		onAccessChange: handleAccessChange,
 		onRemove: handleRemove,
-		currentUserEmail
 	});
 
 	const headerContent = (
@@ -252,8 +251,9 @@ const ListUsers = () => {
 				onHide={handleCancel}
 				header={headerContent}
 				modal
-				className="p-fluid w-full md:w-8 lg:w-6"
+				className="p-fluid w-full sm:w-10 md:w-8 lg:w-5"
 				contentClassName="p-0"
+				style={{ maxWidth: '600px' }}
 			>
 				{selectedUser ? (
 					<UserDetails
