@@ -6,8 +6,8 @@ import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { DynamicTableProps, TableColumn, TableAction, TablePaginationParams } from "./types";
+import { FilterMatchMode } from "primereact/api";
+import { DynamicTableProps, TableColumn, TableAction } from "./types";
 import { classNames } from "primereact/utils";
 import { Dropdown } from "primereact/dropdown";
 
@@ -162,17 +162,6 @@ export function DynamicTable<T extends Record<string, any>>({
         );
     };
 
-    const actionsBodyTemplate = (rowData: T) => {
-        return <ActionsCell rowData={rowData} actions={actions || []} />;
-    };
-
-    const defaultStyle = {
-        '--p-datatable-header-height': '4rem',
-        '--p-datatable-row-height': '5rem'
-    } as React.CSSProperties;
-
-    const header = title || createButton ? renderHeader() : undefined;
-
     const renderFilterElement = (col: TableColumn) => {
         if (col.filterOptions) {
             return (
@@ -181,7 +170,7 @@ export function DynamicTable<T extends Record<string, any>>({
                     options={col.filterOptions}
                     onChange={(e) => {
                         const newFilters = { ...filters };
-                        newFilters[col.field] = { value: e.value, matchMode: col.filterMatchMode || FilterMatchMode.EQUALS };
+                        newFilters[col.field] = { value: e.value, matchMode: FilterMatchMode.EQUALS };
                         setFilters(newFilters);
                         
                         if (onFilter) {
@@ -197,8 +186,39 @@ export function DynamicTable<T extends Record<string, any>>({
                 />
             );
         }
-        return undefined;
+
+        return (
+            <InputText
+                value={(filters[col.field] as any)?.value || ''}
+                onChange={(e) => {
+                    const newFilters = { ...filters };
+                    newFilters[col.field] = { value: e.target.value, matchMode: FilterMatchMode.CONTAINS };
+                    setFilters(newFilters);
+                    
+                    if (onFilter) {
+                        onFilter({
+                            page: 1,
+                            limit: rowsPerPageOptions[0],
+                            filters: newFilters
+                        });
+                    }
+                }}
+                placeholder={col.filterPlaceholder || "Buscar..."}
+                className="p-column-filter w-full"
+            />
+        );
     };
+
+    const actionsBodyTemplate = (rowData: T) => {
+        return <ActionsCell rowData={rowData} actions={actions || []} />;
+    };
+
+    const defaultStyle = {
+        '--p-datatable-header-height': '4rem',
+        '--p-datatable-row-height': '5rem'
+    } as React.CSSProperties;
+
+    const header = title || createButton ? renderHeader() : undefined;
 
     return (
         <div className="card">
@@ -247,16 +267,10 @@ export function DynamicTable<T extends Record<string, any>>({
                         sortable={false}
                         filter={col.filter}
                         filterPlaceholder={col.filterPlaceholder || "Buscar..."}
-                        filterMatchMode={col.filterMatchMode || FilterMatchMode.CONTAINS}
-                        filterMatchModeOptions={col.filterMatchModeOptions}
-                        filterElement={col.filterOptions ? () => renderFilterElement(col) : undefined}
-                        style={col.style}
+                        filterElement={col.filter ? () => renderFilterElement(col) : undefined}
                         body={col.body}
-                        showFilterMenu={false}
-                        showFilterOperator={false}
-                        showAddButton={false}
-                        showApplyButton={false}
-                        showClearButton={false}
+                        style={col.style}
+                        className={col.className}
                     />
                 ))}
                 {actions && actions.length > 0 && (

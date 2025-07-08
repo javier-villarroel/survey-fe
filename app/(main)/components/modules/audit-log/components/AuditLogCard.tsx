@@ -25,9 +25,7 @@ interface FormattedDate {
     exact: string;
 }
 
-const formatDate = (dateString: string | undefined): FormattedDate => {
-    if (!dateString) return { relative: 'Fecha no disponible', exact: 'Fecha no disponible' };
-    
+const formatDate = (dateString: string): FormattedDate => {
     try {
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return { relative: 'Fecha inválida', exact: 'Fecha inválida' };
@@ -45,6 +43,16 @@ const formatDate = (dateString: string | undefined): FormattedDate => {
     }
 };
 
+const cleanData = (data: Record<string, any>) => {
+    const cleanedData = { ...data };
+    delete cleanedData.groups;
+    delete cleanedData.lastLogin;
+    if (cleanedData.status === 'DELETED') {
+        cleanedData.status = 'Eliminado';
+    }
+    return cleanedData;
+};
+
 export const AuditLogCard: React.FC<AuditLogCardProps> = ({ item, onClick }) => {
     const [formattedDate, setFormattedDate] = useState<FormattedDate>(formatDate(item.createdAt));
 
@@ -59,10 +67,13 @@ export const AuditLogCard: React.FC<AuditLogCardProps> = ({ item, onClick }) => 
     const moduleType = item.module as AuditModule;
     const event = item.event as AuditEvent;
 
+    const cleanedOldData = cleanData(item.oldData);
+    const cleanedNewData = cleanData(item.newData);
+
     return (
         <Card
             className="mb-4 border-left-3 surface-border cursor-pointer hover:shadow-lg"
-            onClick={() => onClick(item)}
+            onClick={() => onClick({ ...item, oldData: cleanedOldData, newData: cleanedNewData })}
             style={{ width: '100%' }}
         >
             <div className="flex flex-col gap-2">
@@ -75,13 +86,13 @@ export const AuditLogCard: React.FC<AuditLogCardProps> = ({ item, onClick }) => 
                         justifyItems: 'center'
                     }}
                 >
-                    {/* Nombre */}
-                    <span className="text-lg font-semibold truncate" title={item.newData?.firstName}>
-                        {item.newData?.firstName} {item.newData?.lastName}
+                    {/* Usuario que realizó la acción */}
+                    <span className="text-lg font-semibold truncate" title={item.user.name}>
+                        {item.user.name}
                     </span>
-                    {/* Correo */}
-                    <span className="text-sm text-gray-500 truncate" title={item.newData?.email}>
-                        {item.newData?.email}
+                    {/* Correo del usuario que realizó la acción */}
+                    <span className="text-sm text-gray-500 truncate" title={item.user.email}>
+                        {item.user.email}
                     </span>
                     {/* Fecha */}
                     <div className="flex flex-column align-items-center">

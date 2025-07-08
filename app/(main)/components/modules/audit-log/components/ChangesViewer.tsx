@@ -1,14 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Timeline } from 'primereact/timeline';
 import { Card } from 'primereact/card';
 import { Badge } from 'primereact/badge';
 import { Chip } from 'primereact/chip';
 
 interface ChangeViewerProps {
-    oldData: any;
-    newData: any;
+    oldData: Record<string, any>;
+    newData: Record<string, any>;
 }
 
 const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
@@ -17,6 +16,11 @@ const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
         const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
 
         allKeys.forEach(key => {
+            // Ignorar campos específicos
+            if (key === 'groups' || key === 'lastLogin') {
+                return;
+            }
+
             const oldValue = oldData[key];
             const newValue = newData[key];
 
@@ -40,29 +44,18 @@ const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
                 case 'action':
                     changes.push({
                         field: 'Acción',
-                        oldValue: oldValue === 'UNASSIGN' ? 'Desasignado' : oldValue,
-                        newValue: newValue === 'ASSIGN' ? 'Asignado' : newValue,
+                        oldValue: translateAction(oldValue),
+                        newValue: translateAction(newValue),
                         type: 'action'
                     });
                     break;
                 case 'status':
                     changes.push({
                         field: 'Estado',
-                        oldValue: oldValue === 'ACTIVE' ? 'Activo' : 'Inactivo',
-                        newValue: newValue === 'ACTIVE' ? 'Activo' : 'Inactivo',
+                        oldValue: translateStatus(oldValue),
+                        newValue: translateStatus(newValue),
                         type: 'status'
                     });
-                    break;
-                case 'groups':
-                    // Solo mostrar cambios en grupos si es relevante
-                    if (newValue?.length !== oldValue?.length) {
-                        changes.push({
-                            field: 'Grupos',
-                            oldValue: oldValue?.length || 0,
-                            newValue: newValue?.length || 0,
-                            type: 'groups'
-                        });
-                    }
                     break;
                 case 'twoFactorAuth':
                     changes.push({
@@ -88,18 +81,44 @@ const ChangesViewer: React.FC<ChangeViewerProps> = ({ oldData, newData }) => {
         return changes;
     };
 
+    const translateAction = (action: string) => {
+        const translations: Record<string, string> = {
+            'ASSIGN': 'Asignado',
+            'UNASSIGN': 'Desasignado'
+        };
+        return translations[action] || action;
+    };
+
+    const translateStatus = (status: string) => {
+        const translations: Record<string, string> = {
+            'ACTIVE': 'Activo',
+            'SUSPENDED': 'Suspendido',
+            'DELETED': 'Eliminado',
+            'INACTIVE': 'Inactivo'
+        };
+        return translations[status] || status;
+    };
+
     const getFieldLabel = (key: string) => {
         const labels: { [key: string]: string } = {
             firstName: 'Nombre',
             lastName: 'Apellido',
             email: 'Correo electrónico',
-            phone: 'Teléfono'
+            phone: 'Teléfono',
+            createdAt: 'Fecha de creación',
+            updatedAt: 'Fecha de actualización'
         };
         return labels[key] || key;
     };
 
     const getStatusSeverity = (status: string) => {
-        return status === 'ACTIVE' || status === 'Activo' ? 'success' : 'danger';
+        const severities: Record<string, string> = {
+            'Activo': 'success',
+            'Suspendido': 'warning',
+            'Eliminado': 'danger',
+            'Inactivo': 'danger'
+        };
+        return severities[status] || 'info';
     };
 
     const renderValue = (change: any) => {

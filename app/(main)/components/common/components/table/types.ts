@@ -18,16 +18,10 @@ export interface TableColumn {
     sortable?: boolean;
     filter?: boolean;
     filterPlaceholder?: string;
-    filterMatchMode?: FilterMatchMode;
+    filterOptions?: { label: string; value: any }[];
     body?: (rowData: any) => React.ReactNode;
     style?: React.CSSProperties;
-    filterMatchModeOptions?: {
-        label: string;
-        value: FilterMatchMode;
-    }[];
-    filterElement?: (options: any) => React.ReactNode;
-    showFilterMenu?: boolean;
-    filterOptions?: { label: string; value: any }[];
+    className?: string;
 }
 
 export interface TablePaginationParams {

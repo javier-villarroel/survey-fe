@@ -200,6 +200,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
     };
 
     const customContent = (item: AuditLogItem) => {
+        console.log(item.user)
         const moduleType = item.module as AuditModule;
         const event = item.event as AuditEvent;
         const { relative: timeAgo, exact: exactTime } = formatDate(item.createdAt);
@@ -212,7 +213,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
             initials = getInitials(undefined, undefined, item.user?.email);
         } else {
             // Para otros casos, usar firstName y lastName
-            initials = getInitials(item.user?.name, item.user?.lastName);
+            initials = getInitials(item.user?.name, item.user?.name);
         }
 
         // Obtener información del estado si es módulo AUTH

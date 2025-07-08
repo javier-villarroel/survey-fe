@@ -30,7 +30,6 @@ const getFieldLabel = (key: string): string => {
         role: 'Rol',
         action: 'Acción',
         twoFactorAuth: 'Autenticación de dos factores',
-        groups: 'Grupos',
         name: 'Nombre',
         description: 'Descripción',
         startDate: 'Fecha de inicio',
@@ -89,62 +88,12 @@ const getTimeAgo = (dateString: string | undefined | null): string => {
 const formatValue = (value: any): string | React.ReactNode => {
     if (value === null || value === undefined) return 'No definido';
     if (typeof value === 'boolean') return value ? 'Sí' : 'No';
-    
-    // Manejo especial para grupos
-    if (Array.isArray(value) && value.length > 0 && value[0]?.role) {
-        return value.map((group, index) => (
-            <div key={index} className="p-2 surface-100 border-round mb-2">
-                <div className="flex align-items-center gap-2">
-                    <i className="pi pi-users text-primary"></i>
-                    <span>{group.role?.name || 'Sin nombre'}</span>
-                    {group.principal && (
-                        <Tag severity="info" value="Principal" />
-                    )}
-                </div>
-            </div>
-        ));
-    }
 
-    // Manejo especial para roles individuales
-    if (typeof value === 'object' && value !== null && 'role' in value) {
-        return (
-            <div className="p-2 surface-100 border-round">
-                <div className="flex align-items-center gap-2">
-                    <i className="pi pi-user text-primary"></i>
-                    <span>{value.role?.name || 'Sin nombre'}</span>
-                    {value.principal && (
-                        <Tag severity="info" value="Principal" />
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    // Manejo especial para objetos role
-    if (typeof value === 'object' && value !== null && 'name' in value) {
-        return (
-            <div className="p-2 surface-100 border-round">
-                <div className="flex align-items-center gap-2">
-                    <i className="pi pi-user text-primary"></i>
-                    <span>{value.name || 'Sin nombre'}</span>
-                    {value.color && (
-                        <div 
-                            className="border-round" 
-                            style={{ 
-                                width: '1rem', 
-                                height: '1rem', 
-                                backgroundColor: value.color 
-                            }}
-                        />
-                    )}
-                </div>
-            </div>
-        );
-    }
-
+    // Traducciones de estados
     if (value === 'ACTIVE') return 'Activo';
     if (value === 'INACTIVE') return 'Inactivo';
     if (value === 'SUSPENDED') return 'Suspendido';
+    if (value === 'DELETED') return 'Eliminado';
     if (value === 'ASSIGN') return 'Asignado';
     if (value === 'UNASSIGN') return 'Desasignado';
     
@@ -162,7 +111,7 @@ const getChangedFields = (oldData: any, newData: any) => {
 
     allKeys.forEach(key => {
         // Ignorar campos específicos
-        if (['id', 'createdAt', 'updatedAt'].includes(key)) return;
+        if (['id', 'createdAt', 'updatedAt', 'groups', 'lastLogin', 'roleId', 'role'].includes(key)) return;
 
         const oldValue = oldData?.[key];
         const newValue = newData?.[key];
@@ -250,41 +199,22 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                                         />
                                     </div>
                                 </div>
-                                
-                                {/* Contenido de la comparación */}
+                                {/* Contenido del cambio */}
                                 <div className="p-3 surface-ground">
-                                    <div className="flex align-items-stretch gap-3">
-                                        {/* Valor anterior */}
-                                        {(change.type === 'modified' || change.type === 'removed') && (
-                                            <div className="flex-1 bg-white border-round-lg p-0 shadow-1">
-                                                <div className="bg-red-50 p-2 border-round-top flex align-items-center gap-2">
-                                                    <i className="pi pi-history text-red-600"></i>
-                                                    <span className="font-medium text-red-600">Valor anterior</span>
-                                                </div>
-                                                <div className="p-3 border-round-bottom">
-                                                    {formatValue(change.oldValue)}
+                                    <div className="grid">
+                                        {change.type !== 'added' && (
+                                            <div className="col-12 md:col-6">
+                                                <div className="p-3 surface-card border-round">
+                                                    <div className="text-500 mb-2">Valor anterior</div>
+                                                    <div>{formatValue(change.oldValue)}</div>
                                                 </div>
                                             </div>
                                         )}
-
-                                        {/* Flecha central - solo para modificaciones */}
-                                        {change.type === 'modified' && (
-                                            <div className="flex align-items-center">
-                                                <div className="p-2 border-round bg-primary-50">
-                                                    <i className="pi pi-arrow-right text-primary text-xl"></i>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Valor nuevo */}
-                                        {(change.type === 'modified' || change.type === 'added') && (
-                                            <div className="flex-1 bg-white border-round-lg p-0 shadow-1">
-                                                <div className="bg-green-50 p-2 border-round-top flex align-items-center gap-2">
-                                                    <i className="pi pi-check-circle text-green-600"></i>
-                                                    <span className="font-medium text-green-600">Nuevo valor</span>
-                                                </div>
-                                                <div className="p-3 border-round-bottom">
-                                                    {formatValue(change.newValue)}
+                                        {change.type !== 'removed' && (
+                                            <div className="col-12 md:col-6">
+                                                <div className="p-3 surface-card border-round">
+                                                    <div className="text-500 mb-2">Valor nuevo</div>
+                                                    <div>{formatValue(change.newValue)}</div>
                                                 </div>
                                             </div>
                                         )}
@@ -293,15 +223,6 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
                             </div>
                         </div>
                     ))}
-                    
-                    {changes.length === 0 && (
-                        <div className="col-12">
-                            <div className="p-4 surface-ground border-round text-center">
-                                <i className="pi pi-info-circle text-xl text-blue-500 mb-3"></i>
-                                <div className="text-lg">No se encontraron cambios en los datos</div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         );
@@ -309,42 +230,94 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({
 
     return (
         <Dialog
-            header="Detalles de la actividad"
             visible={visible}
             onHide={onHide}
+            header="Detalle de la Auditoría"
             style={{ width: '90vw', maxWidth: '1200px' }}
             modal
             className="p-fluid"
         >
-            <div className="grid">
-                <div className="col-12">
-                    <div className="flex flex-column gap-3">
-                        <div className="flex align-items-center gap-2">
-                            <i className="pi pi-clock text-xl"></i>
-                            <span className="font-bold">Fecha:</span>
-                            <span>{exactTime}</span>
-                            <span className="text-500">({timeAgo})</span>
+            <div className="surface-section p-4">
+                {/* Encabezado */}
+                <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <div className="flex align-items-center gap-3 mb-3 md:mb-0">
+                        <Tag 
+                            value={EventTranslations[event]} 
+                            severity={EventColors[event]}
+                            className="text-lg"
+                        />
+                        <span className="text-xl font-medium">{ModuleTranslations[moduleType]}</span>
+                    </div>
+                    <div className="flex flex-column align-items-end">
+                        <span className="text-lg">{exactTime}</span>
+                        <span className="text-500">({timeAgo})</span>
+                    </div>
+                </div>
+
+                {/* Usuario afectado */}
+                {selectedItem.newData && (
+                    <div className="mt-4">
+                        <div className="flex align-items-center gap-2 mb-3">
+                            <i className="pi pi-user-edit text-xl text-primary"></i>
+                            <h3 className="text-xl font-semibold m-0">Registro afectado - {ModuleTranslations[moduleType]}</h3>
                         </div>
-                        <div className="flex align-items-center gap-2">
-                            <i className="pi pi-tag text-xl"></i>
-                            <span className="font-bold">Módulo:</span>
-                            <span>{ModuleTranslations[moduleType]}</span>
+                        <div className="grid">
+                            <div className="col-12 md:col-6">
+                                <div className="p-3 surface-ground border-round">
+                                    <div className="text-500 mb-2">ID</div>
+                                    <div className="text-900">{selectedItem.newData.id}</div>
+                                </div>
+                            </div>
+                            <div className="col-12 md:col-6">
+                                <div className="p-3 surface-ground border-round">
+                                    <div className="text-500 mb-2">Correo electrónico</div>
+                                    <div className="text-900">{selectedItem.newData.email}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex align-items-center gap-2">
-                            <i className="pi pi-info-circle text-xl"></i>
-                            <span className="font-bold">Evento:</span>
-                            <Tag value={EventTranslations[event]} severity={EventColors[event]} />
+                    </div>
+                )}
+
+                {/* Información del usuario que realizó la acción */}
+                <div className="mt-4">
+                    <div className="flex align-items-center gap-2 mb-3">
+                        <i className="pi pi-user text-xl text-primary"></i>
+                        <h3 className="text-xl font-semibold m-0">Usuario que realizó la acción</h3>
+                    </div>
+                    <div className="grid">
+                        <div className="col-12 md:col-6">
+                            <div className="p-3 surface-ground border-round">
+                                <div className="text-500 mb-2">Nombre</div>
+                                <div className="text-900">{selectedItem.user.name}</div>
+                            </div>
                         </div>
-                        <div className="flex align-items-center gap-2">
-                            <i className="pi pi-comment text-xl"></i>
-                            <span className="font-bold">Descripción:</span>
-                            <span>{selectedItem.description}</span>
+                        <div className="col-12 md:col-6">
+                            <div className="p-3 surface-ground border-round">
+                                <div className="text-500 mb-2">Correo electrónico</div>
+                                <div className="text-900">{selectedItem.user.email}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-12">
-                    {renderDataComparison()}
+
+                {/* Detalles del evento */}
+                <div className="mt-4">
+                    <div className="flex align-items-center gap-2 mb-3">
+                        <i className="pi pi-info-circle text-xl text-primary"></i>
+                        <h3 className="text-xl font-semibold m-0">Detalles del evento</h3>
+                    </div>
+                    <div className="grid">
+                        <div className="col-12">
+                            <div className="p-3 surface-ground border-round">
+                                <div className="text-500 mb-2">Descripción</div>
+                                <div className="text-900">{selectedItem.description}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Comparación de datos */}
+                {renderDataComparison()}
             </div>
         </Dialog>
     );
