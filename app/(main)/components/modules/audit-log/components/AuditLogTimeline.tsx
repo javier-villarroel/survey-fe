@@ -190,7 +190,6 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
                      backgroundColor,
                      borderRadius: '50%',
                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                     transition: 'all 0.2s',
                      cursor: 'pointer',
                      border: '3px solid #ffffff'
                  }}>
@@ -229,7 +228,7 @@ export const AuditLogTimeline: React.FC<AuditLogTimelineProps> = ({
             : moduleColor;
 
         return (
-            <div className="surface-card border-round shadow-1 mb-3 cursor-pointer hover:surface-hover transition-colors transition-duration-150"
+            <div className="surface-card border-round shadow-1 mb-3 cursor-pointer hover:surface-hover"
                  onClick={() => onItemClick(item)}
                  style={{ 
                      borderLeft: `4px solid ${moduleColor}`,
