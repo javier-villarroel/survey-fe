@@ -8,6 +8,7 @@ import { AuditLogTimeline } from './components/AuditLogTimeline';
 import { AuditLogDialog } from './components/AuditLogDialog';
 import { useAuditLog } from './hooks/useAuditLog';
 import { AuditLogItem } from './types';
+import PermissionError from '@/app/(main)/components/common/components/error/PermissionError';
 import './styles.css';
 
 const pageSizeOptions = [
@@ -60,11 +61,7 @@ export const AuditLog: React.FC = () => {
     };
 
     if (error) {
-        return (
-            <div className="flex align-items-center justify-content-center">
-                <div className="text-red-500">{error.message}</div>
-            </div>
-        );
+        return <PermissionError message={error instanceof Error ? error.message : "Error al cargar la bitácora"} />;
     }
 
     return (

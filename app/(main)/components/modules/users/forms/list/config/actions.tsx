@@ -1,27 +1,41 @@
 import { TableAction } from "@/app/(main)/components/common/components/table/types";
 import { IUser } from "../../../services/types";
 import { UserStatus } from "../../../lib/enums";
-import { getCookie } from "typescript-cookie";
 
 interface ActionsConfig {
     onEdit?: (user: IUser) => void;
     onStatusChange?: (user: IUser, newStatus: UserStatus) => void;
     onAccessChange?: (user: IUser) => void;
     onRemove?: (user: IUser) => void;
+    currentUserEmail: string | null;
 }
-
-const currentUserEmail = getCookie('email');
-const isActionDisabled = (user: IUser): boolean => {
-    return user.email ===currentUserEmail;
-};
 
 export const createActions = ({ 
     onEdit, 
     onStatusChange, 
     onAccessChange, 
     onRemove,
- 
+    currentUserEmail
 }: ActionsConfig): TableAction[] => {
+    const isActionDisabled = (user: IUser): boolean => {
+        // Si no hay usuario actual, permitir todas las acciones
+        if (!currentUserEmail) return false;
+        
+        // Si no hay email del usuario de la fila, no debería pasar, pero por seguridad
+        if (!user?.email) return true;
+        
+        // Solo deshabilitar si es el mismo usuario
+        const isSameUser = user.email.toLowerCase() === currentUserEmail.toLowerCase();
+        
+        console.log({
+            rowUserEmail: user.email,
+            currentUserEmail,
+            isSameUser
+        });
+        
+        return isSameUser;
+    };
+
     return [
         {
             label: "Editar",

@@ -1,6 +1,6 @@
 import { IUsersListResponse } from "../services/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getUsersService } from "../services/getUsersService";
 
 interface UserFilters {
@@ -21,33 +21,6 @@ const initialPagination: TableParams = {
     page: 1,
     limit: 5,
     filters: {} as UserFilters
-};
-
-const getCookie = (name: string): string | null => {
-    try {
-        if (typeof document === 'undefined') return null;
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) {
-            const cookieValue = parts.pop()?.split(';').shift();
-            return cookieValue ? decodeURIComponent(cookieValue) : null;
-        }
-        return null;
-    } catch (error) {
-        console.error('Error getting cookie:', error);
-        return null;
-    }
-};
-
-const validateAndFormatEmail = (email: string | null): string | null => {
-    if (!email) return null;
-    try {
-        const trimmedEmail = email.toLowerCase().trim();
-        return trimmedEmail.includes('@') ? trimmedEmail : null;
-    } catch (error) {
-        console.error('Error formatting email:', error);
-        return null;
-    }
 };
 
 const formatFilters = (filters: Record<string, any>) => {
@@ -72,39 +45,9 @@ const formatFilters = (filters: Record<string, any>) => {
 
 export const useUsersTable = () => {
     const [queryParams, setQueryParams] = useState<TableParams>(initialPagination);
-    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
-    // Función para actualizar el email
-    const updateCurrentUserEmail = () => {
-        const email = getCookie('email');
-        const validEmail = validateAndFormatEmail(email);
-        if (validEmail !== currentUserEmail) {
-            setCurrentUserEmail(validEmail);
-        }
-    };
-
-    // Actualizar al montar y cuando el componente reciba foco
-    useEffect(() => {
-        updateCurrentUserEmail();
-
-        // Actualizar cuando la ventana recibe foco
-        const handleFocus = () => {
-            updateCurrentUserEmail();
-        };
-
-        window.addEventListener('focus', handleFocus);
-        
-        // Actualizar periódicamente
-        const interval = setInterval(updateCurrentUserEmail, 30000);
-
-        return () => {
-            window.removeEventListener('focus', handleFocus);
-            clearInterval(interval);
-        };
-    }, []);
-
-    const { data, isLoading, error } = useQuery<IUsersListResponse>({
+    const { data, isLoading: loading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
         queryFn: async () => {
             const formattedFilters = formatFilters(queryParams.filters || {});
@@ -120,7 +63,7 @@ export const useUsersTable = () => {
         refetchOnMount: true,
         refetchOnWindowFocus: true,
         select: (data) => {
-            if (!data || !currentUserEmail) return data;
+            if (!data) return data;
             
             return {
                 ...data,
@@ -168,10 +111,9 @@ export const useUsersTable = () => {
     return {
         data: data?.result || [],
         pagination: transformedPagination,
-        loading: isLoading,
+        loading,
         error,
         handleFilter,
-        refreshData,
-        currentUserEmail
+        refreshData
     };
 }; 

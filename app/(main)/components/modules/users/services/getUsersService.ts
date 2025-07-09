@@ -86,6 +86,7 @@ export const getUsersService = async ({ page, limit, filters }: GetUsersParams):
 
         return data;
     } catch (error) {
+        
         if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.info?.message_to_show || "Error al obtener los usuarios");
         }

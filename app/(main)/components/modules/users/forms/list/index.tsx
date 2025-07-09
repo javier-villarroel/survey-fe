@@ -4,6 +4,8 @@ import { DynamicTable } from "@/app/(main)/components/common/components/table/Dy
 import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
 import { UserFilters } from "../../components/UserFilters";
+import PermissionError from "@/app/(main)/components/common/components/error/PermissionError";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 import { createActions } from "./config/actions";
 import { Paginator } from 'primereact/paginator';
@@ -106,7 +108,9 @@ const ListUsers = () => {
 			status: undefined
 		}
 	});
-	const { data, loading, pagination, handleFilter, refreshData, currentUserEmail } = useUsersTable();
+
+	const { currentUserEmail, isLoading: currentUserLoading } = useCurrentUser();
+	const { data, loading, error, pagination, handleFilter, refreshData } = useUsersTable();
 	const { 
 		changeUserStatus, 
 		toast: statusToast,
@@ -225,6 +229,7 @@ const ListUsers = () => {
 		onStatusChange: handleStatusChange,
 		onAccessChange: handleAccessChange,
 		onRemove: handleRemove,
+		currentUserEmail
 	});
 
 	const headerContent = (
@@ -236,17 +241,12 @@ const ListUsers = () => {
 		</div>
 	);
 
-	if (loading) {
-		return (
-			<>
-				<div className="relative w-full mb-4">
-					<h2 className="text-2xl font-bold">Gestión de usuarios</h2>
-				</div>
-				<Card className="w-full shadow-2">
-					<LoadingSkeleton />
-				</Card>
-			</>
-		);
+	if (error) {
+		return <PermissionError message={error instanceof Error ? error.message : "Error al cargar los usuarios"} />;
+	}
+
+	if (loading || currentUserLoading) {
+		return <LoadingSkeleton />;
 	}
 
 	return (
