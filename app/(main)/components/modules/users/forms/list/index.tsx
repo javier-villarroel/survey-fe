@@ -84,13 +84,27 @@ const LoadingSkeleton = () => {
 	);
 };
 
+interface UserFilters {
+	firstName?: string;
+	lastName?: string;
+	email?: string;
+	'role.name'?: string;
+	status?: string;
+}
+
 const ListUsers = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 	const [queryParams, setQueryParams] = useState<TableParams>({ 
 		page: 1, 
 		limit: 5, 
-		filters: {} 
+		filters: {
+			firstName: undefined,
+			lastName: undefined,
+			email: undefined,
+			'role.name': undefined,
+			status: undefined
+		}
 	});
 	const { data, loading, pagination, handleFilter, refreshData, currentUserEmail } = useUsersTable();
 	const { 
@@ -316,14 +330,24 @@ const ListUsers = () => {
 
 			<UserStatusConfirmDialog
 				show={showStatusConfirmDialog}
-				onConfirm={handleStatusConfirm}
+				onConfirm={async () => {
+					const result = await handleStatusConfirm();
+					if (result !== null) {
+						refreshData();
+					}
+				}}
 				onReject={handleStatusReject}
 				pendingAction={pendingStatusAction}
 			/>
 
 			<UserAccessConfirmDialog
 				show={showAccessConfirmDialog}
-				onConfirm={handleAccessConfirm}
+				onConfirm={async () => {
+					const result = await handleAccessConfirm();
+					if (result) {
+						refreshData();
+					}
+				}}
 				onReject={handleAccessReject}
 				pendingAction={pendingAccessAction}
 			/>

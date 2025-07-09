@@ -3,16 +3,24 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { getUsersService } from "../services/getUsersService";
 
+interface UserFilters {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    'role.name'?: string;
+    status?: string;
+}
+
 export interface TableParams {
     page: number;
     limit: number;
-    filters?: Record<string, any>;
+    filters: UserFilters;
 }
 
 const initialPagination: TableParams = {
     page: 1,
     limit: 5,
-    filters: {}
+    filters: {} as UserFilters
 };
 
 const getCookie = (name: string): string | null => {
