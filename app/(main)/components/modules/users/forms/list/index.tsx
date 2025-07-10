@@ -5,9 +5,7 @@ import { DataTableStateEvent } from 'primereact/datatable';
 import { useUsersTable } from "../../hooks/useUsersTable";
 import { UserFilters } from "../../components/UserFilters";
 import PermissionError from "@/app/(main)/components/common/components/error/PermissionError";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
-
-import { createActions } from "./config/actions";
+import { createActions } from "./actions";
 import { Paginator } from 'primereact/paginator';
 import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
@@ -29,6 +27,7 @@ import { useChangeUserStatus } from "../../hooks/changeStatus/useChangeUserStatu
 import { useAddUserAccess } from "../../hooks/changeStatus/useAddUserAccess";
 import { useRemoveUser } from "../../hooks/changeStatus/useRemoveUser";
 import AccessDeniedPage from "@/app/(full-page)/auth/access/page";
+import { getCookie } from "typescript-cookie";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -110,7 +109,6 @@ const ListUsers = () => {
 		}
 	});
 
-	const { currentUserEmail, isLoading: currentUserLoading } = useCurrentUser();
 	const { data, loading, error, pagination, handleFilter, refreshData } = useUsersTable();
 	const { 
 		changeUserStatus, 
@@ -131,20 +129,60 @@ const ListUsers = () => {
 	const { removeUser, toast: removeToast } = useRemoveUser();
 
 	const handleEdit = (user: IUser) => {
+		const currentUserEmail = getCookie('email');
+		if (currentUserEmail === user.email) {
+			statusToast.current?.show({
+				severity: 'error',
+				summary: 'Error',
+				detail: 'No puedes editar tu propio usuario por esta vía.',
+				life: 3000
+			});
+			return;
+		}
 		setSelectedUser(user);
 		setShowModal(true);
 	};
 
 	const handleStatusChange = (user: IUser, newStatus: UserStatus) => {
+		const currentUserEmail = getCookie('email');
+		if (currentUserEmail === user.email) {
+			statusToast.current?.show({
+				severity: 'error',
+				summary: 'Error',
+				detail: 'No puedes cambiar el estado de tu propio usuario.',
+				life: 3000
+			});
+			return;
+		}
 		const userId = typeof user.id === 'number' ? user.id : parseInt(user.id);
 		changeUserStatus(userId, newStatus);
 	};
 
 	const handleAccessChange = (user: IUser) => {
+		const currentUserEmail = getCookie('email');
+		if (currentUserEmail === user.email) {
+			accessToast.current?.show({
+				severity: 'error',
+				summary: 'Error',
+				detail: 'No puedes cambiar el acceso de tu propio usuario.',
+				life: 3000
+			});
+			return;
+		}
 		toggleUserAccess(user);
 	};
 
 	const handleRemove = (user: IUser) => {
+		const currentUserEmail = getCookie('email');
+		if (currentUserEmail === user.email) {
+			removeToast.current?.show({
+				severity: 'error',
+				summary: 'Error',
+				detail: 'No puedes eliminar tu propio usuario.',
+				life: 3000
+			});
+			return;
+		}
 		confirmDialog({
 			message: '¿Está seguro que desea eliminar este usuario?',
 			header: 'Confirmar Eliminación',
@@ -229,8 +267,7 @@ const ListUsers = () => {
 		onEdit: handleEdit,
 		onStatusChange: handleStatusChange,
 		onAccessChange: handleAccessChange,
-		onRemove: handleRemove,
-		currentUserEmail
+		onRemove: handleRemove
 	});
 
 	const headerContent = (
@@ -248,7 +285,7 @@ const ListUsers = () => {
 
 	}
 
-	if (loading || currentUserLoading) {
+	if (loading) {
 		return <LoadingSkeleton />;
 	}
 
@@ -314,7 +351,7 @@ const ListUsers = () => {
 				onHide={handleCancel}
 				header={headerContent}
 				modal
-				className="p-fluid w-full md:w-8 lg:w-6"
+				className="p-fluid w-full md:w-3 lg:w-3"
 				contentClassName="p-0"
 			>
 				{selectedUser ? (

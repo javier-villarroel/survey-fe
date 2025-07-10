@@ -154,31 +154,33 @@ export const AuditLogHeader: React.FC<AuditLogHeaderProps> = ({
                                 <label htmlFor="dateRange" className="font-medium">
                                     Rango de Fechas
                                 </label>
-                                <div className="flex gap-2">
-                                    <Calendar
-                                        id="startDate"
-                                        value={startDate}
-                                        onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
-                                        showIcon
-                                        placeholder="Fecha inicial"
-                                        className="w-full"
-                                        maxDate={endDate || undefined}
-                                        dateFormat="dd/mm/yy"
-                                        locale="es"
-                                        style={{ minWidth: '200px' }}
-                                    />
-                                    <Calendar
-                                        id="endDate"
-                                        value={endDate}
-                                        onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
-                                        showIcon
-                                        placeholder="Fecha final"
-                                        className="w-full"
-                                        minDate={startDate || undefined}
-                                        dateFormat="dd/mm/yy"
-                                        locale="es"
-                                        style={{ minWidth: '200px' }}
-                                    />
+                                <div className="grid p-0 m-0">
+                                    <div className="col-12 sm:col-6 p-0 sm:pr-1">
+                                        <Calendar
+                                            id="startDate"
+                                            value={startDate}
+                                            onChange={(e) => onDateRangeChange(e.value as Date | null, endDate)}
+                                            showIcon
+                                            placeholder="Inicial"
+                                            className="w-full"
+                                            maxDate={endDate || undefined}
+                                            dateFormat="dd/mm/yy"
+                                            locale="es"
+                                        />
+                                    </div>
+                                    <div className="col-12 sm:col-6 p-0 sm:pl-1">
+                                        <Calendar
+                                            id="endDate"
+                                            value={endDate}
+                                            onChange={(e) => onDateRangeChange(startDate, e.value as Date | null)}
+                                            showIcon
+                                            placeholder="Final"
+                                            className="w-full"
+                                            minDate={startDate || undefined}
+                                            dateFormat="dd/mm/yy"
+                                            locale="es"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
