@@ -28,6 +28,7 @@ import { TableParams } from "../../hooks/useUsersTable";
 import { useChangeUserStatus } from "../../hooks/changeStatus/useChangeUserStatus";
 import { useAddUserAccess } from "../../hooks/changeStatus/useAddUserAccess";
 import { useRemoveUser } from "../../hooks/changeStatus/useRemoveUser";
+import AccessDeniedPage from "@/app/(full-page)/auth/access/page";
 
 const pageSizeOptions = [
 	{ label: '5 por página', value: 5 },
@@ -242,7 +243,9 @@ const ListUsers = () => {
 	);
 
 	if (error) {
-		return <PermissionError message={error instanceof Error ? error.message : "Error al cargar los usuarios"} />;
+		return <AccessDeniedPage  />;
+		// return <PermissionError message={error instanceof Error ? error.message : "Error al cargar los usuarios"} />;
+
 	}
 
 	if (loading || currentUserLoading) {

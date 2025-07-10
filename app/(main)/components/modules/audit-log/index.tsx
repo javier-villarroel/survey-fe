@@ -10,6 +10,7 @@ import { useAuditLog } from './hooks/useAuditLog';
 import { AuditLogItem } from './types';
 import PermissionError from '@/app/(main)/components/common/components/error/PermissionError';
 import './styles.css';
+import AccessDeniedPage from '@/app/(full-page)/auth/access/page';
 
 const pageSizeOptions = [
     { label: '5 por página', value: 5 },
@@ -57,11 +58,13 @@ export const AuditLog: React.FC = () => {
 
     const handleItemClick = (item: AuditLogItem) => {
         setSelectedItem(item);
-        setDialogVisible(true);
+        setDialogVisible(true); 
     };
 
     if (error) {
-        return <PermissionError message={error instanceof Error ? error.message : "Error al cargar la bitácora"} />;
+        return <AccessDeniedPage />;
+        // return <PermissionError message={error instanceof Error ? error.message : "Error al cargar la bitácora"} />;
+
     }
 
     return (
