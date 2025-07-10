@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import apiWithAuth from "@/app/api/axios";
-import { IUser, IUpdateUserRequest, IUserResponse } from "./types";
+import { IUser, IUpdateUserRequest } from "./types";
 import { USER_API_BASE } from "./constants";
 
 export const updateUserService = async (
@@ -9,7 +9,7 @@ export const updateUserService = async (
   userData: IUpdateUserRequest
 ): Promise<IUser | null> => {
   try {
-    const { data } = await apiWithAuth.patch<IUserResponse>(`${USER_API_BASE}/${id}`, userData);
+    const { data } = await apiWithAuth.patch<any>(`${USER_API_BASE}/${id}`, userData);
     toast.success(data.info.message_to_show || "Usuario actualizado exitosamente");
     return data.result;
   } catch (error) {

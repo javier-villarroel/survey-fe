@@ -1,7 +1,8 @@
+import { UserStatus } from "../lib/enums";
+
 export interface IUser {
-  id: number;
-  userName: string;
-  name: string;
+  id: string | number;
+  firstName: string;
   lastName: string;
   email: string;
   phone?: string;
@@ -10,9 +11,11 @@ export interface IUser {
     name: string;
     roleProcess: any[];
   };
-  status: boolean;
+  status: UserStatus;
   createdAt: string;
   updatedAt: string;
+  isAdmin: boolean;
+  action?: "ASSIGN" | "UNASSIGN";
 }
 
 export interface IPagination {
@@ -42,23 +45,33 @@ export interface IApiResponse<T> {
   result: T;
 }
 
+export interface IUserResponse {
+  result: IUser;
+}
+
 export interface ICreateUserRequest {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phonePrefix: string;
+  phoneNumber: string;
+  phone?: string;
+  status?: string;
 }
 
 export interface IUpdateUserRequest {
-  name?: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
-  phone?: string | number;
+  phone?: string;
   roleId?: number;
   status?: boolean;
   password?: string;
 }
 
+export interface IChangeUserStatusRequest {
+  status: UserStatus;
+}
+
 // Tipos específicos para las respuestas de usuarios
-export type IUserResponse = IApiResponse<IUser>;
 export type IUsersListResponse = IApiResponse<IUser[]>; 

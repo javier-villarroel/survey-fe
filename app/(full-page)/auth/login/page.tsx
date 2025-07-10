@@ -55,7 +55,7 @@ const LoginPage = () => {
         setCode(value);
         setHasError(false);
         
-        if (value.length === 4) {
+        if (value.length === 6) {
             try {
                 const otpResult = await handleOTPComplete(value, twoFacData.passToken);
                 if (otpResult) {
@@ -133,7 +133,7 @@ const LoginPage = () => {
                             height: '8px',
                             borderTopLeftRadius: '56px',
                             borderTopRightRadius: '56px',
-                            background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                            background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                             zIndex: 2
                         }}
                     />
@@ -334,7 +334,7 @@ const LoginPage = () => {
                     <ReactCodeInput
                         name="otp"
                         type="text"
-                        fields={4}
+                        fields={6}
                         value={code}
                         onChange={handleTokenChange}
                         inputMode="numeric"

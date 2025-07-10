@@ -1,75 +1,119 @@
-import { TablePaginationParams } from "@/app/(main)/components/common/components/table/types";
-import { DataTableStateEvent } from "primereact/datatable";
 import { IUsersListResponse } from "../services/types";
-import { useQuery } from "@tanstack/react-query";
-import { useUsers } from "./useUsers";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { getUsersService } from "../services/getUsersService";
 
-interface TableParams extends TablePaginationParams {
-    filters?: Record<string, any>;
-    search?: string;
+interface UserFilters {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    'role.name'?: string;
+    status?: string;
 }
 
-const initialPagination: TablePaginationParams = {
+export interface TableParams {
+    page: number;
+    limit: number;
+    filters: UserFilters;
+}
+
+const initialPagination: TableParams = {
     page: 1,
-    limit: 10
+    limit: 5,
+    filters: {} as UserFilters
+};
+
+const formatFilters = (filters: Record<string, any>) => {
+    const formattedFilters: Record<string, any> = {};
+    
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value && value !== '') {
+            if (key === 'role.name') {
+                if (value === 'NO_ROLE') {
+                    formattedFilters['role'] = null;
+                } else {
+                    formattedFilters['role.name'] = value;
+                }
+            } else {
+                formattedFilters[key] = value;
+            }
+        }
+    });
+
+    return formattedFilters;
 };
 
 export const useUsersTable = () => {
-    const [queryParams, setQueryParams] = useState<TableParams>({ 
-        ...initialPagination,
-        search: "",
-        filters: {}
-    });
-    const { getUsers } = useUsers();
+    const [queryParams, setQueryParams] = useState<TableParams>(initialPagination);
+    const queryClient = useQueryClient();
 
-    const { data, isLoading, error } = useQuery<IUsersListResponse>({
+    const { data, isLoading: loading, error } = useQuery<IUsersListResponse>({
         queryKey: ["users", queryParams],
-        queryFn: () => getUsers({
-            page: queryParams.page,
-            limit: queryParams.limit,
-            search: queryParams.search
-        }),
-        staleTime: 0, // Siempre considerar los datos como obsoletos
-        refetchOnMount: true, // Refetch al montar el componente
-        refetchOnWindowFocus: true // Refetch cuando la ventana recupera el foco
+        queryFn: async () => {
+            const formattedFilters = formatFilters(queryParams.filters || {});
+            const response = await getUsersService({
+                page: queryParams.page,
+                limit: queryParams.limit,
+                filters: formattedFilters
+            });
+
+            return response;
+        },
+        staleTime: 0,
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+        select: (data) => {
+            if (!data) return data;
+            
+            return {
+                ...data,
+                pagination: {
+                    ...data.pagination,
+                    totalDocs: data.pagination.count,
+                    totalPages: data.pagination.totalPages,
+                    perPage: data.pagination.limit,
+                    page: data.pagination.page,
+                    hasNextPage: data.pagination.hasNextPage,
+                    hasPrevPage: data.pagination.hasPrevPage
+                }
+            };
+        }
     });
 
-    const onTableChange = (event: DataTableStateEvent) => {
-        setQueryParams(prev => ({
-            ...prev,
-            page: (event.page ?? 0) + 1,
-            limit: event.rows ?? prev.limit
-        }));
+    const refreshData = () => {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
     };
 
-    const handleFilter = (params: TablePaginationParams) => {
-        setQueryParams(prev => ({
-            ...prev,
-            page: params.page,
-            limit: params.limit,
-            search: params.search,
-            filters: params.filters
-        }));
+    const handleFilter = (params: TableParams) => {
+        setQueryParams(params);
     };
 
-    // Transformamos la paginación para que coincida con lo que espera PrimeReact
     const transformedPagination = data?.pagination ? {
-        currentPage: data.pagination.page - 1, // PrimeReact espera páginas basadas en 0
-        totalPages: Math.ceil(data.pagination.count / data.pagination.perPage), // Calculamos el total de páginas basado en el total de registros
+        currentPage: data.pagination.page,
+        totalPages: data.pagination.totalPages,
         totalDocs: data.pagination.count,
-        rowsPerPage: data.pagination.perPage,
-        first: (data.pagination.page - 1) * data.pagination.perPage,
+        rowsPerPage: data.pagination.limit,
+        first: (data.pagination.page - 1) * data.pagination.limit,
         hasNextPage: data.pagination.hasNextPage,
-        hasPrevPage: data.pagination.hasPrevPage
-    } : undefined;
+        hasPrevPage: data.pagination.hasPrevPage,
+        page: data.pagination.page
+    } : {
+        currentPage: 1,
+        totalPages: 1,
+        totalDocs: 0,
+        rowsPerPage: initialPagination.limit,
+        first: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        page: 1
+    };
 
     return {
         data: data?.result || [],
         pagination: transformedPagination,
-        loading: isLoading,
+        loading,
         error,
-        onTableChange,
-        handleFilter
+        handleFilter,
+        refreshData
     };
 }; 

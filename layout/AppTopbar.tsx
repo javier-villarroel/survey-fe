@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { classNames } from "primereact/utils";
 import React, {
 	forwardRef,
 	useContext,
@@ -38,13 +37,13 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
 	};
 
 	const userItems = [
-		// {
-		// 	label: "Ver perfil",
-		// 	icon: "pi pi-user",
-		// 	command: () => {
-		// 		router.push("/perfil");
-		// 	},
-		// },
+		{
+			label: "Ver perfil",
+			icon: "pi pi-user",
+			command: () => {
+				router.push("/perfil");
+			},
+		},
 		{
 			label: "Cerrar sesión",
 			icon: "pi pi-power-off",
@@ -78,7 +77,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
 
 	return (
 		<div className="layout-topbar" style={{
-			backgroundColor: layoutConfig.colorScheme !== "dark" ? "#2dabd2" : "",
+			backgroundColor: layoutConfig.colorScheme !== "dark" ? "#000e28" : "",
 			display: 'flex',
 			justifyContent: 'space-between',
 			alignItems: 'center',

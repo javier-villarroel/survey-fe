@@ -20,10 +20,10 @@ export const menuModel: any[] = [
 			},
 		],
 	},
-	// {
-	// 	label: "",
-	// 	items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
-	// },
+	{
+		label: "",
+		items: [{ label: "Usuarios", icon: "pi pi-users", to: "/usuarios" }],
+	},
 	// {
 	// 	label: "",
 	// 	items: [{ label: "Proyectos", icon: "pi pi-briefcase", to: "/proyectos" }],
@@ -36,7 +36,7 @@ export const menuModel: any[] = [
 				icon: "pi pi-fw pi-cog",
 				items: [
 					{
-						label: "Bitacora",
+						label: "Bitácora",
 						icon: "pi pi-fw pi-calendar",		
 						to: "/bitacora" 		
 					},
@@ -65,11 +65,11 @@ const AppMenu = () => {
                     </ul>
                     <div className="w-full flex justify-center py-4 mt-auto border-t border-gray-200">
                         <span
-							style={{ marginLeft: '-100%', backgroundColor: '#2dabd2', borderRadius: '9999px' }}
+							style={{ marginLeft: '-100%', backgroundColor: '#000e28', borderRadius: '9999px' }}
                             className=" text-white text-sm font-bold px-6 py-2  shadow-sm cursor-pointer transition-colors"
                             onClick={() => router.push('/versiones')}
                         >
-                            Versión 0.1.0
+                            Versión 0.1.4
                         </span>
                     </div>
                 </div>

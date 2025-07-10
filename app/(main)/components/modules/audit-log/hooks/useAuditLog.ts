@@ -79,10 +79,14 @@ export const useAuditLog = (): UseAuditLogReturn => {
                 };
             }
             if (startDate) {
-                filters.startDate = startDate.toISOString();
+                const startOfDay = new Date(startDate);
+                startOfDay.setHours(0, 0, 0, 0);
+                filters.startDate = startOfDay.toISOString();
             }
             if (endDate) {
-                filters.endDate = endDate.toISOString();
+                const endOfDay = new Date(endDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                filters.endDate = endOfDay.toISOString();
             }
 
             const response = await auditLogService.getAuditLogs(

@@ -328,8 +328,8 @@ export const StimuliManager: React.FC<StimuliManagerProps> = ({ stimuli, setStim
                             label="Agregar Estímulo"
                             onClick={() => setShowStimulusModal(true)}
                             style={{
-                                backgroundColor: '#2dabd2',
-                                borderColor: '#2dabd2'
+                                backgroundColor: '#000e28',
+                                borderColor: '#000e28'
                             }}
                         />
                     </div>

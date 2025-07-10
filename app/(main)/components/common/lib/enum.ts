@@ -1,7 +1,7 @@
 export enum ModuleEnum {
 	DASHBOARD = "DASHBOARD",
 	QUESTIONS = "QUESTIONS",
-	USER = "USER",
+	USER = "user",
 	ROLE = "ROLE",
 	AUTH = "AUTH",
 	STATUS = "STATUS",

@@ -80,20 +80,20 @@
 
             &.active-route {
                 font-weight: 700;
-                color: #2dabd2;
+                color: #000e28;
                 background-color: rgba(45, 171, 210, 0.1);
 
                 .layout-menuitem-icon {
-                    color: #2dabd2;
+                    color: #000e28;
                 }
             }
 
             &:hover {
                 background-color: var(--surface-hover);
-                color: #2dabd2;
+                color: #000e28;
 
                 .layout-menuitem-icon {
-                    color: #2dabd2;
+                    color: #000e28;
                 }
             }
 

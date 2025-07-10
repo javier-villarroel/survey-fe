@@ -44,15 +44,43 @@ const VersionsPage = () => {
         //     type: "feature"
         // },
         {
+            version: "0.1.4",
+            date: "10-07-2025",
+            title: "Módulo de Perfil de Usuario",
+            description: "Implementación del módulo de perfil de usuario, permitiendo a los usuarios ver y editar su información personal.",
+            type: "feature"
+        },
+        {
+            version: "0.1.3",
+            date: "09-07-2025",
+            title: "Módulo de Gestión de usuarios",
+            description: "Implementación del módulo de gestión de usuarios con funcionalidades CRUD, incluyendo creación, edición y eliminación de usuarios.",
+            type: "feature"
+        },
+        {
+            version: "0.1.2",
+            date: "03-07-2025",
+            title: "Módulo de recuperación de contraseña",
+            description: "Sistema de recuperación de contraseña implementado, permitiendo a los usuarios restablecer su contraseña mediante un enlace enviado a su correo electrónico.",
+            type: "feature"
+        },
+        {
+            version: "0.1.1",
+            date: "20-06-2025",
+            title: "Módulo de inicio de sesión",
+            description: "Otps implementados podrán bloquear al usuario si tiene un intento fallido, como también será de seis dígitos. Se agregó rango de fechas en la bitacora.",
+            type: "feature"
+        },
+        {
             version: "0.1.0",
-            date: "2025-06-20",
-            title: "Modulo de inicio de sesión",
+            date: "20-06-2025",
+            title: "Módulo de inicio de sesión",
             description: "Implementación del módulo de inicio de sesión con autenticación básica y validación de usuarios.",
             type: "feature"
         },
         {
             version: "0.0.0",
-            date: "2025-06-16",
+            date: "16-06-2025",
             title: "Lanzamiento Inicial",
             description: "Primera versión estable del sistema con funcionalidades básicas.",
             type: "feature"

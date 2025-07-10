@@ -1,0 +1,57 @@
+import { useState, useRef } from "react";
+import { Toast } from "primereact/toast";
+import { UserStatus } from "../../lib/enums";
+import { changeUserStatusService } from "../../services/changeUserStatusService";
+
+
+export const useRemoveUser = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const toast = useRef<Toast>(null);
+
+    const removeUser = async (userId: number) => {
+        try {
+            setIsLoading(true);
+            const result = await changeUserStatusService(userId, UserStatus.DELETED);
+            toast.current?.show({
+                severity: "success",
+                summary: "Usuario Eliminado",
+                detail: "El usuario ha sido eliminado exitosamente",
+                life: 3000,
+                style: {
+                    background: '#1b4e2f',
+                    color: '#ffffff'
+                },
+                contentStyle: {
+                    background: '#1b4e2f',
+                    color: '#ffffff'
+                }
+            });
+
+            return result;
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: error instanceof Error ? error.message : "Error al eliminar el usuario",
+                life: 3000,
+                style: {
+                    background: '#991b1b',
+                    color: '#ffffff'
+                },
+                contentStyle: {
+                    background: '#991b1b',
+                    color: '#ffffff'
+                }
+            });
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return {
+        removeUser,
+        isLoading,
+        toast,
+    };
+}; 

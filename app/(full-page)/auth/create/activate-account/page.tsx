@@ -7,6 +7,7 @@ import { classNames } from 'primereact/utils';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import type { ToastMessage } from 'primereact/toast';
 import { noAuthApi } from '@/app/api/axios';
 
 const ActivateAccountContent = () => {
@@ -45,7 +46,7 @@ const ActivateAccountContent = () => {
         }
 
         // Validar requisitos de contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
         if (!passwordRegex.test(password)) {
             toast.current?.show({
                 severity: 'error',
@@ -101,6 +102,7 @@ const ActivateAccountContent = () => {
                 <li>Al menos una letra minúscula</li>
                 <li>Al menos una letra mayúscula</li>
                 <li>Al menos un número</li>
+                <li>Al menos un carácter especial (!@#$%^&*)</li>
                 <li>Mínimo 8 caracteres</li>
             </ul>
         </div>
@@ -147,7 +149,7 @@ const ActivateAccountContent = () => {
                                 height: '8px',
                                 borderTopLeftRadius: '56px',
                                 borderTopRightRadius: '56px',
-                                background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                                background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                                 zIndex: 2
                             }}
                         />
@@ -214,8 +216,23 @@ const ActivateAccountContent = () => {
             }}
         >
             <Toast ref={toast} pt={{
-                content: { style: { background: '#f44336', color: '#fff' } },
-                closeButton: { style: { color: '#fff' } }
+                message: {
+                    style: ({ severity }: { severity: ToastMessage['severity'] }) => ({
+                        background: severity === 'success' ? '#1b4e2f' : '#8B0000',
+                        color: '#ffffff'
+                    })
+                },
+                content: {
+                    style: ({ severity }: { severity: ToastMessage['severity'] }) => ({
+                        background: severity === 'success' ? '#1b4e2f' : '#8B0000',
+                        color: '#ffffff'
+                    })
+                },
+                closeButton: { 
+                    style: { 
+                        color: '#ffffff' 
+                    } 
+                }
             }} />
             <div className="flex flex-column align-items-center justify-content-center" style={{ marginLeft: '5vw' }}>
                 <div
@@ -239,7 +256,7 @@ const ActivateAccountContent = () => {
                             height: '8px',
                             borderTopLeftRadius: '56px',
                             borderTopRightRadius: '56px',
-                            background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                            background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                             zIndex: 2
                         }}
                     />
@@ -319,6 +336,21 @@ const ActivateAccountContent = () => {
                                                 }
                                             }
                                         },
+                                        panel: {
+                                            className: 'bg-gray-900',
+                                            style: {
+                                                background: '#2b2d4d'
+                                            }
+                                        },
+                                        meter: {
+                                            className: 'mb-2'
+                                        },
+                                        meterLabel: {
+                                            className: "pl-2",
+                                            style: {
+                                                color: '#fff'
+                                            }
+                                        },
                                         hideIcon: {
                                             style: {
                                                 color: '#fff',
@@ -342,6 +374,9 @@ const ActivateAccountContent = () => {
                                             }
                                         }
                                     }}
+                                    weakLabel="Débil"
+                                    mediumLabel="Media"
+                                    strongLabel="Fuerte"
                                 />
                             </div>
 

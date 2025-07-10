@@ -74,7 +74,6 @@ export const recoverPasswordService = async (email: IFormRecoverPassword): Promi
 export const verifyOTPService = async (verifyData: IVerifyOTPRequest): Promise<ServiceResponse<{ valid: boolean }>> => {
 	
 	try {
-		console.log('verificando');
 		const { data } = await noAuthApi.post<BaseResponse<{ valid: boolean }>>(
 			"/otp/confirmation",
 			{ "event": "OTP_RESET_PASSWORD",...verifyData}
@@ -114,7 +113,7 @@ export const verifySignInOTPService = async (verifyData: IVerifySignInOTPRequest
 
 export const resetPasswordService = async (resetData: IResetPasswordRequest): Promise<ServiceResponse<{ success: boolean }>> => {
 	try {
-		const { data } = await noAuthApi.post<BaseResponse<{ success: boolean }>>(
+		const { data } = await noAuthApi.patch<BaseResponse<{ success: boolean }>>(
 			"/auth/update_password",
 			resetData
 		);

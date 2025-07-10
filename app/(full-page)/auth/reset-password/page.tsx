@@ -10,11 +10,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { resetPasswordService } from '../services/Auth/auth.services';
 import type { Password as PasswordType } from 'primereact/password';
 
-// Dynamically import Password component with suspense
-const Password = dynamic<React.ComponentProps<typeof PasswordType>>(() => import('primereact/password').then(mod => {
-    const { Password } = mod;
-    return Password;
-}), {
+// Dynamically import Password component
+const Password = dynamic(() => import('primereact/password').then(mod => mod.Password), {
     ssr: false,
     loading: () => <div className="animate-pulse bg-gray-200 h-12 w-full rounded"></div>
 });
@@ -39,6 +36,7 @@ const ResetPasswordForm = () => {
                 <li>Al menos una letra minúscula</li>
                 <li>Al menos una letra mayúscula</li>
                 <li>Al menos un número</li>
+                <li>Al menos un carácter especial (!@#$%^&*)</li>
                 <li>Mínimo 8 caracteres</li>
             </ul>
         </div>
@@ -68,12 +66,12 @@ const ResetPasswordForm = () => {
         }
 
         // Validar requisitos de contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
         if (!passwordRegex.test(password)) {
             toast.current?.show({ 
                 severity: 'error', 
                 summary: 'Error', 
-                detail: 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y tener mínimo 8 caracteres',
+                detail: 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número, un carácter especial y tener mínimo 8 caracteres',
                 style: { background: '#dc3545', color: '#fff' },
                 contentStyle: { background: '#dc3545', color: '#fff' }
             });
@@ -181,7 +179,7 @@ const ResetPasswordForm = () => {
                         height: '8px',
                         borderTopLeftRadius: '56px',
                         borderTopRightRadius: '56px',
-                        background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                        background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                         zIndex: 2
                     }} />
                     <div className="w-full py-8 px-5 sm:px-8" style={{

@@ -43,7 +43,7 @@ export default function NotFound() {
                             height: '8px',
                             borderTopLeftRadius: '56px',
                             borderTopRightRadius: '56px',
-                            background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                            background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                             zIndex: 2
                         }}
                     />
@@ -78,7 +78,7 @@ export default function NotFound() {
                                 icon="pi pi-home"
                                 onClick={() => router.push('/')}
                                 style={{
-                                    background: 'linear-gradient(90deg, #2dabd2, #93d704)',
+                                    background: 'linear-gradient(90deg, #000e28, #93d704)',
                                     border: 'none',
                                     padding: '1rem 2rem'
                                 }}

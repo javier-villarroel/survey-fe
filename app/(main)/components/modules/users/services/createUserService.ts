@@ -1,10 +1,18 @@
 import { AxiosError } from "axios";
 import { IUser, ICreateUserRequest, IUserResponse } from "./types";
-import { noAuthApi } from "@/app/api/axios";
+import apiWithAuth from "@/app/api/axios";
+import { USER_API_BASE } from "./constants";
 
 export const createUserService = async (userData: ICreateUserRequest): Promise<IUser | null> => {
   try {
-    const { data } = await noAuthApi.post<IUserResponse>("/user", userData);
+    const { phonePrefix, phoneNumber, ...rest } = userData;
+    const phone = phonePrefix && phoneNumber ? `${phonePrefix}${phoneNumber}` : undefined;
+
+    const { data } = await apiWithAuth.post<IUserResponse>(`${USER_API_BASE}`, {
+      ...rest,
+      phone
+    });
+    
     return data.result;
   } catch (error) {
     if (error instanceof AxiosError) {

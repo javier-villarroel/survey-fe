@@ -1,27 +1,25 @@
 import { z } from "zod";
 
 export const createUserSchema = z.object({
-  id: z.number().optional(),
-  pidType: z.string().optional(),
-  pid: z.string().optional(),
+  firstName: z.string({ message: "Requerido" })
+    .nonempty({ message: "Requerido" })
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜàèìòùÀÈÌÒÙ\s\-]*$/, { message: "Este campo solo admite caracteres alfabéticos" }),
   lastName: z.string({ message: "Requerido" })
     .nonempty({ message: "Requerido" })
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜàèìòùÀÈÌÒÙ\s\-]*$/, { message: "Este campo solo admite caracteres alfabéticos" }),
-  firstName: z.string({ message: "Requerido" })
-    .nonempty({ message: "Requerido" })
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜàèìòùÀÈÌÒÙ\s\-]*$/, { message: "Este campo solo admite caracteres alfabéticos" })
-    .refine(value => value.trim() === '' || /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜàèìòùÀÈÌÒÙ\s\-]+$/.test(value), {
-      message: "Este campo solo admite caracteres alfabéticos",
-    }),
-  status: z.string({ message: "Requerido" }).nonempty({ message: "Requerido" }),
   email: z.string({ message: "Requerido" })
     .nonempty({ message: "Requerido" })
     .email({ message: "Debe ser un correo electrónico válido" }),
-  phoneCode: z.string({ message: "Requerido" })
-    .nonempty({ message: "Requerido" }),
+  phonePrefix: z.string({ message: "Requerido" })
+    .nonempty({ message: "El prefijo es requerido" }),
   phoneNumber: z.string({ message: "Requerido" })
-    .nonempty({ message: "Requerido" })
-    .length(7, { message: "El número de teléfono debe de tener 7 dígitos" }),
+    .nonempty({ message: "El número es requerido" })
+    .length(7, { message: "El número debe tener 7 dígitos" })
+    .regex(/^\d+$/, { message: "Solo se permiten números" }),
+  status: z.string().optional(),
+  id: z.number().optional(),
+  pidType: z.string().optional(),
+  pid: z.string().optional()
 });
 
 export type IFormCreateUser = z.infer<typeof createUserSchema>;

@@ -7,6 +7,13 @@ export enum AUTH_CODES {
 	RTE001 = "RTE001", // refresh token expired
 }
 
+export enum OTP_EVENT_TYPE {
+    LOGIN = "LOGIN",
+    REGISTER = "REGISTER",
+    RESET_PASSWORD = "RESET_PASSWORD",
+    VERIFY_EMAIL = "VERIFY_EMAIL"
+}
+
 export type IRecovery = {
 	email: string;
 };

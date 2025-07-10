@@ -34,7 +34,7 @@ export const useForgotPassword = (): UseForgotPasswordReturn => {
 
     const handleTokenChange = (value: string) => {
         setToken(value);
-        if (value.length === 4) {
+        if (value.length === 6) {
             handleOTPComplete(value).then(success => {
                 if (success) {
                     setShowModal(false);

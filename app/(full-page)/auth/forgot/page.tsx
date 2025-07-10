@@ -12,55 +12,57 @@ import { Toast } from 'primereact/toast';
 import '@/app/styles/toast.scss';
 
 const Forgot = () => {
-    const { onSubmit, handleOTPComplete, passToken,  userId } = useOnSubmit();
+    const { onSubmit, handleOTPComplete, passToken, userId } = useOnSubmit();
     const [showModal, setShowModal] = React.useState(false);
     const { layoutConfig } = useContext(LayoutContext);
     const toast = useRef<Toast>(null);
     const [email, setEmail] = React.useState('');
     const [token, setToken] = React.useState('');
     const [hasError, setHasError] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
     const router = useRouter();
 
     const containerClassName = classNames('surface-ground min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
     const handleEmailSubmit = async () => {
         if (!email) {
-            toast.current?.show({ 
-                severity: 'error', 
-                summary: 'Error', 
-                detail: 'Por favor, ingrese su correo electrónico', 
-                life: 3000 
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Por favor, ingrese su correo electrónico',
+                life: 3000
             });
             return;
         }
-
+        setIsSubmitting(true);
         const success = await onSubmit(email);
         if (success) {
             setShowModal(true);
             setHasError(false);
             setToken('');
         } else {
-            toast.current?.show({ 
-                severity: 'error', 
-                summary: 'Error', 
-                detail: 'No se pudo enviar el correo. Por favor, verifique el correo ingresado.', 
-                life: 3000 
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo enviar el correo. Por favor, verifique el correo ingresado.',
+                life: 3000
             });
         }
+        setIsSubmitting(false);
     };
 
     const handleTokenChange = (value: string) => {
         setToken(value);
         setHasError(false);
-        
-        if (value.length === 4) {
+
+        if (value.length === 6) {
             handleOTPComplete(value).then(success => {
                 if (success) {
-                    toast.current?.show({ 
-                        severity: 'success', 
-                        summary: 'Éxito', 
-                        detail: 'Código verificado correctamente', 
-                        life: 3000 
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Éxito',
+                        detail: 'Código verificado correctamente',
+                        life: 3000
                     });
                     setShowModal(false);
                     setTimeout(() => {
@@ -72,11 +74,11 @@ const Forgot = () => {
                     }, 1500);
                 } else {
                     setHasError(true);
-                    toast.current?.show({ 
-                        severity: 'error', 
-                        summary: 'Error', 
-                        detail: 'Código de verificación inválido', 
-                        life: 3000 
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Código de verificación inválido',
+                        life: 3000
                     });
                 }
             });
@@ -185,7 +187,7 @@ const Forgot = () => {
                     <ReactCodeInput
                         name="otp"
                         type="text"
-                        fields={4}
+                        fields={6}
                         value={token}
                         onChange={handleTokenChange}
                         inputMode="numeric"
@@ -235,7 +237,7 @@ const Forgot = () => {
                             height: '8px',
                             borderTopLeftRadius: '56px',
                             borderTopRightRadius: '56px',
-                            background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                            background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                             zIndex: 2
                         }}
                     />
@@ -278,8 +280,17 @@ const Forgot = () => {
                             />
 
                             <div className="flex align-items-center justify-content-between mb-5 gap-5">
-                                <Button label="Recuperar clave" className="w-full p-3 text-xl mb-2" onClick={handleEmailSubmit}></Button>
-                                <Button label="Volver al inicio" className="w-full p-3 text-xl" onClick={handleNavigateToLogin}></Button>
+                                <Button
+                                    label="Recuperar clave"
+                                    className="w-full p-3 text-xl mb-2"
+                                    onClick={handleEmailSubmit}
+                                    disabled={isSubmitting}
+                                />
+                                <Button
+                                    label="Volver al inicio"
+                                    className="w-full p-3 text-xl"
+                                    onClick={handleNavigateToLogin}
+                                />
                             </div>
                         </div>
                     </div>

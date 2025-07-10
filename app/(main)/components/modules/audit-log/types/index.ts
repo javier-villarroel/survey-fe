@@ -15,16 +15,27 @@ export interface AuditLogMetadata {
     Despues: Record<string, any>;
 }
 
+export interface AuditUser {
+    id: number;
+    firstName: string;
+    lastName: string;
+    name: string;
+    email: string;
+}
+
 export interface AuditLogItem {
-    _id: string;
-    event: AuditEvent;
+    id: number;
+    user: AuditUser;
+    createdAt: string;
     module: AuditModule;
+    event: AuditEvent;
+    resourceId: number;
     description: string;
-    userId: string;
-    oldData?: any;
-    newData?: any;
-    createdAt?: string;
-    status?: 'SUCCESS' | 'FAILED' | 'FALLIDO';
+    oldData: Record<string, any>;
+    newData: Record<string, any>;
+    level: 'INFORMATIVE' | 'WARNING' | 'ERROR';
+    status: 'SUCCESS' | 'FAILED';
+    meta: Record<string, any>;
 }
 
 export interface AuditLogState {

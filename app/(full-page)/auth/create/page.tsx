@@ -181,7 +181,7 @@ const ResetPasswordForm = () => {
                         height: '8px',
                         borderTopLeftRadius: '56px',
                         borderTopRightRadius: '56px',
-                        background: 'linear-gradient(90deg, #2dabd2, #93d704, #f05707)',
+                        background: 'linear-gradient(90deg, #000e28, #93d704, #f05707)',
                         zIndex: 2
                     }} />
                     <div className="w-full py-8 px-5 sm:px-8" style={{

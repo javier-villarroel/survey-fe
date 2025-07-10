@@ -60,7 +60,7 @@ export const useOnSubmit = (): UseOnSubmitReturn => {
   }, [isVerifying, passToken]);
 
   const handleOTPComplete = useCallback(async (code: string): Promise<boolean> => {
-    if (code.length === 4 && passToken && passToken.trim() !== '') {
+    if (code.length === 6 && passToken && passToken.trim() !== '') {
       return await verifyOTP(code);
     }
     return false;

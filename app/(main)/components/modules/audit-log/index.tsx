@@ -8,8 +8,9 @@ import { AuditLogTimeline } from './components/AuditLogTimeline';
 import { AuditLogDialog } from './components/AuditLogDialog';
 import { useAuditLog } from './hooks/useAuditLog';
 import { AuditLogItem } from './types';
+import PermissionError from '@/app/(main)/components/common/components/error/PermissionError';
 import './styles.css';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import AccessDeniedPage from '@/app/(full-page)/auth/access/page';
 
 const pageSizeOptions = [
     { label: '5 por página', value: 5 },
@@ -57,15 +58,13 @@ export const AuditLog: React.FC = () => {
 
     const handleItemClick = (item: AuditLogItem) => {
         setSelectedItem(item);
-        setDialogVisible(true);
+        setDialogVisible(true); 
     };
 
     if (error) {
-        return (
-            <div className="flex align-items-center justify-content-center">
-                <div className="text-red-500">{error.message}</div>
-            </div>
-        );
+        return <AccessDeniedPage />;
+        // return <PermissionError message={error instanceof Error ? error.message : "Error al cargar la bitácora"} />;
+
     }
 
     return (
